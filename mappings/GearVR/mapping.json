@@ -1,0 +1,82 @@
+{
+    "version" : 0.1,
+    "gamepad" : {
+        "id" : "Gear-VR",
+        "hands" : {
+            "neutral" : {
+                "asset" : "some-url",
+                "rootId" : "neutral-controller-node",
+                "components" : [0, 1, 2],
+                "primaryButton" : 0,
+                "primaryAxes" : 0
+            }
+        },
+        "components" : [
+            {
+                "dataSource" : 0,
+                "rootId" : "thumbstick-node",
+                "labelTransformId" : "thumbstick-label-transform",
+                "pressResponse" : 0,
+                "touchResponse" : 1
+            },
+            {
+                "dataSource" : 1,
+                "rootId" : "faceButton-node",
+                "labelTransformId" : "faceButton-label-transform",
+                "pressResponse" : 2
+            }
+        ],
+        "dataSources" : [
+            {
+                "touchpad" : {
+                    "id" : "thumbstick",
+                    "xAxis" : {
+                        "gamepadAxesIndex" : 0
+                    },
+                    "yAxis" : {
+                        "gamepadAxesIndex" : 1
+                    },
+                    "button" : {
+                        "gamepadButtonsIndex" : 0
+                    }
+                }
+            },
+            {
+                "button" : {
+                    "name" : "faceButton",
+                    "gamepadButtonsIndex" : 2,
+                    "supportsTouch" : false
+                }
+            }
+        ],
+        "responses" : [
+            {
+                "touchpadPress" : {
+                    "target" : "touchpad-transform-node",
+                    "default" : "touchpad-transform-default-node",
+                    "left" : "touchpad-transform-left-node",
+                    "right" : "touchpad-transform-right-node",
+                    "up" : "touchpad-transform-up-node",
+                    "down" : "touchpad-transform-down-node"
+                }
+            },
+            {
+                "touchpadTouch" : {
+                    "target" : "touchpad-touchpoint-node",
+                    "default" : "touchpad-touchpoint-default-node",
+                    "left" : "touchpad-touchpoint-left-node",
+                    "right" : "touchpad-touchpoint-right-node",
+                    "up" : "touchpad-touchpoint-up-node",
+                    "down" : "touchpad-touchpoint-down-node"
+                }
+            },
+            {
+                "buttonPress" : {
+                    "target" : "faceButton-transform-node",
+                    "min" : "faceButton-min-transform-node",
+                    "max" : "faceButton-max-transform-node"
+                }
+            }
+        ]
+    }
+}

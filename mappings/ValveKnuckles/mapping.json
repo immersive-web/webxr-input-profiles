@@ -1,0 +1,126 @@
+{
+    "version" : 0.1,
+    "gamepad" : {
+        "id" : "Knuckles",
+        "hands" : {
+            "left" : {
+                "components" : [0, 1, 2, 3],
+                "primaryButton" : 0,
+                "primaryAxes" : 0
+            },
+            "right" : {
+                "components" : [0, 1, 2, 3],
+                "primaryButton" : 0,
+                "primaryAxes" : 0
+            }
+        },
+        "components" : [
+            {
+                "dataSource" : 0,
+                "rootId" : "touchpad-node",
+                "labelTransformId" : "touchpad-label-transform",
+                "pressResponse" : 0,
+                "touchResponse" : 1
+            },
+            {
+                "dataSource" : 1,
+                "rootId" : "trigger-node",
+                "labelTransformId" : "trigger-label-transform",
+                "pressResponse" : 2
+            },
+            {
+                "dataSource" : 2,
+                "rootId" : "innerFaceButton-node",
+                "labelTransformId" : "innerFaceButton-label-transform",
+                "pressResponse" : 3
+            },
+            {
+                "dataSource" : 3,
+                "rootId" : "outerFaceButton-node",
+                "labelTransformId" : "outerFaceButton-label-transform",
+                "pressResponse" : 4
+            }
+        ],
+        "dataSources" : [
+            {
+                "touchpad" : {
+                    "id" : "trackpad",
+                    "xAxis" : {
+                        "gamepadAxisIndex" : 0
+                    },
+                    "yAxis" : {
+                        "gamepadAxisIndex" : 1
+                    },
+                    "centerButton" : {
+                        "gamepadButtonIndex" : 0
+                    }
+                }
+            },
+            {
+                "button" : {
+                    "id" : "trigger",
+                    "gamepadButtonIndex" : 1,
+                    "analogValues" : true
+                }
+            },
+            {
+                "button" : {
+                    "id" : "innerFaceButton",
+                    "gamepadButtonIndex" : 2,
+                    "supportsTouch" : false
+                }
+            },
+            {
+                "button" : {
+                    "id" : "outerFaceButton",
+                    "gamepadButtonIndex" : 3,
+                    "supportsTouch" : false
+                }
+            }
+        ],
+        "responses" : [
+            {
+                "buttonPress" : {
+                    "target" : "touchpad-transform-node",
+                    "default" : "touchpad-transform-default-node",
+                    "min" : "touchpad-transform-min-node",
+                    "max" : "touchpad-transform-max-node"
+                }
+            },
+            {
+                "touchpadTouch" : {
+                    "target" : "touchpad-touchpoint-node",
+                    "default" : "touchpad-touchpoint-default-node",
+                    "left" : "touchpad-touchpoint-left-node",
+                    "right" : "touchpad-touchpoint-right-node",
+                    "up" : "touchpad-touchpoint-up-node",
+                    "down" : "touchpad-touchpoint-down-node"
+                }
+            },
+            {
+                "buttonPress" : {
+                    "target" : "trigger-transform-node",
+                    "default" : "trigger-default-transform-node",
+                    "min" : "trigger-min-transform-node",
+                    "max" : "trigger-max-transform-node"
+                }
+            },
+            {
+                "buttonPress" : {
+                    "target" : "innerFaceButton-transform-node",
+                    "default" : "innerFaceButton-default-transform-node",
+                    "min" : "innerFaceButton-min-transform-node",
+                    "max" : "innerFaceButton-max-transform-node"
+                }
+            },
+            {
+                "buttonPress" : {
+                    "target" : "outerFaceButton-transform-node",
+                    "default" : "outerFaceButton-default-transform-node",
+                    "min" : "outerFaceButton-min-transform-node",
+                    "max" : "outerFaceButton-max-transform-node"
+                }
+            }
+        ]
+    }
+}

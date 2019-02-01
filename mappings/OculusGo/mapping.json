@@ -1,0 +1,109 @@
+{
+    "version" : 0.1,
+    "gamepad" : {
+        "id" : "Oculus-Go",
+        "hands" : {
+            "left" : {
+                "asset" : "some-url",
+                "rootId" : "controller-node",
+                "componentIds" : [0, 1, 2],
+                "primaryButton" : 0,
+                "primaryAxes" : 0
+            },
+            "right" : {
+                "asset" : "some-url",
+                "rootId" : "controller-node",
+                "componentIds" : [0, 1, 2],
+                "primaryButton" : 0,
+                "primaryAxes" : 0
+            }
+        },
+        "components" : [
+            {
+                "dataSource" : 0,
+                "rootId" : "thumbstick-root",
+                "labelTransformId" : "thumbstick-label-transform",
+                "pressResponse" : 0,
+                "touchResponse" : 1
+            },
+            {
+                "dataSource" : 1,
+                "rootId" : "trigger-root",
+                "labelTransformId" : "trigger-label-transform",
+                "pressResponse" : 2
+            },
+            {
+                "dataSource" : 2,
+                "rootId" : "trigger-root",
+                "labelTransformId" : "trigger-label-transform",
+                "pressResponse" : 3
+            }
+        ],
+        "dataSources" : [
+            {
+                "touchpad" : {
+                    "id" : "thumbstick",
+                    "xAxis" : {
+                        "gamepadAxisIndex" : 0
+                    },
+                    "yAxis" : {
+                        "gamepadAxisIndex" : 1
+                    },
+                    "button" : {
+                        "gamepadButtonsIndex" : 0
+                    }
+                }
+            },
+            {
+                "button" : {
+                    "id" : "trigger",
+                    "gamepadButtonsIndex" : 1,
+                    "analogValues" : true
+                }
+            },
+            {
+                "button" : {
+                    "id" : "faceButton",
+                    "gamepadButtonsIndex" : 2
+                }
+            }
+        ],
+        "visualizationNodes" : [
+            {
+                "touchpadPress" : {
+                    "target" : "touchpad-transform-node",
+                    "default" : "touchpad-transform-default-node",
+                    "left" : "touchpad-transform-left-node",
+                    "right" : "touchpad-transform-right-node",
+                    "up" : "touchpad-transform-up-node",
+                    "down" : "touchpad-transform-down-node"
+                }
+            },
+            {
+                "touchpadTouch" : {
+                    "target" : "touchpad-touchpoint-node",
+                    "left" : "touchpad-touchpoint-left-node",
+                    "right" : "touchpad-touchpoint-right-node",
+                    "up" : "touchpad-touchpoint-up-node",
+                    "down" : "touchpad-touchpoint-down-node"
+                }
+            },
+            {
+                "buttonPress" : {
+                    "target" : "trigger-transform-node",
+                    "default" : "trigger-default-transform-node",
+                    "min" : "trigger-min-transform-node",
+                    "max" : "trigger-max-transform-node"
+                }
+            },
+            {
+                "buttonPress" : {
+                    "target" : "faceButton-transform-node",
+                    "default" : "faceButton-default-transform-node",
+                    "min" : "faceButton-min-transform-node",
+                    "max" : "faceButton-max-transform-node"
+                }
+            }
+        ]
+    }
+}
