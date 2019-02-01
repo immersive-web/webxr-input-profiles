@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "type": "array",
+    "description": "The responses array",
+    "items": {
+        "description": "A collection of nodes in the asset that influence the asset's deformation based on a dataSource",
+        "type" : "object",
+        "anyOf":[
+            {"$ref": "responses.single.schema.json"},
+            {"$ref": "responses.quadrant.schema.json"}
+        ],
+        "properties": {
+            "target" : {
+                "title": "The target node",
+                "description": "The node in the asset to be modified by this visualization",
+                "type": "string"
+            }
+        },
+        "required":["target"]
+    },
+    "minItems": 1
+}

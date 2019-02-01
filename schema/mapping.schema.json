@@ -1,0 +1,28 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "gamepadMapping",
+    "type": "object",
+    "description": "The root object for a gamepad mapping.",
+    "properties": {
+        "version" : {
+            "description": "The schema version",
+            "type" : "string"
+        },
+        "gamepad" : {
+            "description": "The gamepad mapping being described in the file",
+            "type" : "object",
+            "properties": {
+                "id" : {
+                    "description": "The Gamepad.id the mapping applies to",
+                    "type" : "string"
+                },
+                "hands": { "$ref": "hands.schema.json"},
+                "components": { "$ref": "components.schema.json"},
+                "dataSources": { "$ref": "dataSources.schema.json"},
+                "responses": { "$ref": "responses.schema.json"}
+            },
+            "required": [ "hands", "components", "dataSources", "responses" ]
+        }
+    },
+    "required": [ "version", "gamepad" ]
+}

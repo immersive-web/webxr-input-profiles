@@ -1,0 +1,35 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "The components array",
+    "type": "array",
+    "description": "The components array",
+    "items": {
+        "title": "A component",
+        "description": "The joining of a data source and visualization information",
+        "type" : "object",
+        "properties": {
+            "dataSource" : {
+                "allOf": [ { "$ref": "mappingId.schema.json"} ],
+                "description": "The index into the dataSources array"
+            },
+            "root" : {
+                "type": "string",
+                "description": "The name of the component's root node in the asset file"
+            },
+            "labelTransform" : {
+                "type": "string",
+                "description": "The name of the component's node in the asset file at which location a legend description can safely be placed"
+            },
+            "pressResponse" : {
+                "allOf": [ { "$ref": "mappingId.schema.json"} ],
+                "description": "The index of the response to be invoked when the data source is pressed"
+            },
+            "touchResponse" : {
+                "allOf": [ { "$ref": "mappingId.schema.json"} ],
+                "description": "The index of the response to be invoked when the data source is touched"
+            }
+        },
+        "required":["dataSource", "root", "labelTransform"]
+    },
+    "minItems": 1
+}

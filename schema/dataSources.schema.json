@@ -1,0 +1,15 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "The data sources array",
+    "type": "array",
+    "description": "The data sources array",
+    "items": {
+        "anyOf" : [
+            { "$ref": "dataSource.button.schema.json" },
+            { "$ref": "dataSource.dpad.schema.json" },
+            { "$ref": "dataSource.thumbstick.schema.json" },
+            { "$ref": "dataSource.touchpad.schema.json" }
+        ]
+    },
+    "minItems": 1
+}

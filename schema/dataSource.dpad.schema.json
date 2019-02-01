@@ -1,0 +1,44 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "Data source",
+    "type": "object",
+    "description": "Data source",
+    "properties":{
+        "dpadSource" : {
+            "title": "A dpad dataSource",
+            "type": "object",
+            "description": "A dpad dataSource",
+            "allOf": [ 
+                { "$ref": "dataSourceId.schema.json" } ,
+                { "$ref": "dataSource.properties.button.schema.json" } 
+            ],
+            "properties" : {
+                "gamepadButtonsIndices" : {
+                    "description" : "The indices in Gamepad.buttons that feeds this data source",
+                    "type" : "object",
+                    "properties" : {
+                        "left" : {
+                            "allOf" : [ { "$ref" : "gamepadIndex.schema.json" } ],
+                            "description" : "Index of left button in Gamepad.buttons"
+                        },
+                        "right" : {
+                            "allOf" : [ { "$ref" : "gamepadIndex.schema.json" } ],
+                            "description" : "Index of right button in Gamepad.buttons"
+                        },
+                        "down" : {
+                            "allOf" : [ { "$ref" : "gamepadIndex.schema.json" } ],
+                            "description" : "Index of down button in Gamepad.buttons"
+                        },
+                        "up" : {
+                            "allOf" : [ { "$ref" : "gamepadIndex.schema.json" } ],
+                            "description" : "Index of up button in Gamepad.buttons"
+                        }
+                    },
+                    "required" : ["left", "right", "down", "up"]
+                }
+            },
+            "required" : ["gamepadButtonIndices"]
+        }
+    },
+    "required": ["dpadSource"]
+}

@@ -1,0 +1,29 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "type": "object",
+    "description": "The responses array",
+    "oneOf":[
+        {
+            "properties": {
+                "neutral": {
+                    "allOf" : [ {"$ref": "responses.single.schema.json"} ],
+                    "description": "A motion controller reported without handedness"
+                }
+            },
+            "required": ["neutral"]
+        },
+        {
+            "properties": {
+                "left": {
+                    "allOf" : [ {"$ref": "responses.single.schema.json"} ],
+                    "description": "A motion controller reported for use in the left hand"
+                },
+                "right": {
+                    "allOf" : [ {"$ref": "responses.single.schema.json"} ],
+                    "description": "A motion controller reported for use in the right hand"
+                }
+            },
+            "required": ["left", "right"]
+        }
+    ]
+}

@@ -97,9 +97,6 @@ The following is an example of a `thumbstick`:
                         "gamepadAxesIndex" : 1
                     },
                     "button" : {
-                        "supportsTouch" : false,
-                        "supportsPress" : true,
-                        "analogValues" : false,
                         "gamepadButtonsIndex" : 7
                     }
                 }

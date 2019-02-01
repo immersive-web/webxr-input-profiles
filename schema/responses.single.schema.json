@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "A response visualization",
+    "description": "A collection of nodes in the asset that influence the asset's deformation based on a dataSource",
+    "type" : "object",
+    "properties": {
+        "min" : {
+            "title": "The target node",
+            "description": "The node in the asset representing the visualization exclusively of fully released",
+            "type": "string"
+        },
+        "max" : {
+            "title": "The target node",
+            "description": "The node in the asset representing the visualization exclusively of fully pressed",
+            "type": "string"
+        }
+    },
+    "required":["max"]
+}

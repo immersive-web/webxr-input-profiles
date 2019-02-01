@@ -1,0 +1,41 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "Common button dataSource properties",
+    "type": "object",
+    "properties": {
+        "xAxis" : {
+            "type": "object",
+            "description": "The X axis",
+            "properties": {
+                "gamepadAxesIndex" : {
+                    "allOf" : [ { "$ref" : "gamepadIndex.schema.json" } ],
+                    "description" : "Index of X axis in Gamepad.axes"
+                }
+            },
+            "required": ["gamepadAxesIndex"]
+        },
+        "yAxis" : {
+            "type": "object",
+            "description": "The Y axis",
+            "properties": {
+                "gamepadAxesIndex" : {
+                    "allOf" : [ { "$ref" : "gamepadIndex.schema.json" } ],
+                    "description" : "Index of Y axis in Gamepad.axes"
+                }
+            },
+            "required": ["gamepadAxesIndex"]
+        },
+        "button" : {
+            "type" : "object",
+            "allOf" : [ { "$ref": "dataSourceButtonProperties.schema.json" } ],
+            "properties": { 
+                "gamepadButtonsIndex" : {
+                    "allOf" : [ { "$ref" : "gamepadIndex.schema.json" } ],
+                    "description" : "Index of button in Gamepad.buttons"
+                }
+            },
+            "required": ["gamepadButtonsIndex"]
+        }
+    },
+    "required" : ["xAxis", "yAxis"]
+}

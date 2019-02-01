@@ -1,0 +1,30 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "type": "object",
+    "properties": {
+        "asset" : {
+            "description": "The URI of the asset associated with the hand",
+            "type": "string"
+        },
+        "root" : {
+            "description": "The root node of the hand within the associated asset",
+            "type": "string"
+        },
+        "components" : {
+            "description": "The array of components that make up the hand",
+            "type": "array",
+            "items": {
+                "allOf": [ { "$ref": "mappingId.schema.json" } ]
+            }
+        },
+        "primaryButton": {
+            "allOf": [ { "$ref": "mappingId.schema.json" } ],
+            "description": "The primary button suggested by the hardware manufacturer"
+        },
+        "primaryAxes": {
+            "allOf": [ { "$ref": "mappingId.schema.json" } ],
+            "description": "The primary thumbstick or touchpad suggested by the hardware manufacturer"
+        }
+    },
+    "required":["asset", "root", "components"]
+}

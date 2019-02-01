@@ -1,0 +1,23 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "Common button dataSource properties",
+    "type": "object",
+    "properties": {
+        "supportsTouch" : {
+            "description" : "Indicates all of the buttons is capable of reporting GamepadButton.touched",
+            "type" : "boolean",
+            "default" : "false"
+        },
+        "supportsPress" : {
+            "description" : "Indicates all of the buttons is capable of reporting GamepadButton.pressed",
+            "type" : "boolean",
+            "default" : "true"
+        },
+        "analogValues" : {
+            "description" : "Indicates at least one of the buttons are capable of reporting numbers in between min and max",
+            "type" : "boolean",
+            "default" : "false"
+        }
+    },
+    "required" : ["id"]
+}

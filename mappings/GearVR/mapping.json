@@ -5,7 +5,7 @@
         "hands" : {
             "neutral" : {
                 "asset" : "some-url",
-                "rootId" : "neutral-controller-node",
+                "root" : "neutral-controller-node",
                 "components" : [0, 1, 2],
                 "primaryButton" : 0,
                 "primaryAxes" : 0
@@ -14,21 +14,21 @@
         "components" : [
             {
                 "dataSource" : 0,
-                "rootId" : "thumbstick-node",
-                "labelTransformId" : "thumbstick-label-transform",
+                "root" : "thumbstick-node",
+                "labelTransform" : "thumbstick-label-transform",
                 "pressResponse" : 0,
                 "touchResponse" : 1
             },
             {
                 "dataSource" : 1,
-                "rootId" : "faceButton-node",
-                "labelTransformId" : "faceButton-label-transform",
+                "root" : "faceButton-node",
+                "labelTransform" : "faceButton-label-transform",
                 "pressResponse" : 2
             }
         ],
         "dataSources" : [
             {
-                "touchpad" : {
+                "touchpadSource" : {
                     "id" : "thumbstick",
                     "xAxis" : {
                         "gamepadAxesIndex" : 0
@@ -42,7 +42,7 @@
                 }
             },
             {
-                "button" : {
+                "buttonSource" : {
                     "name" : "faceButton",
                     "gamepadButtonsIndex" : 2,
                     "supportsTouch" : false
@@ -51,31 +51,26 @@
         ],
         "responses" : [
             {
-                "touchpadPress" : {
-                    "target" : "touchpad-transform-node",
-                    "default" : "touchpad-transform-default-node",
-                    "left" : "touchpad-transform-left-node",
-                    "right" : "touchpad-transform-right-node",
-                    "up" : "touchpad-transform-up-node",
-                    "down" : "touchpad-transform-down-node"
-                }
+                "target" : "touchpad-transform-node",
+                "default" : "touchpad-transform-default-node",
+                "left" : "touchpad-transform-left-node",
+                "right" : "touchpad-transform-right-node",
+                "up" : "touchpad-transform-up-node",
+                "down" : "touchpad-transform-down-node"
+
             },
             {
-                "touchpadTouch" : {
-                    "target" : "touchpad-touchpoint-node",
-                    "default" : "touchpad-touchpoint-default-node",
-                    "left" : "touchpad-touchpoint-left-node",
-                    "right" : "touchpad-touchpoint-right-node",
-                    "up" : "touchpad-touchpoint-up-node",
-                    "down" : "touchpad-touchpoint-down-node"
-                }
+                "target" : "touchpad-touchpoint-node",
+                "default" : "touchpad-touchpoint-default-node",
+                "left" : "touchpad-touchpoint-left-node",
+                "right" : "touchpad-touchpoint-right-node",
+                "up" : "touchpad-touchpoint-up-node",
+                "down" : "touchpad-touchpoint-down-node"
             },
             {
-                "buttonPress" : {
-                    "target" : "faceButton-transform-node",
-                    "min" : "faceButton-min-transform-node",
-                    "max" : "faceButton-max-transform-node"
-                }
+                "target" : "faceButton-transform-node",
+                "min" : "faceButton-min-transform-node",
+                "max" : "faceButton-max-transform-node"
             }
         ]
     }
