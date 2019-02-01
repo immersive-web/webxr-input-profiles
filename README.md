@@ -16,10 +16,10 @@ This repository provides a mechanism to bridge the gap between the available `Ga
 > REFER TO BRANDON'S PR ON HOW BUTTONS AND AXES ARE SLOTTED FOR WEBXR
 The Gamepad API does not provide an explicit relationship between axes and buttons.  The `dataSources` array mitigates through defining four styles of physical data sources and enumerating the `Gamepad` parts which back them.
 
-#### Buttons
-The `button` data source maps directly to the data coming from a single index in the `Gamepad.buttons` array. This mapping is defined by the required `gamepadButtonsIndex` property which represents the index of the backing `GamepadButton` in the `Gamepad.buttons` array.
+#### Button Data Source
+The `buttonSource` data source maps directly to the data coming from a single index in the `Gamepad.buttons` array. This mapping is defined by the required `gamepadButtonsIndex` property which represents the index of the backing `GamepadButton` in the `Gamepad.buttons` array.
 
-In addition, this schema adds information about the expected behavior of the button. The first of these additional properties is `button.supportsTouch` and `button.supportsPress`.  These values will be `true` by default indicating that the `GamepadButton.touched` and `GamepadButton.pressed` are capable of being `true`. The next additional metadata is `button.analogValues` which will be `false` by default.  When false, this indicates, per the Gamepad Spec, that the `GamepadButton.value` will always be `1` when `GamepadButton.pressed` is `true` and `0` otherwise. When `button.analogValues` is true, developers may assume that intermediary values can also be returned.
+In addition, this schema adds information about the expected behavior of the button. The first of these additional properties is `buttonSource.supportsTouch` and `buttonSource.supportsPress`.  These values will be `true` by default indicating that the `GamepadButton.touched` and `GamepadButton.pressed` are capable of being `true`. The next additional metadata is `buttonSource.analogValues` which will be `false` by default.  When false, this indicates, per the Gamepad Spec, that the `GamepadButton.value` will always be `1` when `GamepadButton.pressed` is `true` and `0` otherwise. When `buttonSource.analogValues` is true, developers may assume that intermediary values can also be returned.
 
 The following example shows several different button variants.  The first is a trigger style button which will report an analog value based on how hard the user has pressed it.  The second is a menu style button that does not have the ability to report a `touched` status or analog values.  The third is a thumbrest button which can report when it is touched, but will never report being pressed or analog values.
 
@@ -28,17 +28,17 @@ The following example shows several different button variants.  The first is a t
     "gamepad" : {
         "dataSources" : [
             {
-                "button" : {
+                "buttonSource" : {
                     "id" : "trigger",
                     "gamepadButtonsIndex" : 0,
                     "analogValues" : true
                 },
-                "button" : {
+                "buttonSource" : {
                     "id" : "menu",
                     "gamepadButtonsIndex" : 1,
                     "supportsTouch" : false
                 },
-                "button" : {
+                "buttonSource" : {
                     "id" : "thumbrest",
                     "gamepadButtonsIndex" : 2,
                     "supportsPress" : false
@@ -49,20 +49,20 @@ The following example shows several different button variants.  The first is a t
 }
 ```
 
-#### Dpad
-A `dpad` data source maps to four separate buttons in the `Gamepad.buttons` array. This mapping is defined by the required `left`, `right`, `up`, and `down` properties of the `gamepadButtonsIndices`.  The values of these properties represent the indices of the backing `GamepadButton` objects in the `Gamepad.buttons` array.
+#### Dpad Data Source
+A `dpadSource` data source maps to four separate buttons in the `Gamepad.buttons` array. This mapping is defined by the required `left`, `right`, `up`, and `down` properties of the `gamepadButtonsIndices`.  The values of these properties represent the indices of the backing `GamepadButton` objects in the `Gamepad.buttons` array.
 
-In addition, this schema adds information about the expected behavior of the dpad.  The first of these additional properties is `dpad.supportsTouch` which defaults to `false`.  The second of these additional properties is `dpad.supportsPress` which defaults to `true`. In order for either of these values to be `true` all the buttons which make up the `dpad` must be capable of reporting `Gamepad.touched` and `Gamepad.pressed` respectively.  The third of these additional properties is `dpad.analogValues` which defaults to `false`. When false, this indicates, per the Gamepad Spec, that for all the buttons which make up the `dpad` the `GamepadButton.value` will always be `1` when `GamepadButton.pressed` is `true` and `0` otherwise. When `button.analogValues` is true, developers may assume that for at least one `GamepadButton` that makes up the `dpad`, any of the button's intermediary values can also be returned.
+In addition, this schema adds information about the expected behavior of the dpad.  The first of these additional properties is `dpadSource.supportsTouch` which defaults to `false`.  The second of these additional properties is `dpadSource.supportsPress` which defaults to `true`. In order for either of these values to be `true` all the buttons which make up the `dpad` must be capable of reporting `Gamepad.touched` and `Gamepad.pressed` respectively.  The third of these additional properties is `dpadSource.analogValues` which defaults to `false`. When false, this indicates, per the Gamepad Spec, that for all the buttons which make up the `dpadSource` the `GamepadButton.value` will always be `1` when `GamepadButton.pressed` is `true` and `0` otherwise. When `dpadSource.analogValues` is true, developers may assume that for at least one `GamepadButton` that makes up the `dpadSource`, any of the button's intermediary values can also be returned.
 
-The buttons which make up a `dpad` are arranged in a particular order and physically connected to one another such that only two adjacent buttons can be `pressed` at the same time.  For example, if a `left` button is pressed it is possible for an `up` or `down` button to also be pressed, but it is not possible for a `right` button to also be pressed.
+The buttons which make up a `dpadSource` are arranged in a particular order and physically connected to one another such that only two adjacent buttons can be `pressed` at the same time.  For example, if a `left` button is pressed it is possible for an `up` or `down` button to also be pressed, but it is not possible for a `right` button to also be pressed.
 
-The following is an example of a `dpad`:
+The following is an example of a `dpadSource`:
 ```json
 {
     "gamepad" : {
         "dataSources" : [
             {
-                "dpad" : {
+                "dpadSource" : {
                     "id" : "leftHandDpad",
                     "gamepadButtonsIndices" : {
                         "left" : 3,
@@ -77,18 +77,18 @@ The following is an example of a `dpad`:
 }
 ```
 
-#### Thumbsticks
-A `thumbstick` data source maps to two axes in the `Gamepad.axes` array and optionally a button in the `Gamepad.buttons` array.  This mapping is defined by the required `gamepadAxesIndex` in the `xAxis` and `yAxis` properties which represent the indices of the backing entries in the `Gamepad.axes` array.
+#### Thumbstick Data Source
+A `thumbstickSource` data source maps to two axes in the `Gamepad.axes` array and optionally a button in the `Gamepad.buttons` array.  This mapping is defined by the required `gamepadAxesIndex` in the `xAxis` and `yAxis` properties which represent the indices of the backing entries in the `Gamepad.axes` array.
 
-The `thumbstick.button` must follow the behavior of the `button` data source if it is present.  If `button.supportsTouch` is `true`, the `GamepadButton.touched` property must be `true` when either axis is non-zero.
+If present, the `thumbstickSource.button` mostly mirrors the behavior of a `buttonSource` data source.  If `button.supportsTouch` is `true`, the `GamepadButton.touched` property must be `true` when either axis is non-zero.
 
-The following is an example of a `thumbstick`:
+The following is an example of a `thumbstickSource`:
 ```json
 {
     "gamepad" : {
         "dataSources" : [
             {
-                "thumbstick" : {
+                "thumbstickSource" : {
                     "id" : "thumbstick",
                     "xAxis" : {
                         "gamepadAxesIndex" : 0
@@ -106,18 +106,18 @@ The following is an example of a `thumbstick`:
 }
 ```
 
-#### Touchpad
-A `touchpad` data source maps to two axes in the `Gamepad.axes` array and optionally a button in the `Gamepad.buttons` array.  This mapping is defined by the required `gamepadAxesIndex` in the `xAxis` and `yAxis` properties which represent the indices of the backing entries in the `Gamepad.axes` array.
+#### Touchpad Data Source
+A `touchpadSource` data source maps to two axes in the `Gamepad.axes` array and optionally a button in the `Gamepad.buttons` array.  This mapping is defined by the required `gamepadAxesIndex` in the `xAxis` and `yAxis` properties which represent the indices of the backing entries in the `Gamepad.axes` array.
 
-The `touchpad.button` must follow the behavior of the `button` data source if it is present.  If `button.supportsTouch` is `true`, the `GamepadButton.touched` property must be `true` when either axis is non-zero.
+If present, the `touchpadSource.button` mostly mirrors the behavior of a `buttonSource` data source.  If `button.supportsTouch` is `true`, the `GamepadButton.touched` property must be `true` when either axis is non-zero.
 
-The following is an example of a `touchpad`:
+The following is an example of a `touchpadSource`:
 ```json
 {
     "gamepad" : {
         "dataSources" : [
             {
-                "touchpad" : {
+                "touchpadSource" : {
                     "id" : "touchpad",
                     "xAxis" : {
                         "gamepadAxesIndex" : 2
@@ -145,10 +145,8 @@ Responses are the virtual manifestations of the physical motion controller's cha
     "gamepad" : {
         "responses" : [
             {
-                "buttonPress" : {
-                    "target" : "trigger-transform",
-                    "max" : "trigger-transform-max",
-                }
+                "target" : "trigger-transform",
+                "max" : "trigger-transform-max"
             }
         ]
     }
@@ -162,13 +160,11 @@ Responses are the virtual manifestations of the physical motion controller's cha
     "gamepad" : {
         "responses" : [
             {
-                "dpadPress" : {
-                    "target" : "dpad-transform",
-                    "left" : "dpad-transform-leftmost",
-                    "right" : "dpad-transform-rightmost",
-                    "down" : "dpad-transform-downmost",
-                    "up" : "dpad-transform-upmost"
-                }
+                "target" : "dpad-transform",
+                "left" : "dpad-transform-leftmost",
+                "right" : "dpad-transform-rightmost",
+                "down" : "dpad-transform-downmost",
+                "up" : "dpad-transform-upmost"
             }
         ]
     }
@@ -182,14 +178,12 @@ Responses are the virtual manifestations of the physical motion controller's cha
     "gamepad" : {
         "responses" : [
             {
-                "thumbstickTouch" : {
-                    "target" : "thumbstick-transform",
-                    "left" : "thumbstick-transform-leftmost",
-                    "right" : "thumbstick-transform-rightmost",
-                    "down" : "thumbstick-transform-downmost",
-                    "up" : "thumbstick-transform-upmost",
-                    "buttonMax" : "thumbstick-transform-buttonpressed",
-                }
+                "target" : "thumbstick-transform",
+                "left" : "thumbstick-transform-leftmost",
+                "right" : "thumbstick-transform-rightmost",
+                "down" : "thumbstick-transform-downmost",
+                "up" : "thumbstick-transform-upmost",
+                "max" : "thumbstick-transform-buttonpressed"
             }
         ]
     }
@@ -203,13 +197,11 @@ Responses are the virtual manifestations of the physical motion controller's cha
     "gamepad" : {
         "responses" : [
             {
-                "touchpadPress" : {
-                    "target" : "touchpad-transform",
-                    "left" : "touchpad-transform-leftmost",
-                    "right" : "touchpad-transform-rightmost",
-                    "down" : "touchpad-transform-downmost",
-                    "up" : "touchpad-transform-upmost",
-                }
+                "target" : "touchpad-transform",
+                "left" : "touchpad-transform-leftmost",
+                "right" : "touchpad-transform-rightmost",
+                "down" : "touchpad-transform-downmost",
+                "up" : "touchpad-transform-upmost"
             }
         ]
     }
@@ -223,13 +215,11 @@ Responses are the virtual manifestations of the physical motion controller's cha
     "gamepad" : {
         "responses" : [
             {
-                "touchpadTouch" : {
-                    "target" : "touchpad-touchpoint-transform",
-                    "left" : "touchpad-touchpoint-transform-leftmost",
-                    "right" : "touchpad-touchpoint-transform-rightmost",
-                    "down" : "touchpad-touchpoint-transform-downmost",
-                    "up" : "touchpad-touchpoint-transform-upmost",
-                }
+                "target" : "touchpad-touchpoint-transform",
+                "left" : "touchpad-touchpoint-transform-leftmost",
+                "right" : "touchpad-touchpoint-transform-rightmost",
+                "down" : "touchpad-touchpoint-transform-downmost",
+                "up" : "touchpad-touchpoint-transform-upmost"
             }
         ]
     }
@@ -254,7 +244,7 @@ For example, here is a gamepad with a single touchpad:
         ],
         "dataSources" : [
             {
-                "touchpad" : {
+                "touchpadSource" : {
                     "id" : "touchpad",
                     "xAxis" : {
                         "gamepadAxesIndex" : 0
@@ -334,10 +324,8 @@ For motion controllers that report a handedness property
         ],
         "responses" : [
             {
-                "buttonPress" : {
-                    "target" : "mainButton-transform",
-                    "max" : "mainButton-transform-max",
-                }
+                "target" : "mainButton-transform",
+                "max" : "mainButton-transform-max"
             }
         ]
     }
@@ -369,7 +357,7 @@ For motion controllers than can't distinguish right vs left
         ],
         "dataSources" : [
             {
-                "button" : {
+                "thumbstickSource" : {
                     "id" : "thumbstick",
                     "xAxis" : {
                         "gamepadAxesIndex" : 0
@@ -385,14 +373,12 @@ For motion controllers than can't distinguish right vs left
         ],
         "responses" : [
             {
-                "thumbstickTouch" : {
-                    "target" : "thumbstick-transform",
-                    "left" : "thumbstick-transform-leftmost",
-                    "right" : "thumbstick-transform-rightmost",
-                    "down" : "thumbstick-transform-downmost",
-                    "up" : "thumbstick-transform-upmost",
-                    "buttonMax" : "thumbstick-transform-buttonpressed",
-                }
+                "target" : "thumbstick-transform",
+                "left" : "thumbstick-transform-leftmost",
+                "right" : "thumbstick-transform-rightmost",
+                "down" : "thumbstick-transform-downmost",
+                "up" : "thumbstick-transform-upmost",
+                "max" : "thumbstick-transform-buttonpressed"
             }
         ]
     }
