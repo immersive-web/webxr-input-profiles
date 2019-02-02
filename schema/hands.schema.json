@@ -6,7 +6,7 @@
         {
             "properties": {
                 "neutral": {
-                    "allOf" : [ {"$ref": "responses.single.schema.json"} ],
+                    "allOf" : [ {"$ref": "hands.properties.schema.json"} ],
                     "description": "A motion controller reported without handedness"
                 }
             },
@@ -15,11 +15,11 @@
         {
             "properties": {
                 "left": {
-                    "allOf" : [ {"$ref": "responses.single.schema.json"} ],
+                    "allOf" : [ {"$ref": "hands.properties.schema.json"} ],
                     "description": "A motion controller reported for use in the left hand"
                 },
                 "right": {
-                    "allOf" : [ {"$ref": "responses.single.schema.json"} ],
+                    "allOf" : [ {"$ref": "hands.properties.schema.json"} ],
                     "description": "A motion controller reported for use in the right hand"
                 }
             },

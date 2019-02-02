@@ -27,7 +27,7 @@
         },
         "button" : {
             "type" : "object",
-            "allOf" : [ { "$ref": "dataSourceButtonProperties.schema.json" } ],
+            "allOf" : [ { "$ref": "dataSource.properties.button.schema.json" } ],
             "properties": { 
                 "gamepadButtonsIndex" : {
                     "allOf" : [ { "$ref" : "gamepadIndex.schema.json" } ],

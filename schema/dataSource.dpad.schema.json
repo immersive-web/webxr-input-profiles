@@ -9,7 +9,7 @@
             "type": "object",
             "description": "A dpad dataSource",
             "allOf": [ 
-                { "$ref": "dataSourceId.schema.json" } ,
+                { "$ref": "dataSource.id.schema.json" } ,
                 { "$ref": "dataSource.properties.button.schema.json" } 
             ],
             "properties" : {
