@@ -1,29 +1,32 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema",
+    "id": "https://immersive-web/gamepad-mapping/0.1.0/hands.schema.json",
     "type": "object",
-    "description": "The responses array",
+    "description": "The hands",
     "oneOf":[
         {
             "properties": {
                 "neutral": {
-                    "allOf" : [ {"$ref": "hands.properties.schema.json"} ],
+                    "allOf" : [ {"$ref": "hand.schema.json"} ],
                     "description": "A motion controller reported without handedness"
                 }
             },
-            "required": ["neutral"]
+            "required": ["neutral"],
+            "additionalProperties": false
         },
         {
             "properties": {
                 "left": {
-                    "allOf" : [ {"$ref": "hands.properties.schema.json"} ],
+                    "allOf" : [ {"$ref": "hand.schema.json"} ],
                     "description": "A motion controller reported for use in the left hand"
                 },
                 "right": {
-                    "allOf" : [ {"$ref": "hands.properties.schema.json"} ],
+                    "allOf" : [ {"$ref": "hand.schema.json"} ],
                     "description": "A motion controller reported for use in the right hand"
                 }
             },
-            "required": ["left", "right"]
+            "required": ["left", "right"],
+            "additionalProperties": false
         }
     ]
 }

@@ -1,0 +1,47 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "id": "https://immersive-web/gamepad-mapping/0.1.0/dataSources.properties.schema.json",
+    "type": "object",
+    "additionalProperties": false,
+    "definitions": {
+        "id": {
+            "description" : "An identifier for the data source",
+            "type" : "string"
+        },
+        "button": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["gamepadButtonsIndex"],
+            "properties": {
+                "gamepadButtonsIndex": { 
+                    "allOf": [{ "$ref": "gamepadIndex.schema.json" }]
+                },
+                "supportsTouch" : {
+                    "description" : "Indicates all of the buttons is capable of reporting GamepadButton.touched",
+                    "type" : "boolean",
+                    "default" : "false"
+                },
+                "supportsPress" : {
+                    "description" : "Indicates all of the buttons is capable of reporting GamepadButton.pressed",
+                    "type" : "boolean",
+                    "default" : "true"
+                },
+                "analogValues" : {
+                    "description" : "Indicates at least one of the buttons are capable of reporting numbers in between min and max",
+                    "type" : "boolean",
+                    "default" : "false"
+                }
+            }
+        },
+        "axis": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["gamepadAxesIndex"],
+            "properties": {
+                "gamepadAxesIndex": { 
+                    "allOf": [{ "$ref": "gamepadIndex.schema.json" }]
+                }
+            }
+        }
+    }
+}

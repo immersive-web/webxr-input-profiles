@@ -1,0 +1,36 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "id": "https://immersive-web/gamepad-mapping/0.1.0/responses.properties.schema.json",
+    "type" : "object",
+    "definitions": {
+        "target" : {
+            "title": "The target node",
+            "description": "The node in the asset to be modified by this visualization",
+            "type": "string"
+        },
+        "buttonMin": {
+            "description": "Node in the asset representing the effect of button.value == 0",
+            "type": "string"
+        },
+        "buttonMax": {
+            "description": "Node in the asset representing the effect of button.value == 1",
+            "type": "string"
+        },
+        "left" : {
+            "description": "Node in the asset representing the effect of dpad.left.value or xAxis at left-most position",
+            "type": "string"
+        },
+        "right" : {
+            "description": "Node in the asset representing the effect of dpad.right.value or xAxis at right-most position",
+            "type": "string"
+        },
+        "down" : {
+            "description": "Node in the asset representing the effect of dpad.down.value or yAxis at down-most position",
+            "type": "string"
+        },
+        "up" : {
+            "description": "Node in the asset representing the effect of dpad.up.value or yAxis at up-most position",
+            "type": "string"
+        }
+    }
+}

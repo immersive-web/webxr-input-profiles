@@ -1,15 +1,19 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema",
+    "id": "https://immersive-web/gamepad-mapping/0.1.0/components.schema.json",
     "title": "The components array",
-    "type": "array",
     "description": "The components array",
+    "type": "array",
+    "additionalItems": false,
+    "uniqueItems": true,
+    "minItems": 1,
     "items": {
         "title": "A component",
         "description": "The joining of a data source and visualization information",
         "type" : "object",
         "properties": {
             "dataSource" : {
-                "allOf": [ { "$ref": "mappingId.schema.json"} ],
+                "allOf": [ { "$ref": "mapping.schema.json#/definitions/mappingIndex"} ],
                 "description": "The index into the dataSources array"
             },
             "root" : {
@@ -21,15 +25,15 @@
                 "description": "The name of the component's node in the asset file at which location a legend description can safely be placed"
             },
             "pressResponse" : {
-                "allOf": [ { "$ref": "mappingId.schema.json"} ],
+                "allOf": [ { "$ref": "mapping.schema.json#/definitions/mappingIndex"} ],
                 "description": "The index of the response to be invoked when the data source is pressed"
             },
             "touchResponse" : {
-                "allOf": [ { "$ref": "mappingId.schema.json"} ],
+                "allOf": [ { "$ref": "mapping.schema.json#/definitions/mappingIndex"} ],
                 "description": "The index of the response to be invoked when the data source is touched"
             }
         },
-        "required":["dataSource", "root", "labelTransform"]
-    },
-    "minItems": 1
+        "required":["dataSource", "root", "labelTransform"],
+        "additionalProperties": false
+    }
 }

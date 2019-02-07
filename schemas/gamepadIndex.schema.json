@@ -1,6 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema",
+    "id": "https://immersive-web/gamepad-mapping/0.1.0/gamepadIndex.schema.json",
     "title": "Gamepad.buttons or Gamepad.axes index",
-    "type": "integer",
+    "type": "number",
     "minimum": 0
 }

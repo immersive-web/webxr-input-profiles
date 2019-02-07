@@ -34,30 +34,31 @@
         ],
         "dataSources" : [
             {
-                "touchpadSource": {
-                    "id" : "trackpad",
-                    "xAxis" : {
-                        "gamepadAxisIndex" : 0
-                    },
-                    "yAxis" : {
-                        "gamepadAxisIndex" : 1
-                    },
-                    "button" : {
-                        "gamepadButtonIndex" : 0
-                    }
+                "id" : "trackpad",
+                "dataSourceType": "touchpadSource",
+                "xAxis" : {
+                    "gamepadAxesIndex" : 0
+                },
+                "yAxis" : {
+                    "gamepadAxesIndex" : 1
+                },
+                "button" : {
+                    "gamepadButtonsIndex" : 0
                 }
             },
             {
-                "buttonSource" : {
-                    "id" : "trigger",
-                    "gamepadButtonIndex" : 1,
+                "id" : "trigger",
+                "dataSourceType": "buttonSource",
+                "button" : {
+                    "gamepadButtonsIndex" : 1,
                     "analogValues" : true
                 }
             },
             {
-                "buttonSource" : {
-                    "id" : "grip",
-                    "gamepadButtonIndex" : 2,
+                "id" : "grip",
+                "dataSourceType": "buttonSource",
+                "button" : {
+                    "gamepadButtonsIndex" : 2,
                     "supportsTouch" : false
                 }
             }
@@ -79,13 +80,13 @@
             },
             {
                 "target" : "trigger-transform-node",
-                "min" : "trigger-min-transform-node",
-                "max" : "trigger-max-transform-node"
+                "buttonMin": "trigger-min-transform-node",
+                "buttonMax": "trigger-max-transform-node"
             },
             {
                 "target" : "grip-transform-node",
-                "min" : "grip-min-transform-node",
-                "max" : "grip-max-transform-node"
+                "buttonMin": "grip-min-transform-node",
+                "buttonMax": "grip-max-transform-node"
             }
         ]
     }
