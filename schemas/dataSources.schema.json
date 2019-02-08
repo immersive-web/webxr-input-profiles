@@ -8,45 +8,11 @@
     "uniqueItems": true,
     "minItems": 1,
     "items": {
-        "anyOf": [
-            { 
-                "description": "Button data source",
-                "type": "object",
-                "additionalProperties": false,
-                "required": ["id", "dataSourceType", "button"],
-                "properties":{
-                    "id": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/id" }] },
-                    "dataSourceType": { "enum": ["buttonSource"] },
-                    "button": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/button" }] }
-                }
-            },
-            { 
-                "description": "Dpad data source",
-                "type": "object",
-                "additionalProperties": false,
-                "required": ["id", "dataSourceType", "left", "right", "down", "up"],
-                "properties":{
-                    "id": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/id" }] },
-                    "dataSourceType": { "enum": ["dpadSource"] },
-                    "left": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/button" }] },
-                    "right": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/button" }] },
-                    "down": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/button" }] },
-                    "up": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/button" }] }
-                }
-            },
-            { 
-                "description": "Thumbstick and touchpad data source",
-                "type": "object",
-                "additionalProperties": false,
-                "required": ["id", "dataSourceType", "xAxis", "yAxis"],
-                "properties":{
-                    "id": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/id" }] },
-                    "dataSourceType": { "enum": ["thumbstickSource", "touchpadSource"] },
-                    "xAxis": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/axis" }] },
-                    "yAxis": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/axis" }] },
-                    "button": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/button" }] }
-                }
-            }
+        "oneOf": [
+            { "allOf": [{ "$ref": "dataSource.button.schema.json" }] },
+            { "allOf": [{ "$ref": "dataSource.dpadFromButtons.schema.json" }] },
+            { "allOf": [{ "$ref": "dataSource.dpadFromAxes.schema.json" }] },
+            { "allOf": [{ "$ref": "dataSource.thumbstickAndTouchpad.schema.json" }] }
         ]
     }
 }

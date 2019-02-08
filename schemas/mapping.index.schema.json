@@ -1,0 +1,11 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "id": "https://immersive-web/gamepad-mapping/0.1.0/mapping.index.schema.json",
+    "definitions": {
+        "mappingIndex": {
+            "description": "Index into an array defined within the mapping",
+            "type": "number",
+            "minimum": 0
+        }
+    }
+}

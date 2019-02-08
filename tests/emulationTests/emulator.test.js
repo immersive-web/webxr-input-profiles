@@ -1,8 +1,8 @@
 const gamepadId = "045E-065D";
-const MockGamepad = require("../mocks/mockGamepad.js");
+const MockGamepad = require("../../mocks/mockGamepad.js");
 const mockGamepad = new MockGamepad(gamepadId);
 
-const GamepadMapping = require("../src/gamepadMapping");
+const GamepadMapping = require("../../src/gamepadMapping");
 const gamepadMapping = new GamepadMapping(mockGamepad, "left");
 
 mockGamepad.initialize(gamepadMapping);
@@ -19,7 +19,12 @@ test("Validate trigger changes", () => {
   mockGamepad.reset();
   const triggerId = "trigger";
   let trigger = mockGamepad.mockComponents[triggerId];
-  trigger.setValues( {"button": 0.5} );
+  trigger.setValues( {
+    "button": {
+      "value": 0.5,
+      "touched": true
+    }
+  });
   let actualTriggerValues = gamepadMapping.getValues(triggerId);
   const expectedTriggerValues = {
     button: { value: 0.5, touched: true, pressed: false }
@@ -28,11 +33,18 @@ test("Validate trigger changes", () => {
   gamepadMapping.updateVisuals(mockGamepad);
 });
 
-test("Validate trigger changes", () => {
+test("Validate thumbstick changes", () => {
   mockGamepad.reset();
   const thumbstickId = "thumbstick";
   let thumbstick = mockGamepad.mockComponents[thumbstickId];
-  thumbstick.setValues( {"xAxis": 0.2} );
+  thumbstick.setValues( {
+    "xAxis": {
+      "value": 0.2
+    },
+    "button": {
+      "touched": true
+    }
+   });
   let actualThumbstickValues = gamepadMapping.getValues(thumbstickId);
   const expectedThumbstickValues = {
     button: { value: 0, touched: true, pressed: false },

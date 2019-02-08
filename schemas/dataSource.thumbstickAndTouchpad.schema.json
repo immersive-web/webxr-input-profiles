@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "id": "https://immersive-web/gamepad-mapping/0.1.0/dataSource.thumbstickAndTouchpad.schema.json",
+    "description": "Thumbstick and touchpad data source",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "dataSourceType", "xAxisIndex", "yAxisIndex"],
+    "dependencies": {
+        "analogButtonValues": ["buttonIndex"]
+    },
+    "properties":{
+        "id": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/id" }] },
+        "dataSourceType": { "enum": ["thumbstickSource", "touchpadSource"] },
+        "xAxisIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
+        "yAxisIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
+        "buttonIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
+        "analogButtonValues": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/analogValues" }] }
+    }
+}

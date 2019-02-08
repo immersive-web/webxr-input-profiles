@@ -1,133 +1,71 @@
-const testHelpers = require("./testHelpers.js");
+const testHelpers = require("../testHelpers.js");
+const validator = testHelpers.getValidator("hands.schema.json", ["hand.schema.json", "mapping.index.schema.json"]);
+const validHand = Object.freeze({
+  "asset": "asset uri",
+  "root": "root node",
+  "components": [0]
+});
 
-test("left/right hands", () => {
-  let mapping = testHelpers.getSmallestValidMapping();
-  let hands = mapping.gamepad.hands;
-  let hand = hands.neutral;
-
-  delete hands["neutral"];
-  hands["left"] = hand;
-  hands["right"] = hand;
-
-  let valid = testHelpers.validator(mapping);
+test("valid hands", () => {
+  let valid = false;
+  let hands = {
+    neutral: validHand
+  };
+  
+  valid = validator(hands);
   if (!valid) {
-    expect(testHelpers.validator.errors).toBeNull();
+    expect(validator.errors).toBeNull();
   }
+
+  hands.left = validHand;
+  hands.right = validHand;  
+  valid = validator(hands);
+  if (!valid) {
+    expect(validator.errors).toBeNull();
+  }
+
+  delete hands.neutral;
+  valid = validator(hands);
+  if (!valid) {
+    expect(validator.errors).toBeNull();
+  }
+});
+
+test("Invalid hand pairings", () => {
+  let hands = {
+    neutral: validHand,
+    right: validHand
+  };
+  expect(validator(hands)).toBe(false);
+
+  hands = {
+    neutral: validHand,
+    left: validHand
+  };  
+  expect(validator(hands)).toBe(false);
+});
+
+test("Invalid single hand", () => {
+  let hands = {
+    right: validHand
+  };
+  expect(validator(hands)).toBe(false);
+
+  hands = {
+    left: validHand
+  };  
+  expect(validator(hands)).toBe(false);
 });
 
 test("no valid hand in hands", () => {
-  let mapping = testHelpers.getSmallestValidMapping();
-  delete mapping.gamepad.hands["neutral"];
-  expect(testHelpers.validator(mapping)).toBe(false);
+  let hands = {};
+  expect(validator(hands)).toBe(false);
 });
 
-test("mismatched hands", () => {
-  let mapping = testHelpers.getSmallestValidMapping();
-  let hands = mapping.gamepad.hands;
-  let hand = hands.neutral;
-
-  hands["left"] = hand;
-  expect(testHelpers.validator(mapping)).toBe(false);
-
-  hands["right"] = hand;
-  expect(testHelpers.validator(mapping)).toBe(false);
-
-  delete hands["left"];
-  expect(testHelpers.validator(mapping)).toBe(false);
-
-  delete hands["neutral"];
-  expect(testHelpers.validator(mapping)).toBe(false);
-
-  delete hands["right"];
-  hands["left"] = hand;
-  expect(testHelpers.validator(mapping)).toBe(false);
-})
-
-test("extra invalid thing in hands", () => {
-  const mapping = testHelpers.getSmallestValidMapping();
-
-  const checkPropertyOptions = {
-    "mapping": mapping,
-    "object": mapping.gamepad.hands,
-    "property": "randomThing",
-    "undefinedAllowed": true
-  }
-  testHelpers.checkProperty(checkPropertyOptions);
-
-  let hand = mapping.gamepad.hands["neutral"];
-  mapping.gamepad.hands["randomThing"] = hand;
-  expect(testHelpers.validator(mapping)).toBe(false);
-});
-
-test("invalid asset", () => {
-  const mapping = testHelpers.getSmallestValidMapping();
-  
-  const checkPropertyOptions = {
-    "mapping": mapping,
-    "object": mapping.gamepad.hands.neutral,
-    "property": "asset",
-    "expectedType": "string"
-  }
-  testHelpers.checkProperty(checkPropertyOptions);
-});
-
-test("invalid root", () => {
-  const mapping = testHelpers.getSmallestValidMapping();
-  
-  const checkPropertyOptions = {
-    "mapping": mapping,
-    "object": mapping.gamepad.hands.neutral,
-    "property": "root",
-    "expectedType": "string"
-  }
-  testHelpers.checkProperty(checkPropertyOptions);
-});
-
-test("invalid components", () => {
-  const mapping = testHelpers.getSmallestValidMapping();
-  
-  const checkPropertyOptions = {
-    "mapping": mapping,
-    "object": mapping.gamepad.hands.neutral,
-    "property": "components",
-  }
-  testHelpers.checkProperty(checkPropertyOptions);
-});
-
-test("invalid primaryButton", () => {
-  const mapping = testHelpers.getSmallestValidMapping();
-  
-  const checkPropertyOptions = {
-    "mapping": mapping,
-    "object": mapping.gamepad.hands.neutral,
-    "property": "primaryButton",
-    "expectedType": "number",
-    "undefinedAllowed": true
-  }
-  testHelpers.checkProperty(checkPropertyOptions);
-});
-
-test("invalid primaryAxes", () => {
-  const mapping = testHelpers.getSmallestValidMapping();
-  
-  const checkPropertyOptions = {
-    "mapping": mapping,
-    "object": mapping.gamepad.hands.neutral,
-    "property": "primaryAxes",
-    "expectedType": "number",
-    "undefinedAllowed": true
-  }
-  testHelpers.checkProperty(checkPropertyOptions);
-});
-
-test("extra invalid thing in neutral hand", () => {
-  const mapping = testHelpers.getSmallestValidMapping();
-
-  const checkPropertyOptions = {
-    "mapping": mapping,
-    "object": mapping.gamepad.hands.neutral,
-    "property": "randomThing",
-    "undefinedAllowed": true
-  }
-  testHelpers.checkProperty(checkPropertyOptions);
+test("invalid additional properties", () => {
+  let hands = {
+    neutral: validHand,
+    someNonsense: {}
+  };
+  expect(validator(hands)).toBe(false);
 });

@@ -90,12 +90,8 @@ The following is an example of a `thumbstickSource`:
             {
                 "thumbstickSource" : {
                     "id" : "thumbstick",
-                    "xAxis" : {
-                        "gamepadAxesIndex" : 0
-                    },
-                    "yAxis" : {
-                        "gamepadAxesIndex" : 1
-                    },
+                    "xAxisIndex" : 0,
+                    "yAxisIndex" : 1,
                     "button" : {
                         "gamepadButtonsIndex" : 7
                     }
@@ -119,12 +115,8 @@ The following is an example of a `touchpadSource`:
             {
                 "touchpadSource" : {
                     "id" : "touchpad",
-                    "xAxis" : {
-                        "gamepadAxesIndex" : 2
-                    },
-                    "yAxis" : {
-                        "gamepadAxesIndex" : 3
-                    },
+                    "xAxisIndex" : 2,
+                    "yAxisIndex" : 3,
                     "button" : {
                         "gamepadButtonsIndex" : 8
                     }
@@ -246,12 +238,8 @@ For example, here is a gamepad with a single touchpad:
             {
                 "touchpadSource" : {
                     "id" : "touchpad",
-                    "xAxis" : {
-                        "gamepadAxesIndex" : 0
-                    },
-                    "yAxis" : {
-                        "gamepadAxesIndex" : 1
-                    },
+                    "xAxisIndex" : 0,
+                    "yAxisIndex" : 1,
                     "button" : {
                         "gamepadButtonsIndex" : 0
                     }
@@ -296,14 +284,14 @@ For motion controllers that report a handedness property
                 "asset" : "some-url",
                 "root" : "left-hand-controller",
                 "componentIds" : [0],
-                "primaryButton" : 0,
+                "primaryButtonComponent" : 0,
             },
             "right" : {
                 "asset" : "some-url",
                 "root" : "right-hand-controller",
                 "componentIds" : [0],
-                "primaryButton" : 0,
-                "primaryAxes" : 0
+                "primaryButtonComponent" : 0,
+                "primaryAxesComponent" : 0
             }
         },
         "components" : [
@@ -343,8 +331,8 @@ For motion controllers than can't distinguish right vs left
                 "asset" : "some-url",
                 "root" : "neutral-hand-controller",
                 "componentIds" : [0],
-                "primaryButton" : 0,
-                "primaryAxes" : 0
+                "primaryButtonComponent" : 0,
+                "primaryAxesComponent" : 0
             }
         },
         "components" : [
@@ -359,12 +347,8 @@ For motion controllers than can't distinguish right vs left
             {
                 "thumbstickSource" : {
                     "id" : "thumbstick",
-                    "xAxis" : {
-                        "gamepadAxesIndex" : 0
-                    },
-                    "yAxis" : {
-                        "gamepadAxesIndex" : 1
-                    },
+                    "xAxisIndex" : 0,
+                    "yAxisIndex" : 1,
                     "button" : {
                         "gamepadButtonsIndex" : 0
                     }

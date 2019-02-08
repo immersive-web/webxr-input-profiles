@@ -1,88 +1,68 @@
-const testHelpers = require("./testHelpers.js");
-
-test("component exists", () => {
-  let mapping = testHelpers.getSmallestValidMapping();
-  expect(mapping.gamepad.components[0]).toBeDefined();
+const testHelpers = require("../testHelpers.js");
+const validator = testHelpers.getValidator("components.schema.json", ["mapping.index.schema.json"]);
+const validComponent = Object.freeze({
+  "dataSource": 0,
+  "root": "root node",
+  "labelTransform": "labelTransform node"
 });
 
-test("no valid dataSource", () => {
-  let mapping = testHelpers.getSmallestValidMapping();
-
-  const checkPropertyOptions = {
-    "mapping": mapping,
-    "object": mapping.gamepad.components[0],
-    "property": "dataSource",
-    "expectedType": "number"
-  }
-  testHelpers.checkProperty(checkPropertyOptions);
-});
-
-test("no valid root", () => {
-  let mapping = testHelpers.getSmallestValidMapping();
+test("Valid component", () => {
+  let valid = false;
+  let component = Object.assign({}, validComponent);
   
-  const checkPropertyOptions = {
-    "mapping": mapping,
-    "object": mapping.gamepad.components[0],
-    "property": "root",
-    "expectedType": "string"
+  valid = validator([component]);
+  if (!valid) {
+    expect(validator.errors).toBeNull();
   }
-  testHelpers.checkProperty(checkPropertyOptions);
-});
-
-test("no valid label transform", () => {
-  let mapping = testHelpers.getSmallestValidMapping();
   
-  const checkPropertyOptions = {
-    "mapping": mapping,
-    "object": mapping.gamepad.components[0],
-    "property": "labelTransform",
-    "expectedType": "string"
+  component.visualResponses = [0];
+  valid = validator([component]);
+  if (!valid) {
+    expect(validator.errors).toBeNull();
   }
-  testHelpers.checkProperty(checkPropertyOptions);
 });
 
-test("no valid pressResponse", () => {
-  let mapping = testHelpers.getSmallestValidMapping();
+test("Invalid array length", () => {
+  expect(validator([])).toBe(false);
+});
+
+test("Duplicates invalid", () => {
+  expect(validator([validComponent, validComponent])).toBe(false);
+});
+
+test("Invalid dataSource", () => {
+  let component = Object.assign({}, validComponent);
   
-  const checkPropertyOptions = {
-    "mapping": mapping,
-    "object": mapping.gamepad.components[0],
-    "property": "pressResponse",
-    "expectedType": "number",
-    "undefinedAllowed": true
-  }
-  testHelpers.checkProperty(checkPropertyOptions);
+  delete component.dataSource;
+  expect(validator([component])).toBe(false);
 });
 
-test("no valid touchResponse", () => {
-  let mapping = testHelpers.getSmallestValidMapping();
+test("Invalid root", () => {
+  let component = Object.assign({}, validComponent);
   
-  const checkPropertyOptions = {
-    "mapping": mapping,
-    "object": mapping.gamepad.components[0],
-    "property": "touchResponse",
-    "expectedType": "number",
-    "undefinedAllowed": true
-  }
-  testHelpers.checkProperty(checkPropertyOptions);
+  delete component.root;
+  expect(validator([component])).toBe(false);
 });
 
-test("additional properties", () => {
-  let mapping = testHelpers.getSmallestValidMapping();
+test("Invalid labelTransform", () => {
+  let component = Object.assign({}, validComponent);
   
-  const checkPropertyOptions = {
-    "mapping": mapping,
-    "object": mapping.gamepad.components[0],
-    "property": "someNonsense",
-    "undefinedAllowed": true
-  }
-  testHelpers.checkProperty(checkPropertyOptions);
+  delete component.labelTransform;
+  expect(validator([component])).toBe(false);
 });
 
-test("duplicates", () => {
-  let mapping = testHelpers.getSmallestValidMapping();
-  let component = mapping.gamepad.components[0];
+test("Invalid visualResponses", () => {
+  let component = Object.assign({}, validComponent);
+  
+  component.visualResponses = [];
+  expect(validator([component])).toBe(false);
+  
+  component.visualResponses = [0, 0];
+  expect(validator([component])).toBe(false);
+});
 
-  mapping.gamepad.components.push(component);
-  expect(testHelpers.validator(mapping)).toBe(false);
+test("invalid additional properties", () => {
+  let component = Object.assign({}, validComponent);
+  component.someNonsense = {};
+  expect(validator([component])).toBe(false);
 });

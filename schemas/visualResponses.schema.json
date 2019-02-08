@@ -1,0 +1,62 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "id": "https://immersive-web/gamepad-mapping/0.1.0/visualResponses.schema.json",
+    "type": "array",
+    "description": "The responses array",
+    "minItems": 1,
+    "additionalItems": false,
+    "uniqueItems": true,
+    "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+            "type": {
+                "description": "The action which should cause this visualization to apply",
+                "enum": ["onPress", "onTouch"]
+            },
+            "target" : {
+                "description": "The node in the asset to be modified by this visualization",
+                "type": "string"
+            },
+            "buttonMin": {
+                "description": "Node in the asset representing the effect of button.value == 0",
+                "type": "string"
+            },
+            "buttonMax": {
+                "description": "Node in the asset representing the effect of button.value == 1",
+                "type": "string"
+            },
+            "left" : {
+                "description": "Node in the asset representing the effect of dpad.left.value or xAxis at left-most position",
+                "type": "string"
+            },
+            "right" : {
+                "description": "Node in the asset representing the effect of dpad.right.value or xAxis at right-most position",
+                "type": "string"
+            },
+            "down" : {
+                "description": "Node in the asset representing the effect of dpad.down.value or yAxis at down-most position",
+                "type": "string"
+            },
+            "up" : {
+                "description": "Node in the asset representing the effect of dpad.up.value or yAxis at up-most position",
+                "type": "string"
+            }
+        },
+        "dependencies": {
+            "left": ["right", "down", "up"],
+            "right": ["left", "down", "up"],
+            "down": ["left", "right", "up"],
+            "up": ["left", "right", "down"],
+            "buttonMin": ["buttonMax"]
+        },
+        "anyOf": [
+            {
+                "required": ["type", "target", "buttonMax"]
+            },
+            {
+                "required": ["type", "target", "left", "right", "down", "up"]
+            }
+        ]
+    }
+}

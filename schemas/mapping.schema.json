@@ -23,15 +23,8 @@
                 "hands": { "$ref": "hands.schema.json"},
                 "components": { "$ref": "components.schema.json"},
                 "dataSources": { "$ref": "dataSources.schema.json"},
-                "responses": { "$ref": "responses.schema.json"}
+                "visualResponses": { "$ref": "visualResponses.schema.json"}
             }
-        }
-    },
-    "definitions": {
-        "mappingIndex": {
-            "description": "Index into an array defined within the mapping",
-            "type": "number",
-            "minimum": 0
         }
     }
 }
