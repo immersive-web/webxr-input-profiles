@@ -13,6 +13,10 @@
             "description": "The root node of the hand within the associated asset",
             "type": "string"
         },
+        "webVR_targetRayOrigin" : {
+            "description": "The node in the asset at which the pointing origin is located.  WebVR-only",
+            "type": "string"
+        },
         "components" : {
             "description": "The array of components that make up the hand",
             "type": "array",

@@ -1,4 +1,10 @@
 module.exports = {
+  MappingType: {
+    WEBXR: "WebXR",
+    WEBVR: "WebVR",
+    MOCK: "mock"
+  },
+
   Handedness: Object.freeze({
     NONE: "none",
     LEFT: "left",

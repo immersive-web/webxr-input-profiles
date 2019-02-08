@@ -1,10 +1,28 @@
 {
-    "version" : "0.1",
-    "id" : "HTC-Vive-Controller",
+    "version" : "0.1.0",
+    "id" : "OpenVR Gamepad",
+    "webVR": true,
     "handedness" : {
         "none" : {
             "asset" : "some-url",
             "root" : "none-controller-node",
+            "webVR_targetRayOrigin": "none-controller-pointing-origin",
+            "components" : [ 0, 1, 2],
+            "primaryButtonComponent" : 0,
+            "primaryAxesComponent" : 0
+        },
+        "left" : {
+            "asset" : "some-url",
+            "root" : "none-controller-node",
+            "webVR_targetRayOrigin": "none-controller-pointing-origin",
+            "components" : [ 0, 1, 2],
+            "primaryButtonComponent" : 0,
+            "primaryAxesComponent" : 0
+        },
+        "right" : {
+            "asset" : "some-url",
+            "root" : "none-controller-node",
+            "webVR_targetRayOrigin": "none-controller-pointing-origin",
             "components" : [ 0, 1, 2],
             "primaryButtonComponent" : 0,
             "primaryAxesComponent" : 0
@@ -36,7 +54,8 @@
             "dataSourceType": "touchpadSource",
             "xAxisIndex" : 0,
             "yAxisIndex" : 1,
-            "buttonIndex" : 0
+            "buttonIndex" : 0,
+            "webVR_yAxisInverted": true
         },
         {
             "id" : "trigger",

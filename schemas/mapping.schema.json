@@ -15,6 +15,10 @@
             "description": "The Gamepad.id the mapping applies to",
             "type" : "string"
         },
+        "webVR": {
+            "description": "Indicates the mapping file is being used with a WebVR gamepad",
+            "type": "boolean"
+        },
         "handedness": { "$ref": "handedness.schema.json"},
         "components": { "$ref": "components.schema.json"},
         "dataSources": { "$ref": "dataSources.schema.json"},

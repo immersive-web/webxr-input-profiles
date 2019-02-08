@@ -3,70 +3,77 @@ const MockGamepad = require("./mockGamepad/mockGamepad.js");
 const Constants = require("../src/constants.js");
 const XRGamepad = require("../src/xrGamepad.js");
 
-let testTable = [];
-const mappingList = TestHelpers.getMappingsList();
-mappingList.forEach((gamepadId) => {
-  let mapping = TestHelpers.getMappingById(gamepadId);
-  Object.keys(mapping.handedness).forEach((handedness) => {
-    testTable.push([gamepadId, handedness, mapping]);
-  });
-});
-
-const constructorOptions = {
-  gamepadId: "mock3",
-  handedness: Constants.Handedness.NONE
-};
-constructorOptions.mapping = TestHelpers.getMappingById(constructorOptions.gamepadId, constructorOptions.handedness);
-constructorOptions.mockGamepad = new MockGamepad(constructorOptions.mapping, constructorOptions.handedness);
+const validGamepadId = "mock3";
+const validHandedness = Constants.Handedness.NONE;
+const validMapping = Object.freeze(TestHelpers.getMappingById(validGamepadId, Constants.MappingType.MOCK));
+const validGamepad = new MockGamepad(validMapping, validHandedness);
 
 test("Constructor - invalid gamepad", () => {
-  const {mapping, handedness} = constructorOptions;
   expect(() => {
-    let xrGamepad = new XRGamepad(null, mapping, handedness);
+    let xrGamepad = new XRGamepad(null, validMapping, validHandedness);
+    expect(xrGamepad).toBeUndefined();
   }).toThrow();
 });
 
 test("Constructor - invalid mapping", () => {
-  const {mockGamepad, handedness} = constructorOptions;
   expect(() => {
-    let xrGamepad = new XRGamepad(mockGamepad, null, handedness);
+    let xrGamepad = new XRGamepad(validGamepad, null, validHandedness);
+    expect(xrGamepad).toBeUndefined();
   }).toThrow();
 });
 
 test("Constructor - invalid handedness", () => {
-  const {mockGamepad, mapping} = constructorOptions;
-
   expect(() => {
-    let xrGamepad = new XRGamepad(mockGamepad, mapping, "SOME_NONSENSE");
+    let xrGamepad = new XRGamepad(validGamepad, validMapping, "SOME_NONSENSE");
+    expect(xrGamepad).toBeUndefined();
   }).toThrow();
   
   expect(() => {
-    let xrGamepad = new XRGamepad(mockGamepad, mapping, Constants.Handedness.LEFT);
+    let xrGamepad = new XRGamepad(validGamepad, validMapping, Constants.Handedness.LEFT);
+    expect(xrGamepad).toBeUndefined();
   }).toThrow();
 });
 
 test("Constructor - valid handedness variations", () => {
-  const {mockGamepad, mapping} = constructorOptions;
-
-  let xrGamepad = new XRGamepad(mockGamepad, mapping, "");
+  let xrGamepad = new XRGamepad(validGamepad, validMapping, "");
   expect(xrGamepad).toBeDefined();
 
-  xrGamepad = new XRGamepad(mockGamepad, mapping, null);
+  xrGamepad = new XRGamepad(validGamepad, validMapping, null);
   expect(xrGamepad).toBeDefined();
 
-  xrGamepad = new XRGamepad(mockGamepad, mapping);
+  xrGamepad = new XRGamepad(validGamepad, validMapping);
   expect(xrGamepad).toBeDefined();
 });
 
 test("Constructor - mismatched ids", () => {
-  const {mockGamepad, mapping, handedness} = constructorOptions;
-  let modifiedMapping = TestHelpers.copyJsonObject(mapping);
+  let modifiedMapping = TestHelpers.copyJsonObject(validMapping);
   modifiedMapping.id = "SOME NONSENSE";
 
   expect(() => {
-    let xrGamepad = new XRGamepad(mockGamepad, modifiedMapping, handedness);
+    let xrGamepad = new XRGamepad(validGamepad, modifiedMapping, validHandedness);
+    expect(xrGamepad).toBeUndefined();
   }).toThrow();
 });
+
+const createTestTable = function(mappingType) {
+  const testTable = [];
+
+  const mappingList = TestHelpers.getMappingsList(mappingType);
+  mappingList.forEach((gamepadId) => {
+    let mapping = TestHelpers.getMappingById(gamepadId, mappingType);
+    Object.keys(mapping.handedness).forEach((handednessKey) => {
+      testTable.push([gamepadId, handednessKey, mapping]);
+    });
+  });
+
+  return testTable;
+}
+
+const testTable = [
+  ...createTestTable(Constants.MappingType.WEBXR),
+  ...createTestTable(Constants.MappingType.WEBVR),
+  ...createTestTable(Constants.MappingType.MOCK)
+];
 
 describe.each(testTable)("xrGamepad.%s.%s", (gamepadId, handedness, mapping) => {
 

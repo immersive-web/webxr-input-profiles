@@ -9,6 +9,8 @@
         "id": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/id" }] },
         "dataSourceType": { "enum": ["dpadFromAxesSource"] },
         "xAxisIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
-        "yAxisIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] }
+        "yAxisIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
+        "webVR_xAxisInverted": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/webVR_axisInverted" }] },
+        "webVR_yAxisInverted": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/webVR_axisInverted" }] }
     }
 }

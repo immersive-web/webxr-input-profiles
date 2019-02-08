@@ -35,7 +35,7 @@ class XRGamepadComponent {
       if (index >= this.gamepad.axes.length) {
         throw new Error(`Gamepad '${this.xrGamepad.id}' has no ${name} at index ${index}`);
       }
-      this.axes[name] = index;
+      this.axes[name] = { index: index, inverted: (this.dataSource["webVR_" + name + "Inverted"] == true) };
     };
 
     // Helper function to validate and track button reference
@@ -108,7 +108,7 @@ class XRGamepadComponent {
     
     // Checks if axes are present and they have moved beyond defined thresholds
     // for touched and pressed
-    Object.values(this.axes).forEach( (index) => {
+    Object.values(this.axes).forEach( ({index}) => {
       isTouched = isTouched | (Math.abs(this.gamepad.axes[index]) > Constants.TouchThreshold);
       
       // Only treat the component as PRESSED based on axes values if a physical 
@@ -159,8 +159,12 @@ class XRGamepadComponent {
       if (axesAsButtons) {
 
         // Helper function to generate button data pair
-        const addButtonDataPair = (index, negativeKey, positiveKey) => {
-          let value = this.gamepad.axes[index];
+        const addButtonDataPair = (axis, negativeKey, positiveKey) => {
+          let value = this.gamepad.axes[axis.index];
+
+          if (axis.inverted && value != 0) {
+            value = value * -1;
+          }
 
           // Adds a left or top button
           data.buttons[negativeKey] = {
@@ -183,8 +187,14 @@ class XRGamepadComponent {
       } else {
         // Adds axis data to object being returned
         Object.keys(this.axes).forEach((name) => {
-          let index = this.axes[name];
-          data.axes[name] = this.gamepad.axes[index];
+          let axis = this.axes[name];
+          let value = this.gamepad.axes[axis.index];
+
+          if (axis.inverted && value != 0) {
+            value = value * -1;
+          }
+          
+          data.axes[name] = value;
         });
       }
     }

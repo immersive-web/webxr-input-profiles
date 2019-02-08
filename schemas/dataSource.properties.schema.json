@@ -18,6 +18,10 @@
         "analogValues" : {
             "description" : "Indicates the ability to report button values in between min and max",
             "type" : "boolean"
+        },
+        "webVR_axisInverted" : {
+            "description" : "Indicates the axis values will report inverted",
+            "type" : "boolean"
         }
     }
 }
