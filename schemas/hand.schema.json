@@ -21,11 +21,11 @@
                 "allOf": [ { "$ref": "mapping.schema.json#/definitions/mappingIndex"} ]
             }
         },
-        "primaryButton": {
+        "primaryButtonComponent": {
             "allOf": [ { "$ref": "mapping.schema.json#/definitions/mappingIndex"} ],
             "description": "The primary button suggested by the hardware manufacturer"
         },
-        "primaryAxes": {
+        "primaryAxesComponent": {
             "allOf": [ { "$ref": "mapping.schema.json#/definitions/mappingIndex"} ],
             "description": "The primary thumbstick or touchpad suggested by the hardware manufacturer"
         }

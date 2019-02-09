@@ -7,15 +7,15 @@
                 "asset" : "some-url",
                 "root" : "left-controller-node",
                 "components" : [ 0, 1, 2, 3, 4],
-                "primaryButton" : 0,
-                "primaryAxes" : 1
+                "primaryButtonComponent" : 0,
+                "primaryAxesComponent" : 1
             },
             "right" : {
                 "asset" : "some-url",
                 "root" : "right-controller-node",
                 "components" : [ 0, 1, 2, 3, 4],
-                "primaryButton" : 0,
-                "primaryAxes" : 1
+                "primaryButtonComponent" : 0,
+                "primaryAxesComponent" : 1
             }
         },
         "components" : [
@@ -23,92 +23,76 @@
                 "dataSource" : 0,
                 "root" : "trigger-node",
                 "labelTransform" : "trigger-label",
-                "pressResponse" : 0
+                "visualResponses": [0]
             },
             {
                 "dataSource" : 1,
                 "root" : "thumbstick-node",
                 "labelTransform" : "thumbstick-label",
-                "touchResponse" : 1
+                "visualResponses": [1]
             },
             {
                 "dataSource" : 2,
                 "root" : "grip-node",
                 "labelTransform" : "grip-label",
-                "pressResponse" : 2
+                "visualResponses": [2]
             },
             {
                 "dataSource" : 3,
                 "root" : "grip-node",
                 "labelTransform" : "grip-label",
-                "pressResponse" : 3,
-                "touchResponse" : 4
+                "visualResponses": [3, 4]
             },
             {
                 "dataSource" : 4,
                 "root" : "menu-node",
                 "labelTransform" : "menu-label",
-                "pressResponse" : 5
+                "visualResponses": [5]
             }
         ],
         "dataSources" : [
             {
                 "id" : "trigger",
                 "dataSourceType": "buttonSource",
-                "button" : {
-                    "gamepadButtonsIndex" : 0,
-                    "analogValues" : true
+                "buttonIndex": 0,
+                "buttonProperties": {
+                    "analogValues": true
                 }
             },
             {
                 "id" : "thumbstick",
                 "dataSourceType": "thumbstickSource",
-                "xAxis" : {
-                    "gamepadAxesIndex" : 0
-                },
-                "yAxis" : {
-                    "gamepadAxesIndex" : 1
-                },
-                "button" : {
-                    "gamepadButtonsIndex" : 1
-                }
+                "xAxisIndex" : 0,
+                "yAxisIndex" : 1,
+                "buttonIndex" : 1
             },
             {
                 "id" : "grip",
                 "dataSourceType": "buttonSource",
-                "button" : {
-                    "gamepadButtonsIndex" : 2
-                }
+                "buttonIndex" : 2
             },
             {
                 "id" : "touchpad",
                 "dataSourceType": "touchpadSource",
-                "xAxis" : {
-                    "gamepadAxesIndex" : 2
-                },
-                "yAxis" : {
-                    "gamepadAxesIndex" : 3
-                },
-                "button" : {
-                    "gamepadButtonsIndex" : 3
-                }
+                "xAxisIndex" : 2,
+                "yAxisIndex" : 3,
+                "buttonIndex" : 3
             },
             {
                 "id" : "menu",
                 "dataSourceType": "buttonSource",
-                "button" : {
-                    "gamepadButtonsIndex" : 4,
-                    "supportsTouch" : false
-                }
+                "buttonIndex" : 4
             }
         ],
-        "responses" : [
+        "visualResponses" : [
             {
+                "type": "onTouch",
                 "target" : "trigger-transform-node",
                 "buttonMin": "trigger-min-transform-node",
                 "buttonMax": "trigger-max-transform-node"
             },
             {
+                "type": "onTouch",
                 "target" : "thumbstick-transform-node",
                 "left" : "thumbstick-transform-left-node",
                 "right" : "thumbstick-right-transform-right-node",
@@ -118,11 +102,13 @@
                 "buttonMax": "thumbstick-transform-max-node"
             },
             {
+                "type": "onPress",
                 "target" : "grip-transform-node",
                 "buttonMin": "grip-min-transform-node",
                 "buttonMax": "grip-max-transform-node"
             },
             {
+                "type": "onPress",
                 "target" : "touchpad-transform-node",
                 "left" : "touchpad-transform-left-node",
                 "right" : "touchpad-transform-right-node",
@@ -130,6 +116,7 @@
                 "down" : "touchpad-transform-down-node"
             },
             {
+                "type": "onTouch",
                 "target" : "touchpad-touchpoint-node",
                 "left" : "touchpad-touchpoint-left-node",
                 "right" : "touchpad-touchpoint-right-node",
@@ -137,6 +124,7 @@
                 "down" : "touchpad-touchpoint-down-node"
             },
             {
+                "type": "onPress",
                 "target" : "menu-transform-node",
                 "buttonMin": "menu-min-transform-node",
                 "buttonMax": "menu-max-transform-node"

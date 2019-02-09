@@ -24,13 +24,15 @@
                 "type": "string",
                 "description": "The name of the component's node in the asset file at which location a legend description can safely be placed"
             },
-            "pressResponse" : {
-                "allOf": [ { "$ref": "mapping.schema.json#/definitions/mappingIndex"} ],
-                "description": "The index of the response to be invoked when the data source is pressed"
-            },
-            "touchResponse" : {
-                "allOf": [ { "$ref": "mapping.schema.json#/definitions/mappingIndex"} ],
-                "description": "The index of the response to be invoked when the data source is touched"
+            "visualResponses" : {
+                "description": "The indicies of the visual responses to be applied to the component",
+                "type": "array",
+                "minItems": 1,
+                "additionalItems": false,
+                "uniqueItems": true,
+                "items": {
+                    "allOf": [ { "$ref": "mapping.schema.json#/definitions/mappingIndex"} ]
+                }
             }
         },
         "required":["dataSource", "root", "labelTransform"],

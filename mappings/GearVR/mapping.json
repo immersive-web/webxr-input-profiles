@@ -7,8 +7,8 @@
                 "asset" : "some-url",
                 "root" : "neutral-controller-node",
                 "components" : [0, 1, 2],
-                "primaryButton" : 0,
-                "primaryAxes" : 0
+                "primaryButtonComponent" : 0,
+                "primaryAxesComponent" : 0
             }
         },
         "components" : [
@@ -16,41 +16,32 @@
                 "dataSource" : 0,
                 "root" : "thumbstick-node",
                 "labelTransform" : "thumbstick-label-transform",
-                "pressResponse" : 0,
-                "touchResponse" : 1
+                "visualResponses": [0, 1]
             },
             {
                 "dataSource" : 1,
                 "root" : "faceButton-node",
                 "labelTransform" : "faceButton-label-transform",
-                "pressResponse" : 2
+                "visualResponses": [2]
             }
         ],
         "dataSources" : [
             {
                 "id" : "thumbstick",
                 "dataSourceType": "thumbstickSource",
-                "xAxis" : {
-                    "gamepadAxesIndex" : 0
-                },
-                "yAxis" : {
-                    "gamepadAxesIndex" : 1
-                },
-                "button" : {
-                    "gamepadButtonsIndex" : 0
-                }
+                "xAxisIndex" : 0,
+                "yAxisIndex" : 1,
+                "buttonIndex" : 0
             },
             {
                 "id" : "faceButton",
                 "dataSourceType": "buttonSource",
-                "button" : {
-                    "gamepadButtonsIndex" : 2,
-                    "supportsTouch" : false
-                }
+                "buttonIndex" : 1
             }
         ],
-        "responses" : [
+        "visualResponses" : [
             {
+                "type": "onPress",
                 "target" : "touchpad-transform-node",
                 "left" : "touchpad-transform-left-node",
                 "right" : "touchpad-transform-right-node",
@@ -59,6 +50,7 @@
 
             },
             {
+                "type": "onTouch",
                 "target" : "touchpad-touchpoint-node",
                 "left" : "touchpad-touchpoint-left-node",
                 "right" : "touchpad-touchpoint-right-node",
@@ -66,6 +58,7 @@
                 "down" : "touchpad-touchpoint-down-node"
             },
             {
+                "type": "onPress",
                 "target" : "faceButton-transform-node",
                 "buttonMin": "faceButton-min-transform-node",
                 "buttonMax": "faceButton-max-transform-node"

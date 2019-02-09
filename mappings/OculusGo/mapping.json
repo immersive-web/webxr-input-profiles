@@ -7,15 +7,15 @@
                 "asset" : "some-url",
                 "root" : "controller-node",
                 "components" : [0, 1, 2],
-                "primaryButton" : 0,
-                "primaryAxes" : 0
+                "primaryButtonComponent" : 0,
+                "primaryAxesComponent" : 0
             },
             "right" : {
                 "asset" : "some-url",
                 "root" : "controller-node",
                 "components" : [0, 1, 2],
-                "primaryButton" : 0,
-                "primaryAxes" : 0
+                "primaryButtonComponent" : 0,
+                "primaryAxesComponent" : 0
             }
         },
         "components" : [
@@ -23,54 +23,46 @@
                 "dataSource" : 0,
                 "root" : "thumbstick-root",
                 "labelTransform" : "thumbstick-label-transform",
-                "pressResponse" : 0,
-                "touchResponse" : 1
+                "visualResponses": [0, 1]
             },
             {
                 "dataSource" : 1,
                 "root" : "trigger-root",
                 "labelTransform" : "trigger-label-transform",
-                "pressResponse" : 2
+                "visualResponses": [2]
             },
             {
                 "dataSource" : 2,
                 "root" : "trigger-root",
                 "labelTransform" : "trigger-label-transform",
-                "pressResponse" : 3
+                "visualResponses": [3]
             }
         ],
         "dataSources" : [
             {
                 "id" : "thumbstick",
                 "dataSourceType": "thumbstickSource",
-                "xAxis" : {
-                    "gamepadAxesIndex" : 0
-                },
-                "yAxis" : {
-                    "gamepadAxesIndex" : 1
-                },
-                "button" : {
-                    "gamepadButtonsIndex" : 0
-                }
+                "xAxisIndex" : 0,
+                "yAxisIndex" : 1,
+                "buttonIndex" : 0
             },
             {
                 "id" : "trigger",
                 "dataSourceType": "buttonSource",
-                "button" : {
-                    "gamepadButtonsIndex" : 1,
+                "buttonIndex" : 1,
+                "buttonProperties": {
                     "analogValues" : true
                 }
             },
             {
                 "id" : "faceButton",
                 "dataSourceType": "buttonSource",
-                "button" : {
-                    "gamepadButtonsIndex" : 2
-                }
+                "buttonIndex" : 2
             }
         ],
-        "responses" : [
+        "visualResponses" : [
             {
+                "type": "onPress",
                 "target" : "touchpad-transform-node",
                 "left" : "touchpad-transform-left-node",
                 "right" : "touchpad-transform-right-node",
@@ -78,6 +70,7 @@
                 "down" : "touchpad-transform-down-node"
             },
             {
+                "type": "onTouch",
                 "target" : "touchpad-touchpoint-node",
                 "left" : "touchpad-touchpoint-left-node",
                 "right" : "touchpad-touchpoint-right-node",
@@ -85,11 +78,13 @@
                 "down" : "touchpad-touchpoint-down-node"
             },
             {
+                "type": "onTouch",
                 "target" : "trigger-transform-node",
                 "buttonMin": "trigger-min-transform-node",
                 "buttonMax": "trigger-max-transform-node"
             },
             {
+                "type": "onPress",
                 "target" : "faceButton-transform-node",
                 "buttonMin": "faceButton-min-transform-node",
                 "buttonMax": "faceButton-max-transform-node"
