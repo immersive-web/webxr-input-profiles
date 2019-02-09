@@ -5,6 +5,7 @@
     "description": "The responses array",
     "minItems": 1,
     "additionalItems": false,
+    "uniqueItems": true,
     "items": {
         "type": "object",
         "additionalProperties": false,
@@ -51,10 +52,10 @@
         },
         "anyOf": [
             {
-                "required": ["type", "buttonMax"]
+                "required": ["type", "target", "buttonMax"]
             },
             {
-                "required": ["type", "left", "right", "down", "up"]
+                "required": ["type", "target", "left", "right", "down", "up"]
             }
         ]
     }

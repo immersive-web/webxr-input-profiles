@@ -13,7 +13,7 @@
         "type" : "object",
         "properties": {
             "dataSource" : {
-                "allOf": [ { "$ref": "mapping.schema.json#/definitions/mappingIndex"} ],
+                "allOf": [ { "$ref": "mapping.index.schema.json#/definitions/mappingIndex"} ],
                 "description": "The index into the dataSources array"
             },
             "root" : {
@@ -31,7 +31,7 @@
                 "additionalItems": false,
                 "uniqueItems": true,
                 "items": {
-                    "allOf": [ { "$ref": "mapping.schema.json#/definitions/mappingIndex"} ]
+                    "allOf": [ { "$ref": "mapping.index.schema.json#/definitions/mappingIndex"} ]
                 }
             }
         },

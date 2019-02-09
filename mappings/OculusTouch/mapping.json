@@ -80,9 +80,7 @@
                 "id" : "trigger",
                 "dataSourceType": "buttonSource",
                 "buttonIndex" : 1,
-                "buttonProperties": {
-                    "analogValues" : true
-                }
+                "analogValues" : true
             },
             {
                 "id" : "grip",
@@ -113,9 +111,7 @@
                 "id" : "thumbrest",
                 "dataSourceType": "buttonSource",
                 "buttonIndex" : 5,
-                "buttonProperties": {
-                    "pressUnsupported": true
-                }
+                "pressUnsupported": true
             }
         ],
         "visualResponses" : [

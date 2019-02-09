@@ -9,62 +9,10 @@
     "minItems": 1,
     "items": {
         "oneOf": [
-            { 
-                "description": "Button data source",
-                "type": "object",
-                "additionalProperties": false,
-                "required": ["id", "dataSourceType", "buttonIndex"],
-                "properties":{
-                    "id": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/id" }] },
-                    "dataSourceType": { "enum": ["buttonSource"] },
-                    "buttonIndex": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/gamepadIndex" }] },
-                    "buttonProperties": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/buttonProperties" }] }
-                }
-            },
-            { 
-                "description": "Dpad data source from buttons",
-                "type": "object",
-                "additionalProperties": false,
-                "required": ["id", "dataSourceType", "leftButtonIndex", "rightButtonIndex", "downButtonIndex", "upButtonIndex"],
-                "properties":{
-                    "id": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/id" }] },
-                    "dataSourceType": { "enum": ["dpadButtonsSource"] },
-                    "leftButtonIndex": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/gamepadIndex" }] },
-                    "rightButtonIndex": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/gamepadIndex" }] },
-                    "downButtonIndex": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/gamepadIndex" }] },
-                    "upButtonIndex": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/gamepadIndex" }] },
-                    "buttonProperties": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/buttonProperties" }] }
-                }
-            },
-            { 
-                "description": "Dpad data source from axes",
-                "type": "object",
-                "additionalProperties": false,
-                "required": ["id", "dataSourceType", "xAxisIndex", "yAxisIndex"],
-                "properties":{
-                    "id": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/id" }] },
-                    "dataSourceType": { "enum": ["dpadAxesSource"] },
-                    "xAxisIndex": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/gamepadIndex" }] },
-                    "yAxisIndex": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/gamepadIndex" }] }
-                }
-            },
-            { 
-                "description": "Thumbstick and touchpad data source",
-                "type": "object",
-                "additionalProperties": false,
-                "required": ["id", "dataSourceType", "xAxisIndex", "yAxisIndex"],
-                "dependencies": {
-                    "buttonProperties": ["buttonIndex"]
-                },
-                "properties":{
-                    "id": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/id" }] },
-                    "dataSourceType": { "enum": ["thumbstickSource", "touchpadSource"] },
-                    "xAxisIndex": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/gamepadIndex" }] },
-                    "yAxisIndex": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/gamepadIndex" }] },
-                    "buttonIndex": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/gamepadIndex" }] },
-                    "buttonProperties": { "allOf": [{ "$ref": "dataSources.properties.schema.json#/definitions/buttonProperties" }] }
-                }
-            }
+            { "allOf": [{ "$ref": "dataSource.button.schema.json" }] },
+            { "allOf": [{ "$ref": "dataSource.dpadFromButtons.schema.json" }] },
+            { "allOf": [{ "$ref": "dataSource.dpadFromAxes.schema.json" }] },
+            { "allOf": [{ "$ref": "dataSource.thumbstickAndTouchpad.schema.json" }] }
         ]
     }
 }

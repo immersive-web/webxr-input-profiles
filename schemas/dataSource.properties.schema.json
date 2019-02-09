@@ -1,0 +1,27 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "id": "https://immersive-web/gamepad-mapping/0.1.0/dataSource.properties.schema.json",
+    "definitions": {
+        "id": {
+            "description" : "An identifier for the data source",
+            "type" : "string"
+        },
+        "gamepadIndex": {
+            "description": "Index into the Gamepad.buttons or Gamepad.axes arrays",
+            "type": "number",
+            "minimum": 0
+        },
+        "touchSupportedAtMinValue" : {
+            "description" : "Indicates the ability to report GamepadButton.touched==true even when the button's value is at the minimum",
+            "type" : "boolean"
+        },
+        "pressUnsupported" : {
+            "description" : "Indicates the inability to report GamepadButton.pressed",
+            "type" : "boolean"
+        },
+        "analogValues" : {
+            "description" : "Indicates the ability to report button values in between min and max",
+            "type" : "boolean"
+        }
+    }
+}

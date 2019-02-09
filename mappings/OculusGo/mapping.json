@@ -50,9 +50,7 @@
                 "id" : "trigger",
                 "dataSourceType": "buttonSource",
                 "buttonIndex" : 1,
-                "buttonProperties": {
-                    "analogValues" : true
-                }
+                "analogValues" : true
             },
             {
                 "id" : "faceButton",

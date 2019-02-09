@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "id": "https://immersive-web/gamepad-mapping/0.1.0/dataSource.dpadFromButtons.schema.json",
+    "description": "Dpad data source from buttons",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "dataSourceType", "leftButtonIndex", "rightButtonIndex", "downButtonIndex", "upButtonIndex"],
+    "properties":{
+        "id": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/id" }] },
+        "dataSourceType": { "enum": ["dpadFromButtonsSource"] },
+        "leftButtonIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
+        "rightButtonIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
+        "downButtonIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
+        "upButtonIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
+        "touchSupportedAtMinValue": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/touchSupportedAtMinValue" }] },
+        "pressUnsupported": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/pressUnsupported" }] },
+        "analogValues": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/analogValues" }] }
+    }
+}

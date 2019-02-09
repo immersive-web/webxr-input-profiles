@@ -55,9 +55,7 @@
                 "id" : "trigger",
                 "dataSourceType": "buttonSource",
                 "buttonIndex": 0,
-                "buttonProperties": {
-                    "analogValues": true
-                }
+                "analogValues": true
             },
             {
                 "id" : "thumbstick",

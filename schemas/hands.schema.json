@@ -3,6 +3,7 @@
     "id": "https://immersive-web/gamepad-mapping/0.1.0/hands.schema.json",
     "type": "object",
     "description": "The hands",
+    "additionalProperties": false,
     "properties": {
         "neutral": {
             "allOf" : [ {"$ref": "hand.schema.json"} ],
@@ -28,6 +29,5 @@
         {
             "required": ["left", "right"]
         }
-    ],
-    "additionalProperties": false
+    ]
 }
