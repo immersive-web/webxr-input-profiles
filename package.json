@@ -2,10 +2,8 @@
   "name": "gamepad-mappings",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "jest",
-    "emulator": "emulator.js"
+    "test": "jest"
   },
   "author": "",
   "license": "MIT",
