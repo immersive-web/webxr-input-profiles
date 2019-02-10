@@ -12,7 +12,6 @@
         "rightButtonIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
         "downButtonIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
         "upButtonIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
-        "pressUnsupported": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/pressUnsupported" }] },
         "analogValues": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/analogValues" }] }
     }
 }
