@@ -150,8 +150,8 @@ Both thumbsticks and touchpads are represented by an entry in the `dataSources` 
     "gamepad" : {
         "dataSources" : [
             {
-                "id" : "dpad",
-                "type": "dpadFromAxesSource",
+                "id" : "touchpad",
+                "type": "touchpadSource",
                 "xAxisIndex" : 0,
                 "yAxisIndex" : 1
             }
@@ -167,8 +167,8 @@ If the thumbstick or touchpad is able to be depressed, the data source must also
     "gamepad" : {
         "dataSources" : [
             {
-                "id" : "dpad",
-                "type": "dpadFromAxesSource",
+                "id" : "thumbstick",
+                "type": "thumbstickSource",
                 "xAxisIndex" : 0,
                 "yAxisIndex" : 1,
                 "buttonIndex" : 1
@@ -181,12 +181,19 @@ If the thumbstick or touchpad is able to be depressed, the data source must also
 If the thumbstick or touchpad is able to be depressed in an analog manner, the data source must also include an `analogButtonValues` property with a value of `true`.
 
 ## Visual Responses
-The visual representation of a motion controller in a VR must be modified to reflect its actual state in the real-world.  For example, when a physical thumbstick is moved to the left, the virtual thumbstick should also move to the left.  In order to do this without requiring custom code for each `Gamepad.id`, the schema defines an array of `visualResponse` objects.
+The visual representation of a motion controller in a VR must respond to reflect its physical state in the real-world.  For example, when a physical thumbstick is moved to the left, the virtual thumbstick should also move to the left.  In order to do this without requiring custom code for each `Gamepad.id`, the schema defines an array of `visualResponse` objects.
 
-Each `visualResponse` has a `target` property representing a reference to the node in an asset which needs to be modified.  It also contains the `userAction` property which must be either `onTouch` or `onPress` to indicate which user action the visual response should be triggered in response to.  Lastly, each `visualResponse` contains a subset of the `left`, `right`, `down`, `up`, `buttonMax`, and `buttonMin` properties.  These properties represent references to nodes in the same asset file as `target` and will be used to interpolate the correct visual state of `target`.
+Each `visualResponse` must contain a `target` property which references the node in an asset to be modified.  Each `visualResponse` must also contain a `userAction` property set to either `onTouch` or `onPress`.  A `userAction` set to `onTouch` indicates the visual response is describing the desired state of `target` when the associated `GamepadButton.touched` is `true` or the associated elements in the `Gamepad.axes` array are non-zero.  A `userAction` set to `onPress` indicates the visual response is describing the desired state of `target` when the associated `GamepadButton.pressed` is `true`. When `visualResponse` objects have the same `target`, node properties described by a `userAction` equal to `onPress` will take precedence over those with a `userAction` of `onTouch`.
+
+In addition to the `target` and `userResponse` properties, a `visualResponse` must have one of the following groups of properties.  Each property represents a node in the asset at the extent of the value which is it matched to:
+* `buttonMin` and `buttonMax`
+* `left`, `right`, `down`, and `up`
+* `left`, `right`, `down`, `up`, `buttonMin`, and `buttonMax`
+
+For example, a button part would have a `buttonMin` representing the visual state of `target` when the button is not being interacted with and a `buttonMax` representing the visual state of `target` when the button is fully pressed.  Developers are then able to interpolate the correct visualization of `target` by weighting `buttonMin` and `buttonMax` based on `GamepadButton.value`.  The javascript library shipped as part of this package includes this calculation.
 
 ### Button Visual Responses
-In most cases, the visual response for a button should have the `userResponse` property to equal `onTouch` and have the   `buttonMin` and `buttonMax` properties present.  In this example, the transformation of the virtual trigger button will be interpolated between `buttonMin` and `buttonMax` based on the the associated `GamepadButton.value`.
+Visual responses for button parts are expected to interpolate `target` properties based on the associated `GamepadButton.value` attribute. For example:
 
 ```json
 {
@@ -204,7 +211,7 @@ In most cases, the visual response for a button should have the `userResponse` p
 ```
 
 ### Dpad Visual Responses
-> TODO WRITE TEXT
+Physical dpad parts rock around a central pivot, requiring their visual responses to interpolate between `left` and `right` as well as `down` and `up`.  The expected interpolation is different when associated based on a `dpadFromButtonSource` as opposed to a `dpadFromAxes`.  When associated with the former, `right` is weighted by the `GamepadButton.value` associated with the `rightButtonIndex`, `down` is weighted by the `GamepadButton.value` associated with the `downButtonIndex`, and so on.  When associated with the latter type of data source, the algorithm is a bit more complicated.  Only positive values in `Gamepad.axes` array at the `xAxisIndex` position are used for interpolation with the `right` node whereas only the absolute value of negative values are used for interpolation with the `left` node.  The same behavior applies to `up` and `down` regarding the data at the `yAxisIndex` in the `Gamepad.axes` array. In this manner, both types of data sources can be associated with a single type of visual response.  For example:
 
 ```json
 {
@@ -224,7 +231,7 @@ In most cases, the visual response for a button should have the `userResponse` p
 ```
 
 ### Thumbstick Visual Responses
-> TODO WRITE TEXT
+Thumbsticks share physical characteristics with dpad, though they typically have a wider range of motion and may also be clickable.  For interpolating the `target` properties, only positive values in `Gamepad.axes` array at the `xAxisIndex` position are used with the `right` node, whereas only the absolute value of negative values are used with the `left` node.  The same behavior applies to `up` and `down` regarding the data at the `yAxisIndex` in the `Gamepad.axes` array. If clickable, `target` properties are also interpolated with `buttonMin` and `buttonMax` based on `GamepadButton.value`.  For example:
 
 ```json
 {
@@ -246,7 +253,9 @@ In most cases, the visual response for a button should have the `userResponse` p
 ```
 
 ### Touchpad Visual Responses
-> TODO WRITE TEXT
+Thumbsticks share physical characteristics with dpad, though they may also be clickable.  Whereas all other data source types may use a `userAction` of `onTouch` for all visualizations, touchpad data sources will most likely only use an `onTouch` visualization to represent the touch-dot of the user's finger on the part.  Any motion of the touchpad itself due to being clickable, will likely be represented in a visualization with the `userAction` set to `onPress`.
+
+In either case, the algorithm for interpolating the `target` properties is roughly the same.  Only positive values in `Gamepad.axes` array at the `xAxisIndex` position are used with the `right` node, whereas only the absolute value of negative values are used with the `left` node.  The same behavior applies to `up` and `down` regarding the data at the `yAxisIndex` in the `Gamepad.axes` array. If clickable, response visualizations with a `userAction` set to `onPress` may also interpolate `buttonMin` and `buttonMax` based on `GamepadButton.value`.  For example:
 
 ```json
 {
