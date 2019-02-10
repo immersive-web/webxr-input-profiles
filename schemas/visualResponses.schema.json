@@ -10,7 +10,7 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-            "type": {
+            "userAction": {
                 "description": "The action which should cause this visualization to apply",
                 "enum": ["onPress", "onTouch"]
             },
@@ -48,14 +48,15 @@
             "right": ["left", "down", "up"],
             "down": ["left", "right", "up"],
             "up": ["left", "right", "down"],
-            "buttonMin": ["buttonMax"]
+            "buttonMin": ["buttonMax"],
+            "buttonMax": ["buttonMin"]
         },
         "anyOf": [
             {
-                "required": ["type", "target", "buttonMax"]
+                "required": ["userAction", "target", "buttonMax", "buttonMin"]
             },
             {
-                "required": ["type", "target", "left", "right", "down", "up"]
+                "required": ["userAction", "target", "left", "right", "down", "up"]
             }
         ]
     }

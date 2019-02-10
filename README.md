@@ -181,31 +181,38 @@ If the thumbstick or touchpad is able to be depressed, the data source must also
 If the thumbstick or touchpad is able to be depressed in an analog manner, the data source must also include an `analogButtonValues` property with a value of `true`.
 
 ## Visual Responses
-Responses are the virtual manifestations of the physical motion controller's changes.  In order to generically reprsent the range of motion particular controllers allow for their various parts, the virtual models contain nodes representing these ranges. There are six currently defined types of virtual responses to physical motion.
+The visual representation of a motion controller in a VR must be modified to reflect its actual state in the real-world.  For example, when a physical thumbstick is moved to the left, the virtual thumbstick should also move to the left.  In order to do this without requiring custom code for each `Gamepad.id`, the schema defines an array of `visualResponse` objects.
 
-### Button press
->ADD AN EXPLANATION HERE
+Each `visualResponse` has a `target` property representing a reference to the node in an asset which needs to be modified.  It also contains the `userAction` property which must be either `onTouch` or `onPress` to indicate which user action the visual response should be triggered in response to.  Lastly, each `visualResponse` contains a subset of the `left`, `right`, `down`, `up`, `buttonMax`, and `buttonMin` properties.  These properties represent references to nodes in the same asset file as `target` and will be used to interpolate the correct visual state of `target`.
+
+### Button Visual Responses
+In most cases, the visual response for a button should have the `userResponse` property to equal `onTouch` and have the   `buttonMin` and `buttonMax` properties present.  In this example, the transformation of the virtual trigger button will be interpolated between `buttonMin` and `buttonMax` based on the the associated `GamepadButton.value`.
+
 ```json
 {
     "gamepad" : {
-        "responses" : [
+        "visualResponses" : [
             {
-                "target" : "trigger-transform",
-                "max" : "trigger-transform-max"
+                "userAction": "onTouch",
+                "target" : "trigger-root",
+                "buttonMin" : "trigger-transform-buttonMin",
+                "buttonMax" : "trigger-transform-buttonMax"
             }
         ]
     }
 }
 ```
 
-### Dpad button press
->ADD AN EXPLANATION HERE
+### Dpad Visual Responses
+> TODO WRITE TEXT
+
 ```json
 {
     "gamepad" : {
-        "responses" : [
+        "visualResponses" : [
             {
-                "target" : "dpad-transform",
+                "userAction": "onTouch",
+                "target" : "dpad-root",
                 "left" : "dpad-transform-leftmost",
                 "right" : "dpad-transform-rightmost",
                 "down" : "dpad-transform-downmost",
@@ -216,19 +223,52 @@ Responses are the virtual manifestations of the physical motion controller's cha
 }
 ```
 
-#### Thumbstick
->ADD AN EXPLANATION HERE
+### Thumbstick Visual Responses
+> TODO WRITE TEXT
+
 ```json
 {
     "gamepad" : {
-        "responses" : [
+        "visualResponses" : [
             {
-                "target" : "thumbstick-transform",
+                "userAction": "onTouch",
+                "target" : "thumbstick-root",
                 "left" : "thumbstick-transform-leftmost",
                 "right" : "thumbstick-transform-rightmost",
                 "down" : "thumbstick-transform-downmost",
                 "up" : "thumbstick-transform-upmost",
-                "max" : "thumbstick-transform-buttonpressed"
+                "buttonMin" : "thumbstick-transform-buttonMin",
+                "buttonMax" : "thumbstick-transform-buttonMax"
+            }
+        ]
+    }
+}
+```
+
+### Touchpad Visual Responses
+> TODO WRITE TEXT
+
+```json
+{
+    "gamepad" : {
+        "visualResponses" : [
+            {
+                "userAction": "onTouch",
+                "target" : "touchpadDot-root",
+                "left" : "touchpadDot-transform-leftmost",
+                "right" : "touchpadDot-transform-rightmost",
+                "down" : "touchpadDot-transform-downmost",
+                "up" : "touchpadDot-transform-upmost"
+            },
+            {
+                "userAction": "onPress",
+                "target" : "touchpad-root",
+                "left" : "touchpad-transform-leftmost",
+                "right" : "touchpad-transform-rightmost",
+                "down" : "touchpad-transform-downmost",
+                "up" : "touchpad-transform-upmost",
+                "buttonMin" : "touchpad-transform-buttonMin",
+                "buttonMax" : "touchpad-transform-buttonMax"
             }
         ]
     }
@@ -236,55 +276,54 @@ Responses are the virtual manifestations of the physical motion controller's cha
 ```
 
 ## Components
-Components are the glue that binds a `dataSource` to the `response` visualizations.  In addition to this mapping, the a component also contains two additional properties.  The first is the `root` representing the top-most node of the motion controller part in the asset file. The second is the `labelTransform` representing the point relative to the asset at which it would be safe to place text explaining the usage of the motion controller part.
-
-For example, here is a gamepad with a single touchpad:
+For example, here component mapping for a single button.
 ```json
 {
     "gamepad" : {
         "components" : [
             {
                 "dataSource" : 4,
-                "root" : "touchpad-root",
-                "labelTransform" : "touchpad-label-transform",
-                "pressResponse" : 1,
-                "touchResponse" : 0
+                "root" : "trigger-root",
+                "labelTransform" : "trigger-label-transform"
             }
         ],
         "dataSources" : [
             {
-                "touchpadSource" : {
-                    "id" : "touchpad",
-                    "xAxis" : {
-                        "gamepadAxesIndex" : 0
-                    },
-                    "yAxis" : {
-                        "gamepadAxesIndex" : 1
-                    },
-                    "button" : {
-                        "gamepadButtonsIndex" : 0
-                    }
-                }
+                "id" : "triggerButton",
+                "dataSourceType" : "buttonSource",
+                "buttonIndex" : 2
+            }
+        ]
+    }
+}
+```
+
+However, most components will also include one or more `visualResponses` such as the example below.
+
+```json
+{
+    "gamepad" : {
+        "components" : [
+            {
+                "dataSource" : 4,
+                "root" : "trigger-root",
+                "labelTransform" : "trigger-label-transform",
+                "visualResponses" : [0]
             }
         ],
-        "responses" : [
+        "dataSources" : [
             {
-                "touchpadTouch" : {
-                    "target" : "touchpad-touchpoint-transform",
-                    "left" : "touchpad-touchpoint-transform-leftmost",
-                    "right" : "touchpad-touchpoint-transform-rightmost",
-                    "down" : "touchpad-touchpoint-transform-downmost",
-                    "up" : "touchpad-touchpoint-transform-upmost",
-                }
-            },
+                "id" : "triggerButton",
+                "dataSourceType" : "buttonSource",
+                "buttonIndex" : 2
+            }
+        ],
+        "visualResponses" : [
             {
-                "touchpadPress" : {
-                    "target" : "touchpad-transform",
-                    "left" : "touchpad-transform-leftmost",
-                    "right" : "touchpad-transform-rightmost",
-                    "down" : "touchpad-transform-downmost",
-                    "up" : "touchpad-transform-upmost",
-                }
+                "userAction": "onTouch",
+                "target" : "trigger-root",
+                "buttonMin" : "trigger-transform-buttonMin",
+                "buttonMax" : "trigger-transform-buttonMax"
             }
         ]
     }
@@ -292,36 +331,11 @@ For example, here is a gamepad with a single touchpad:
 ```
 
 ## Hands
-Hands are the binding of individual components into motion controllers
-### Hand 
-### Neutral
-#### Handedness
-For motion controllers that report a handedness property
-```json
-{
-    "gamepad" : {
-        "id" : "motion-controller-id",
-        "hands" : {
-            "left" : {
-                "asset" : "some-url",
-                "root" : "left-hand-controller",
-                "componentIds" : [0],
-                "primaryButton" : 0,
-            },
-            "right" : {
-                "asset" : "some-url",
-                "root" : "right-hand-controller",
-                "componentIds" : [0],
-                "primaryButton" : 0,
-                "primaryAxes" : 0
-            }
-        }
-    }
-}
-```
+> Hands are the binding of individual components into motion controllers.  Explain that hands come in `neutral`, `left`, and `right`.
 
-#### Unhanded controllers
-For motion controllers than can't distinguish right vs left
+### Neutral
+> Explain the parts of a hand
+
 ```json
 {
     "gamepad" : {
@@ -329,10 +343,78 @@ For motion controllers than can't distinguish right vs left
         "hands" : {
             "neutral" : {
                 "asset" : "some-url",
-                "root" : "neutral-hand-controller",
-                "componentIds" : [0],
-                "primaryButton" : 0,
-                "primaryAxes" : 0
+                "root" : "neutral-handedness-controller",
+                "components" : [0]
+            }
+        }
+    }
+}
+```
+
+> Explain about primaryButtonComponent and primaryAxisComponent
+
+```json
+{
+    "gamepad" : {
+        "id" : "motion-controller-id",
+        "hands" : {
+            "neutral" : {
+                "asset" : "some-url",
+                "root" : "neutral-handedness-controller",
+                "components" : [0],
+                "primaryButtonComponent" : 0,
+                "primaryAxisComponent" : 1
+            }
+        }
+    }
+}
+```
+
+#### Left and Right
+> Explain about motion controllers that always report a handedness property
+
+```json
+{
+    "gamepad" : {
+        "id" : "motion-controller-id",
+        "hands" : {
+            "left" : {
+                "asset" : "some-url",
+                "root" : "left-handedness-controller",
+                "components" : [0]
+            },
+            "right" : {
+                "asset" : "some-url",
+                "root" : "right-handedness-controller",
+                "components" : [0]
+            }
+        }
+    }
+}
+```
+
+#### Dynamic Handedness
+> Explain about motion controllers than can't distinguish right vs left, but report that way anyway
+
+```json
+{
+    "gamepad" : {
+        "id" : "motion-controller-id",
+        "hands" : {
+            "neutral" : {
+                "asset" : "some-url",
+                "root" : "neutral-handedness-controller",
+                "components" : [0]
+            },
+            "left" : {
+                "asset" : "some-url",
+                "root" : "neutral-handedness-controller",
+                "components" : [0]
+            },
+            "right" : {
+                "asset" : "some-url",
+                "root" : "neutral-handedness-controller",
+                "components" : [0]
             }
         }
     }

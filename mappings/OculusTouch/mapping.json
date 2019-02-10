@@ -116,7 +116,7 @@
         ],
         "visualResponses" : [
             {
-                "type": "onPress",
+                "userAction": "onPress",
                 "target" : "thumbstick-transform-node",
                 "left" : "thumbstick-transform-left-node",
                 "right" : "thumbstick-right-transform-right-node",
@@ -126,43 +126,43 @@
                 "buttonMax": "thumbstick-transform-centerMax-node"
             },
             {
-                "type": "onTouch",
+                "userAction": "onTouch",
                 "target" : "trigger-transform-node",
                 "buttonMin": "trigger-min-transform-node",
                 "buttonMax": "trigger-max-transform-node"
             },
             {
-                "type": "onPress",
+                "userAction": "onPress",
                 "target" : "grip-transform-node",
                 "buttonMin": "grip-min-transform-node",
                 "buttonMax": "grip-max-transform-node"
             },
             {
-                "type": "onPress",
+                "userAction": "onPress",
                 "target" : "x-transform-node",
                 "buttonMin": "x-min-transform-node",
                 "buttonMax": "x-max-transform-node"
             },
             {
-                "type": "onPress",
+                "userAction": "onPress",
                 "target" : "y-transform-node",
                 "buttonMin": "y-min-transform-node",
                 "buttonMax": "y-max-transform-node"
             },
             {
-                "type": "onPress",
+                "userAction": "onPress",
                 "target" : "a-transform-node",
                 "buttonMin": "a-min-transform-node",
                 "buttonMax": "a-max-transform-node"
             },
             {
-                "type": "onPress",
+                "userAction": "onPress",
                 "target" : "b-transform-node",
                 "buttonMin": "b-min-transform-node",
                 "buttonMax": "b-max-transform-node"
             },
             {
-                "type": "onTouch",
+                "userAction": "onTouch",
                 "target" : "thumbrest-touchpoint-node",
                 "buttonMin": "thumbrest-min-touchpoint-node",
                 "buttonMax": "thumbrest-max-touchpoint-node"

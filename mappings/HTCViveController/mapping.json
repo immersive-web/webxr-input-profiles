@@ -53,7 +53,7 @@
         ],
         "visualResponses" : [
             {
-                "type": "onPress",
+                "userAction": "onPress",
                 "target" : "touchpad-transform-node",
                 "left" : "touchpad-transform-left-node",
                 "right" : "touchpad-transform-right-node",
@@ -61,7 +61,7 @@
                 "down" : "touchpad-transform-down-node"
             },
             {
-                "type": "onTouch",
+                "userAction": "onTouch",
                 "target" : "touchpad-touchpoint-node",
                 "left" : "touchpad-touchpoint-left-node",
                 "right" : "touchpad-touchpoint-right-node",
@@ -69,13 +69,13 @@
                 "down" : "touchpad-touchpoint-down-node"
             },
             {
-                "type": "onTouch",
+                "userAction": "onTouch",
                 "target" : "trigger-transform-node",
                 "buttonMin": "trigger-min-transform-node",
                 "buttonMax": "trigger-max-transform-node"
             },
             {
-                "type": "onPress",
+                "userAction": "onPress",
                 "target" : "grip-transform-node",
                 "buttonMin": "grip-min-transform-node",
                 "buttonMax": "grip-max-transform-node"
