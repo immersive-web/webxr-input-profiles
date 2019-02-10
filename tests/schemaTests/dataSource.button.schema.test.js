@@ -15,12 +15,6 @@ test("Valid button sources", () => {
     expect(validator.errors).toBeNull();
   }
 
-  dataSource.touchSupportedAtMinValue = true;
-  valid = validator(dataSource);
-  if (!valid) {
-    expect(validator.errors).toBeNull();
-  }
-
   dataSource.pressUnsupported = true;
   valid = validator(dataSource);
   if (!valid) {

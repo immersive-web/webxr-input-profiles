@@ -37,8 +37,9 @@ test("Valid mapping", () => {
   }
 
   const visualResponse = {
-    "type": "onTouch",
+    "userAction": "onTouch",
     "target": "target node",
+    "buttonMin": "buttonMin node",
     "buttonMax": "buttonMax node"
   };
   mapping.gamepad.visualResponses = [visualResponse];
