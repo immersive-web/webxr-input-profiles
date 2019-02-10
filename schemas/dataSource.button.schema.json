@@ -9,7 +9,6 @@
         "id": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/id" }] },
         "dataSourceType": { "enum": ["buttonSource"] },
         "buttonIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
-        "touchSupportedAtMinValue": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/touchSupportedAtMinValue" }] },
         "pressUnsupported": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/pressUnsupported" }] },
         "analogValues": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/analogValues" }] }
     }

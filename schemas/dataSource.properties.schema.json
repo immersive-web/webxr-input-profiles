@@ -11,10 +11,6 @@
             "type": "number",
             "minimum": 0
         },
-        "touchSupportedAtMinValue" : {
-            "description" : "Indicates the ability to report GamepadButton.touched==true even when the button's value is at the minimum",
-            "type" : "boolean"
-        },
         "pressUnsupported" : {
             "description" : "Indicates the inability to report GamepadButton.pressed",
             "type" : "boolean"
