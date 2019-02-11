@@ -81,8 +81,8 @@
                 "target" : "touchpad-touchpoint-node",
                 "left" : "touchpad-touchpoint-left-node",
                 "right" : "touchpad-touchpoint-right-node",
-                "up" : "touchpad-touchpoint-up-node",
-                "down" : "touchpad-touchpoint-down-node"
+                "top" : "touchpad-touchpoint-top-node",
+                "bottom" : "touchpad-touchpoint-bottom-node"
             },
             {
                 "userAction": "onTouch",

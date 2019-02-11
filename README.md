@@ -100,7 +100,7 @@ A dpad is a physical part that rocks in two directions, left-right and top-botto
 The `standard` mapping defined in the [Gamepad API](https://www.w3.org/TR/gamepad/#remapping) suggests that dpad parts should be divided into four separate entries in the `Gamepad.buttons` array.  It has been observed, however, that some hardware may report dpads as two entries in the `Gamepad.axes` array instead.  As a result, this schema provides two different subschemas that may be used to represent dpads.
 
 #### Dpads From Buttons
-A data source of this type is defined as one with the `dataSourceType` property set to `dpadFromButtonsSource`. It must include `leftIndex`, `rightIndex`, `upIndex`, and `downIndex` properties with values representing the indices in the `Gamepad.buttons` array at which to find the related data.  For example:
+A data source of this type is defined as one with the `dataSourceType` property set to `dpadFromButtonsSource`. It must include `leftButtonIndex`, `rightButtonIndex`, `topButtonIndex`, and `bottomButtonIndex` properties with values representing the indices in the `Gamepad.buttons` array at which to find the related data.  For example:
 
 ```json
 {
@@ -109,10 +109,10 @@ A data source of this type is defined as one with the `dataSourceType` property 
             {
                 "id" : "dpad",
                 "type": "dpadFromButtonsSource",
-                "leftIndex" : 3,
-                "rightIndex" : 4,
-                "upIndex" : 5, 
-                "downIndex" : 6
+                "leftButtonIndex" : 3,
+                "rightButtonIndex" : 4,
+                "bottomButtonIndex" : 5,
+                "topButtonIndex" : 6
             }
         ]
     }
@@ -186,8 +186,8 @@ Each `visualResponse` must contain a `target` property which references the node
 
 In addition to the `target` and `userResponse` properties, a `visualResponse` must have one of the following groups of properties.  Each property represents a node in the asset at the extent of the value which is it matched to:
 * `buttonMin` and `buttonMax`
-* `left`, `right`, `down`, and `up`
-* `left`, `right`, `down`, `up`, `buttonMin`, and `buttonMax`
+* `left`, `right`, `bottom`, and `top`
+* `left`, `right`, `bottom`, `top`, `buttonMin`, and `buttonMax`
 
 For example, a button part would have a `buttonMin` representing the visual state of `target` when the button is not being interacted with and a `buttonMax` representing the visual state of `target` when the button is fully pressed.  Developers are then able to interpolate the correct visualization of `target` by weighting `buttonMin` and `buttonMax` based on `GamepadButton.value`.  The javascript library shipped as part of this package includes this calculation.
 
@@ -210,7 +210,7 @@ Visual responses for button parts are expected to interpolate `target` propertie
 ```
 
 ### Dpad Visual Responses
-Physical dpad parts rock around a central pivot, requiring their visual responses to interpolate between `left` and `right` as well as `down` and `up`.  The expected interpolation is different when associated based on a `dpadFromButtonSource` as opposed to a `dpadFromAxes`.  When associated with the former, `right` is weighted by the `GamepadButton.value` associated with the `rightButtonIndex`, `down` is weighted by the `GamepadButton.value` associated with the `downButtonIndex`, and so on.  When associated with the latter type of data source, the algorithm is a bit more complicated.  Only positive values in `Gamepad.axes` array at the `xAxisIndex` position are used for interpolation with the `right` node whereas only the absolute value of negative values are used for interpolation with the `left` node.  The same behavior applies to `up` and `down` regarding the data at the `yAxisIndex` in the `Gamepad.axes` array. In this manner, both types of data sources can be associated with a single type of visual response.  For example:
+Physical dpad parts rock around a central pivot, requiring their visual responses to interpolate between `left` and `right` as well as `bottom` and `top`.  The expected interpolation is different when associated based on a `dpadFromButtonSource` as opposed to a `dpadFromAxes`.  When associated with the former, `right` is weighted by the `GamepadButton.value` associated with the `rightButtonIndex`, `bottom` is weighted by the `GamepadButton.value` associated with the `bottomButtonIndex`, and so on.  When associated with the latter type of data source, the algorithm is a bit more complicated.  Only positive values in `Gamepad.axes` array at the `xAxisIndex` position are used for interpolation with the `right` node whereas only the absolute value of negative values are used for interpolation with the `left` node.  The same behavior applies to `top` and `bottom` regarding the data at the `yAxisIndex` in the `Gamepad.axes` array. In this manner, both types of data sources can be associated with a single type of visual response.  For example:
 
 ```json
 {
@@ -221,8 +221,8 @@ Physical dpad parts rock around a central pivot, requiring their visual response
                 "target" : "dpad-root",
                 "left" : "dpad-transform-leftmost",
                 "right" : "dpad-transform-rightmost",
-                "down" : "dpad-transform-downmost",
-                "up" : "dpad-transform-upmost"
+                "bottom" : "dpad-transform-bottommost",
+                "top" : "dpad-transform-topmost"
             }
         ]
     }
@@ -230,7 +230,7 @@ Physical dpad parts rock around a central pivot, requiring their visual response
 ```
 
 ### Thumbstick Visual Responses
-Thumbsticks share physical characteristics with dpad, though they typically have a wider range of motion and may also be clickable.  For interpolating the `target` properties, only positive values in `Gamepad.axes` array at the `xAxisIndex` position are used with the `right` node, whereas only the absolute value of negative values are used with the `left` node.  The same behavior applies to `up` and `down` regarding the data at the `yAxisIndex` in the `Gamepad.axes` array. If clickable, `target` properties are also interpolated with `buttonMin` and `buttonMax` based on `GamepadButton.value`.  For example:
+Thumbsticks share physical characteristics with dpad, though they typically have a wider range of motion and may also be clickable.  For interpolating the `target` properties, only positive values in `Gamepad.axes` array at the `xAxisIndex` position are used with the `right` node, whereas only the absolute value of negative values are used with the `left` node.  The same behavior applies to `top` and `bottom` regarding the data at the `yAxisIndex` in the `Gamepad.axes` array. If clickable, `target` properties are also interpolated with `buttonMin` and `buttonMax` based on `GamepadButton.value`.  For example:
 
 ```json
 {
@@ -241,8 +241,8 @@ Thumbsticks share physical characteristics with dpad, though they typically have
                 "target" : "thumbstick-root",
                 "left" : "thumbstick-transform-leftmost",
                 "right" : "thumbstick-transform-rightmost",
-                "down" : "thumbstick-transform-downmost",
-                "up" : "thumbstick-transform-upmost",
+                "bottom" : "thumbstick-transform-bottommost",
+                "top" : "thumbstick-transform-topmost",
                 "buttonMin" : "thumbstick-transform-buttonMin",
                 "buttonMax" : "thumbstick-transform-buttonMax"
             }
@@ -254,7 +254,7 @@ Thumbsticks share physical characteristics with dpad, though they typically have
 ### Touchpad Visual Responses
 Thumbsticks share physical characteristics with dpad, though they may also be clickable.  Whereas all other data source types may use a `userAction` of `onTouch` for all visualizations, touchpad data sources will most likely only use an `onTouch` visualization to represent the touch-dot of the user's finger on the part.  Any motion of the touchpad itself due to being clickable, will likely be represented in a visualization with the `userAction` set to `onPress`.
 
-In either case, the algorithm for interpolating the `target` properties is roughly the same.  Only positive values in `Gamepad.axes` array at the `xAxisIndex` position are used with the `right` node, whereas only the absolute value of negative values are used with the `left` node.  The same behavior applies to `up` and `down` regarding the data at the `yAxisIndex` in the `Gamepad.axes` array. If clickable, response visualizations with a `userAction` set to `onPress` may also interpolate `buttonMin` and `buttonMax` based on `GamepadButton.value`.  For example:
+In either case, the algorithm for interpolating the `target` properties is roughly the same.  Only positive values in `Gamepad.axes` array at the `xAxisIndex` position are used with the `right` node, whereas only the absolute value of negative values are used with the `left` node.  The same behavior applies to `top` and `bottom` regarding the data at the `yAxisIndex` in the `Gamepad.axes` array. If clickable, response visualizations with a `userAction` set to `onPress` may also interpolate `buttonMin` and `buttonMax` based on `GamepadButton.value`.  For example:
 
 ```json
 {
@@ -265,16 +265,16 @@ In either case, the algorithm for interpolating the `target` properties is rough
                 "target" : "touchpadDot-root",
                 "left" : "touchpadDot-transform-leftmost",
                 "right" : "touchpadDot-transform-rightmost",
-                "down" : "touchpadDot-transform-downmost",
-                "up" : "touchpadDot-transform-upmost"
+                "bottom" : "touchpadDot-transform-bottommost",
+                "top" : "touchpadDot-transform-topmost"
             },
             {
                 "userAction": "onPress",
                 "target" : "touchpad-root",
                 "left" : "touchpad-transform-leftmost",
                 "right" : "touchpad-transform-rightmost",
-                "down" : "touchpad-transform-downmost",
-                "up" : "touchpad-transform-upmost",
+                "bottom" : "touchpad-transform-bottommost",
+                "top" : "touchpad-transform-topmost",
                 "buttonMin" : "touchpad-transform-buttonMin",
                 "buttonMax" : "touchpad-transform-buttonMax"
             }

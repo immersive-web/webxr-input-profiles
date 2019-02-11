@@ -27,27 +27,27 @@
                 "type": "string"
             },
             "left" : {
-                "description": "Node in the asset representing the effect of dpad.left.value or xAxis at left-most position",
+                "description": "Node in the asset representing the effect of the button at leftButtonIndex or the xAxis at the left-most position",
                 "type": "string"
             },
             "right" : {
-                "description": "Node in the asset representing the effect of dpad.right.value or xAxis at right-most position",
+                "description": "Node in the asset representing the effect of the button at rightButtonIndex or the xAxis at the right-most position",
                 "type": "string"
             },
-            "down" : {
-                "description": "Node in the asset representing the effect of dpad.down.value or yAxis at down-most position",
+            "bottom" : {
+                "description": "Node in the asset representing the effect of the button at bottomButtonIndex or the yAxis at the bottom-most position",
                 "type": "string"
             },
-            "up" : {
-                "description": "Node in the asset representing the effect of dpad.up.value or yAxis at up-most position",
+            "top" : {
+                "description": "Node in the asset representing the effect of the button at topButtonIndex or yAxis at the top-most position",
                 "type": "string"
             }
         },
         "dependencies": {
-            "left": ["right", "down", "up"],
-            "right": ["left", "down", "up"],
-            "down": ["left", "right", "up"],
-            "up": ["left", "right", "down"],
+            "left": ["right", "bottom", "top"],
+            "right": ["left", "bottom", "top"],
+            "bottom": ["left", "right", "top"],
+            "top": ["left", "right", "bottom"],
             "buttonMin": ["buttonMax"],
             "buttonMax": ["buttonMin"]
         },
@@ -56,7 +56,7 @@
                 "required": ["userAction", "target", "buttonMax", "buttonMin"]
             },
             {
-                "required": ["userAction", "target", "left", "right", "down", "up"]
+                "required": ["userAction", "target", "left", "right", "bottom", "top"]
             }
         ]
     }

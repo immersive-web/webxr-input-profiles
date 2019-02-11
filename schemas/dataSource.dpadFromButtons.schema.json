@@ -4,14 +4,14 @@
     "description": "Dpad data source from buttons",
     "type": "object",
     "additionalProperties": false,
-    "required": ["id", "dataSourceType", "leftButtonIndex", "rightButtonIndex", "downButtonIndex", "upButtonIndex"],
+    "required": ["id", "dataSourceType", "leftButtonIndex", "rightButtonIndex", "bottomButtonIndex", "topButtonIndex"],
     "properties":{
         "id": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/id" }] },
         "dataSourceType": { "enum": ["dpadFromButtonsSource"] },
         "leftButtonIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
         "rightButtonIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
-        "downButtonIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
-        "upButtonIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
+        "bottomButtonIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
+        "topButtonIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
         "analogValues": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/analogValues" }] }
     }
 }
