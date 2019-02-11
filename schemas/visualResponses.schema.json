@@ -1,0 +1,63 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "id": "https://immersive-web/gamepad-mapping/0.1.0/visualResponses.schema.json",
+    "type": "array",
+    "description": "The responses array",
+    "minItems": 1,
+    "additionalItems": false,
+    "uniqueItems": true,
+    "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+            "userAction": {
+                "description": "The action which should cause this visualization to apply",
+                "enum": ["onPress", "onTouch"]
+            },
+            "target" : {
+                "description": "The node in the asset to be modified by this visualization",
+                "type": "string"
+            },
+            "buttonMin": {
+                "description": "Node in the asset representing the effect of button.value == 0",
+                "type": "string"
+            },
+            "buttonMax": {
+                "description": "Node in the asset representing the effect of button.value == 1",
+                "type": "string"
+            },
+            "left" : {
+                "description": "Node in the asset representing the effect of the button at leftButtonIndex or the xAxis at the left-most position",
+                "type": "string"
+            },
+            "right" : {
+                "description": "Node in the asset representing the effect of the button at rightButtonIndex or the xAxis at the right-most position",
+                "type": "string"
+            },
+            "bottom" : {
+                "description": "Node in the asset representing the effect of the button at bottomButtonIndex or the yAxis at the bottom-most position",
+                "type": "string"
+            },
+            "top" : {
+                "description": "Node in the asset representing the effect of the button at topButtonIndex or yAxis at the top-most position",
+                "type": "string"
+            }
+        },
+        "dependencies": {
+            "left": ["right", "bottom", "top"],
+            "right": ["left", "bottom", "top"],
+            "bottom": ["left", "right", "top"],
+            "top": ["left", "right", "bottom"],
+            "buttonMin": ["buttonMax"],
+            "buttonMax": ["buttonMin"]
+        },
+        "anyOf": [
+            {
+                "required": ["userAction", "target", "buttonMax", "buttonMin"]
+            },
+            {
+                "required": ["userAction", "target", "left", "right", "bottom", "top"]
+            }
+        ]
+    }
+}

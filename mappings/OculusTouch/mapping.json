@@ -1,210 +1,171 @@
 {
-    "version" : 0.1,
+    "version" : "0.1",
     "gamepad" : {
         "id" : "Oculus-Touch",
         "hands" : {
             "left" : {
                 "asset" : "some-url",
-                "rootId" : "left-controller-node",
-                "componentIds" : [0, 1, 2, 3, 4, 7],
-                "primaryButton" : 0,
-                "primaryAxes" : 1
+                "root" : "left-controller-node",
+                "components" : [0, 1, 2, 3, 4, 7],
+                "primaryButtonComponent" : 0,
+                "primaryAxesComponent" : 1
             },
             "right" : {
                 "asset" : "some-url",
-                "rootId" : "right-controller-node",
-                "componentIds" : [0, 1, 2, 5, 6, 7],
-                "primaryButton" : 0,
-                "primaryAxes" : 1
+                "root" : "right-controller-node",
+                "components" : [0, 1, 2, 5, 6, 7],
+                "primaryButtonComponent" : 0,
+                "primaryAxesComponent" : 1
             }
         },
         "components" : [
             {
                 "dataSource" : 0,
-                "rootId" : "thumbstick-node",
-                "labelTransformId" : "thumbstick-label",
-                "touchResponse" : 0
+                "root" : "thumbstick-node",
+                "labelTransform" : "thumbstick-label",
+                "visualResponses": [0]
             },
             {
                 "dataSource" : 1,
-                "rootId" : "trigger-node",
-                "labelTransformId" : "trigger-label",
-                "pressResponse" : 1
+                "root" : "trigger-node",
+                "labelTransform" : "trigger-label",
+                "visualResponses": [1]
             },
             {
                 "dataSource" : 2,
-                "rootId" : "grip-node",
-                "labelTransformId" : "grip-label",
-                "pressResponse" : 2
+                "root" : "grip-node",
+                "labelTransform" : "grip-label",
+                "visualResponses": [2]
             },
             {
                 "dataSource" : 3,
-                "rootId" : "x-node",
-                "labelTransformId" : "x-label",
-                "pressResponse" : 3
+                "root" : "x-node",
+                "labelTransform" : "x-label",
+                "visualResponses": [3]
             },
             {
                 "dataSource" : 4,
-                "rootId" : "y-node",
-                "labelTransformId" : "y-label",
-                "pressResponse" : 4
+                "root" : "y-node",
+                "labelTransform" : "y-label",
+                "visualResponses": [4]
             },
             {
                 "dataSource" : 5,
-                "rootId" : "a-node",
-                "labelTransformId" : "a-label",
-                "pressResponse" : 5
+                "root" : "a-node",
+                "labelTransform" : "a-label",
+                "visualResponses": [5]
             },
             {
                 "dataSource" : 6,
-                "rootId" : "b-node",
-                "labelTransformId" : "b-label",
-                "pressResponse" : 6
+                "root" : "b-node",
+                "labelTransform" : "b-label",
+                "visualResponses": [6]
             },
             {
                 "dataSource" : 7,
-                "rootId" : "thumbrest-node",
-                "labelTransformId" : "thumbrest-label",
-                "touchResponse" : 7
+                "root" : "thumbrest-node",
+                "labelTransform" : "thumbrest-label",
+                "visualResponses": [7]
             }
         ],
         "dataSources" : [
             {
-                "thumbstick" : {
-                    "id" : "thumbstick",
-                    "xAxis" : {
-                        "gamepadAxesIndex" : 0,
-                        "left" : 0,
-                        "right" : 1
-                    },
-                    "yAxis" : {
-                        "gamepadAxesIndex" : 1,
-                        "down" : 0,
-                        "up" : 1
-                    },
-                    "button" : {
-                        "gamepadButtonsIndex" : 0
-                    }
-                }
+                "id" : "thumbstick",
+                "dataSourceType": "thumbstickSource",
+                "xAxisIndex" : 0,
+                "yAxisIndex" : 1,
+                "buttonIndex" : 0
             },
             {
-                "button" : {
-                    "id" : "trigger",
-                    "gamepadButtonsIndex" : 1,
-                    "analogValues" : true
-                }
+                "id" : "trigger",
+                "dataSourceType": "buttonSource",
+                "buttonIndex" : 1,
+                "analogValues" : true
             },
             {
-                "button" : {
-                    "id" : "grip",
-                    "gamepadButtonIndex" : 2,
-                    "supportsTouch" : false
-                }
+                "id" : "grip",
+                "dataSourceType": "buttonSource",
+                "buttonIndex" : 2
             },
             {
-                "button" : {
-                    "id" : "x",
-                    "gamepadButtonsIndex" : 3,
-                    "supportsTouch" : false
-                }
+                "id" : "x",
+                "dataSourceType": "buttonSource",
+                "buttonIndex" : 3
             },
             {
-                "button" : {
-                    "id" : "y",
-                    "gamepadButtonsIndex" : 4,
-                    "supportsTouch" : false
-                }
+                "id" : "y",
+                "dataSourceType": "buttonSource",
+                "buttonIndex" : 4
             },
             {
-                "button" : {
-                    "name" : "a",
-                    "gamepadButtonsIndex" : 3,
-                    "supportsTouch" : false
-                }
+                "id" : "a",
+                "dataSourceType": "buttonSource",
+                "buttonIndex" : 3
             },
             {
-                "button" : {
-                    "name" : "b",
-                    "gamepadButtonsIndex" : 4,
-                    "supportsTouch" : false
-                }
+                "id" : "b",
+                "dataSourceType": "buttonSource",
+                "buttonIndex" : 4
             },
             {
-                "button" : {
-                    "id" : "thumbrest",
-                    "gamepadButtonsIndex" : 5,
-                    "supportsPress" : false
-                }
+                "id" : "thumbrest",
+                "dataSourceType": "buttonSource",
+                "buttonIndex" : 5,
+                "pressUnstopported": true
             }
         ],
-        "responses" : [
+        "visualResponses" : [
             {
-                "thumbstickTouch" : {
-                    "target" : "thumbstick-transform-node",
-                    "default" : "thumbstick-transform-default-node",
-                    "left" : "thumbstick-transform-left-node",
-                    "right" : "thumbstick-right-transform-right-node",
-                    "up" : "thumbstick-transform-up-node",
-                    "down" : "thumbstick-transform-down-node",
-                    "centerMin" : "thumbstick-transform-centerMin-node",
-                    "centerMax" : "thumbstick-transform-centerMax-node"
-                }
+                "userAction": "onPress",
+                "target" : "thumbstick-transform-node",
+                "left" : "thumbstick-transform-left-node",
+                "right" : "thumbstick-right-transform-right-node",
+                "top" : "thumbstick-transform-top-node",
+                "bottom" : "thumbstick-transform-bottom-node",
+                "buttonMin": "thumbstick-transform-centerMin-node",
+                "buttonMax": "thumbstick-transform-centerMax-node"
             },
             {
-                "buttonPress" : {
-                    "target" : "trigger-transform-node",
-                    "default" : "trigger-default-transform-node",
-                    "min" : "trigger-min-transform-node",
-                    "max" : "trigger-max-transform-node"
-                }
+                "userAction": "onTouch",
+                "target" : "trigger-transform-node",
+                "buttonMin": "trigger-min-transform-node",
+                "buttonMax": "trigger-max-transform-node"
             },
             {
-                "buttonPress" : {
-                    "target" : "grip-transform-node",
-                    "default" : "grip-default-transform-node",
-                    "min" : "grip-min-transform-node",
-                    "max" : "grip-max-transform-node"
-                }
+                "userAction": "onPress",
+                "target" : "grip-transform-node",
+                "buttonMin": "grip-min-transform-node",
+                "buttonMax": "grip-max-transform-node"
             },
             {
-                "buttonPress" : {
-                    "target" : "x-transform-node",
-                    "default" : "x-default-transform-node",
-                    "min" : "x-min-transform-node",
-                    "max" : "x-max-transform-node"
-                }
+                "userAction": "onPress",
+                "target" : "x-transform-node",
+                "buttonMin": "x-min-transform-node",
+                "buttonMax": "x-max-transform-node"
             },
             {
-                "buttonPress" : {
-                    "target" : "y-transform-node",
-                    "default" : "y-default-transform-node",
-                    "min" : "y-min-transform-node",
-                    "max" : "y-max-transform-node"
-                }
+                "userAction": "onPress",
+                "target" : "y-transform-node",
+                "buttonMin": "y-min-transform-node",
+                "buttonMax": "y-max-transform-node"
             },
             {
-                "buttonPress" : {
-                    "target" : "a-transform-node",
-                    "default" : "a-default-transform-node",
-                    "min" : "a-min-transform-node",
-                    "max" : "a-max-transform-node"
-                }
+                "userAction": "onPress",
+                "target" : "a-transform-node",
+                "buttonMin": "a-min-transform-node",
+                "buttonMax": "a-max-transform-node"
             },
             {
-                "buttonPress" : {
-                    "target" : "b-transform-node",
-                    "default" : "b-default-transform-node",
-                    "min" : "b-min-transform-node",
-                    "max" : "b-max-transform-node"
-                }
+                "userAction": "onPress",
+                "target" : "b-transform-node",
+                "buttonMin": "b-min-transform-node",
+                "buttonMax": "b-max-transform-node"
             },
             {
-                "buttonTouch" : {
-                    "target" : "thumbrest-touchpoint-node",
-                    "default" : "thumbrest-default-touchpoint-node",
-                    "min" : "thumbrest-min-touchpoint-node",
-                    "max" : "thumbrest-max-touchpoint-node"
-                }
+                "userAction": "onTouch",
+                "target" : "thumbrest-touchpoint-node",
+                "buttonMin": "thumbrest-min-touchpoint-node",
+                "buttonMax": "thumbrest-max-touchpoint-node"
             }
         ]
     }

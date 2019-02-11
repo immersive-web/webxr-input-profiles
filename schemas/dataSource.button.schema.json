@@ -1,0 +1,15 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "id": "https://immersive-web/gamepad-mapping/0.1.0/dataSource.button.schema.json",
+    "description": "Button data source",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "dataSourceType", "buttonIndex"],
+    "properties":{
+        "id": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/id" }] },
+        "dataSourceType": { "enum": ["buttonSource"] },
+        "buttonIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
+        "pressUnsupported": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/pressUnsupported" }] },
+        "analogValues": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/analogValues" }] }
+    }
+}

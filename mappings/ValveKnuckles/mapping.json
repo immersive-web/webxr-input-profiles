@@ -1,125 +1,106 @@
 {
-    "version" : 0.1,
+    "version" : "0.1",
     "gamepad" : {
         "id" : "Knuckles",
         "hands" : {
             "left" : {
+                "asset" : "some-url",
+                "root" : "left-controller-node",
                 "components" : [0, 1, 2, 3],
-                "primaryButton" : 0,
-                "primaryAxes" : 0
+                "primaryButtonComponent" : 0,
+                "primaryAxesComponent" : 0
             },
             "right" : {
+                "asset" : "some-url",
+                "root" : "right-controller-node",
                 "components" : [0, 1, 2, 3],
-                "primaryButton" : 0,
-                "primaryAxes" : 0
+                "primaryButtonComponent" : 0,
+                "primaryAxesComponent" : 0
             }
         },
         "components" : [
             {
                 "dataSource" : 0,
-                "rootId" : "touchpad-node",
-                "labelTransformId" : "touchpad-label-transform",
-                "pressResponse" : 0,
-                "touchResponse" : 1
+                "root" : "touchpad-node",
+                "labelTransform" : "touchpad-label-transform",
+                "visualResponses": [0, 1]
             },
             {
                 "dataSource" : 1,
-                "rootId" : "trigger-node",
-                "labelTransformId" : "trigger-label-transform",
-                "pressResponse" : 2
+                "root" : "trigger-node",
+                "labelTransform" : "trigger-label-transform",
+                "visualResponses": [2]
             },
             {
                 "dataSource" : 2,
-                "rootId" : "innerFaceButton-node",
-                "labelTransformId" : "innerFaceButton-label-transform",
-                "pressResponse" : 3
+                "root" : "innerFaceButton-node",
+                "labelTransform" : "innerFaceButton-label-transform",
+                "visualResponses": [3]
             },
             {
                 "dataSource" : 3,
-                "rootId" : "outerFaceButton-node",
-                "labelTransformId" : "outerFaceButton-label-transform",
-                "pressResponse" : 4
+                "root" : "outerFaceButton-node",
+                "labelTransform" : "outerFaceButton-label-transform",
+                "visualResponses": [4]
             }
         ],
         "dataSources" : [
             {
-                "touchpad" : {
-                    "id" : "trackpad",
-                    "xAxis" : {
-                        "gamepadAxisIndex" : 0
-                    },
-                    "yAxis" : {
-                        "gamepadAxisIndex" : 1
-                    },
-                    "centerButton" : {
-                        "gamepadButtonIndex" : 0
-                    }
-                }
+                "id" : "trackpad",
+                "dataSourceType": "touchpadSource",
+                "xAxisIndex" : 0,
+                "yAxisIndex" : 1,
+                "buttonIndex" : 0
             },
             {
-                "button" : {
-                    "id" : "trigger",
-                    "gamepadButtonIndex" : 1,
-                    "analogValues" : true
-                }
+                "id" : "trigger",
+                "dataSourceType": "buttonSource",
+                "buttonIndex" : 1,
+                "analogValues" : true
             },
             {
-                "button" : {
-                    "id" : "innerFaceButton",
-                    "gamepadButtonIndex" : 2,
-                    "supportsTouch" : false
-                }
+                "id" : "innerFaceButton",
+                "dataSourceType": "buttonSource",
+                "buttonIndex" : 2
             },
             {
-                "button" : {
-                    "id" : "outerFaceButton",
-                    "gamepadButtonIndex" : 3,
-                    "supportsTouch" : false
-                }
+                "id" : "outerFaceButton",
+                "dataSourceType": "buttonSource",
+                "buttonIndex" : 3
             }
         ],
-        "responses" : [
+        "visualResponses" : [
             {
-                "buttonPress" : {
-                    "target" : "touchpad-transform-node",
-                    "default" : "touchpad-transform-default-node",
-                    "min" : "touchpad-transform-min-node",
-                    "max" : "touchpad-transform-max-node"
-                }
+                "userAction": "onPress",
+                "target" : "touchpad-transform-node",
+                "buttonMin": "touchpad-transform-min-node",
+                "buttonMax": "touchpad-transform-max-node"
             },
             {
-                "touchpadTouch" : {
-                    "target" : "touchpad-touchpoint-node",
-                    "default" : "touchpad-touchpoint-default-node",
-                    "left" : "touchpad-touchpoint-left-node",
-                    "right" : "touchpad-touchpoint-right-node",
-                    "up" : "touchpad-touchpoint-up-node",
-                    "down" : "touchpad-touchpoint-down-node"
-                }
+                "userAction": "onTouch",
+                "target" : "touchpad-touchpoint-node",
+                "left" : "touchpad-touchpoint-left-node",
+                "right" : "touchpad-touchpoint-right-node",
+                "top" : "touchpad-touchpoint-top-node",
+                "bottom" : "touchpad-touchpoint-bottom-node"
             },
             {
-                "buttonPress" : {
-                    "target" : "trigger-transform-node",
-                    "default" : "trigger-default-transform-node",
-                    "min" : "trigger-min-transform-node",
-                    "max" : "trigger-max-transform-node"
-                }
+                "userAction": "onTouch",
+                "target" : "trigger-transform-node",
+                "buttonMin": "trigger-min-transform-node",
+                "buttonMax": "trigger-max-transform-node"
             },
             {
-                "buttonPress" : {
-                    "target" : "innerFaceButton-transform-node",
-                    "default" : "innerFaceButton-default-transform-node",
-                    "min" : "innerFaceButton-min-transform-node",
-                    "max" : "innerFaceButton-max-transform-node"
-                }
+                "userAction": "onPress",
+                "target" : "innerFaceButton-transform-node",
+                "buttonMin": "innerFaceButton-min-transform-node",
+                "buttonMax": "innerFaceButton-max-transform-node"
             },
             {
-                "buttonPress" : {
-                    "target" : "outerFaceButton-transform-node",
-                    "default" : "outerFaceButton-default-transform-node",
-                    "min" : "outerFaceButton-min-transform-node",
-                    "max" : "outerFaceButton-max-transform-node"
-                }
+                "userAction": "onPress",
+                "target" : "outerFaceButton-transform-node",
+                "buttonMin": "outerFaceButton-min-transform-node",
+                "buttonMax": "outerFaceButton-max-transform-node"
             }
         ]
     }

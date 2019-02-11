@@ -1,0 +1,30 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "id": "https://immersive-web/gamepad-mapping/0.1.0/mapping.schema.json",
+    "type": "object",
+    "description": "The root object for a gamepad mapping.",
+    "additionalProperties": false,
+    "required": [ "version", "gamepad" ],
+    "properties": {
+        "version" : {
+            "description": "The schema version",
+            "type" : "string"
+        },
+        "gamepad" : {
+            "description": "The gamepad mapping being described in the file",
+            "type" : "object",
+            "additionalProperties": false,
+            "required": [ "hands", "components", "dataSources"],
+            "properties": {
+                "id" : {
+                    "description": "The Gamepad.id the mapping applies to",
+                    "type" : "string"
+                },
+                "hands": { "$ref": "hands.schema.json"},
+                "components": { "$ref": "components.schema.json"},
+                "dataSources": { "$ref": "dataSources.schema.json"},
+                "visualResponses": { "$ref": "visualResponses.schema.json"}
+            }
+        }
+    }
+}

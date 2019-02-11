@@ -1,0 +1,18 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "id": "https://immersive-web/gamepad-mapping/0.1.0/dataSources.schema.json",
+    "title": "The data sources array",
+    "type": "array",
+    "description": "The data sources array",
+    "additionalItems": false,
+    "uniqueItems": true,
+    "minItems": 1,
+    "items": {
+        "oneOf": [
+            { "allOf": [{ "$ref": "dataSource.button.schema.json" }] },
+            { "allOf": [{ "$ref": "dataSource.dpadFromButtons.schema.json" }] },
+            { "allOf": [{ "$ref": "dataSource.dpadFromAxes.schema.json" }] },
+            { "allOf": [{ "$ref": "dataSource.thumbstickAndTouchpad.schema.json" }] }
+        ]
+    }
+}

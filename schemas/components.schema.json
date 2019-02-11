@@ -1,0 +1,41 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "id": "https://immersive-web/gamepad-mapping/0.1.0/components.schema.json",
+    "title": "The components array",
+    "description": "The components array",
+    "type": "array",
+    "additionalItems": false,
+    "uniqueItems": true,
+    "minItems": 1,
+    "items": {
+        "title": "A component",
+        "description": "The joining of a data source and visualization information",
+        "type" : "object",
+        "properties": {
+            "dataSource" : {
+                "allOf": [ { "$ref": "mapping.index.schema.json#/definitions/mappingIndex"} ],
+                "description": "The index into the dataSources array"
+            },
+            "root" : {
+                "type": "string",
+                "description": "The name of the component's root node in the asset file"
+            },
+            "labelTransform" : {
+                "type": "string",
+                "description": "The name of the component's node in the asset file at which location a legend description can safely be placed"
+            },
+            "visualResponses" : {
+                "description": "The indicies of the visual responses to be applied to the component",
+                "type": "array",
+                "minItems": 1,
+                "additionalItems": false,
+                "uniqueItems": true,
+                "items": {
+                    "allOf": [ { "$ref": "mapping.index.schema.json#/definitions/mappingIndex"} ]
+                }
+            }
+        },
+        "required":["dataSource", "root", "labelTransform"],
+        "additionalProperties": false
+    }
+}

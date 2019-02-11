@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "id": "https://immersive-web/gamepad-mapping/0.1.0/dataSource.dpadFromAxes.schema.json",
+    "description": "Dpad data source from axes",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "dataSourceType", "xAxisIndex", "yAxisIndex"],
+    "properties":{
+        "id": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/id" }] },
+        "dataSourceType": { "enum": ["dpadFromAxesSource"] },
+        "xAxisIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
+        "yAxisIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] }
+    }
+}
