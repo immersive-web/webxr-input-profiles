@@ -11,16 +11,16 @@ const dpadVisualResponse = Object.freeze({
   "target": "target node",
   "left": "left node",
   "right": "right node",
-  "down": "down node",
-  "up": "up node"
+  "bottom": "bottom node",
+  "top": "top node"
 });
 const axesVisualResponse = Object.freeze({
   "userAction": "onTouch",
   "target": "target node",
   "left": "left node",
   "right": "right node",
-  "down": "down node",
-  "up": "up node",
+  "bottom": "bottom node",
+  "top": "top node",
   "buttonMin": "buttonMin node",
   "buttonMax": "buttonMax node"
 });
@@ -126,15 +126,15 @@ test("Invalid missing right node", () => {
   expect(validator([visualResponse])).toBe(false);
 });
 
-test("Invalid missing down node", () => {
+test("Invalid missing bottom node", () => {
   let visualResponse = Object.assign({}, dpadVisualResponse);
-  delete visualResponse.down;
+  delete visualResponse.bottom;
   expect(validator([visualResponse])).toBe(false);
 });
 
-test("Invalid missing up node", () => {
+test("Invalid missing top node", () => {
   let visualResponse = Object.assign({}, dpadVisualResponse);
-  delete visualResponse.up;
+  delete visualResponse.top;
   expect(validator([visualResponse])).toBe(false);
 });
 

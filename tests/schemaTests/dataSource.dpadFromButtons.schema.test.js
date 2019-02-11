@@ -5,8 +5,8 @@ const validDataSource = Object.freeze({
   "dataSourceType": "dpadFromButtonsSource",
   "leftButtonIndex": 0,
   "rightButtonIndex": 1,
-  "downButtonIndex": 2,
-  "upButtonIndex": 3,
+  "bottomButtonIndex": 2,
+  "topButtonIndex": 3,
 });
 
 test("Valid dpadFromButton sources", () => {
@@ -61,23 +61,23 @@ test("Invalid rightButtonIndex", () => {
   expect(validator(dataSource)).toBe(false);
 });
 
-test("Invalid downButtonIndex", () => {
+test("Invalid bottomButtonIndex", () => {
   let dataSource = Object.assign({}, validDataSource);
   
-  delete dataSource.downButtonIndex;
+  delete dataSource.bottomButtonIndex;
   expect(validator(dataSource)).toBe(false);
   
-  dataSource.downButtonIndex = -1;
+  dataSource.bottomButtonIndex = -1;
   expect(validator(dataSource)).toBe(false);
 });
 
-test("Invalid upButtonIndex", () => {
+test("Invalid topButtonIndex", () => {
   let dataSource = Object.assign({}, validDataSource);
   
-  delete dataSource.upButtonIndex;
+  delete dataSource.topButtonIndex;
   expect(validator(dataSource)).toBe(false);
   
-  dataSource.upButtonIndex = -1;
+  dataSource.topButtonIndex = -1;
   expect(validator(dataSource)).toBe(false);
 });
 
