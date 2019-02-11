@@ -3,8 +3,7 @@ module.exports = {
     const { join } = require('path');
     const schemasFolder = join(__dirname, "../schemas/");
     const Ajv = require('ajv');
-    const ajv = new Ajv({schemaId: 'id'});
-    ajv.addMetaSchema(require('ajv/lib/refs/json-schema-draft-04.json'));
+    const ajv = new Ajv();
 
     let validator;
 
@@ -23,7 +22,7 @@ module.exports = {
       items.forEach( (filename) => {
         const schemaPath = schemasFolder + filename;
         const schema = require(schemaPath);
-        if (schema.id == mainSchemaId) {
+        if (schema.$id == mainSchemaId) {
           mainSchema = schema;
         } else {
           ajv.addMetaSchema(schema);
