@@ -1,10 +1,11 @@
-# Gamepad mapping
-> Put in a picture of a motion controller and the Gamepad data structure
+# Gamepad Mapping
 
 ## Motivation
-> Explain what WebXR is and how it's different from WebVR
+> **TODO** Explain what WebXR is and how its different from WebVR
 
-XR hardware may support a variety of input sources including motion controllers. When a motion controller is present, developers often wish to do the following:
+> **TODO** Define motion controllers
+
+When a motion controller is present on XR hardware, developers often wish to do the following:
 1. Display the motion controller's virtual model at the correct location
 1. Find out the state of the controller's component parts (made up of buttons and axes)
 1. Modify the virtual model to reflect the state of the components each render frame
@@ -17,32 +18,30 @@ This repository defines a JSON schema to bridge the gap between the needs listed
 
 ## Design Goals
 This repository has been designed to meet the following goals:
-* *Distributable and modifiable.* All content in this repo is available under MIT licence. Feel free to take this schema and modify it for your own purposes.
-* *Community populated.* The schema, validation tests, and tools are designed to make it straightforward to submit a pull request with new mapping files and assets as new XR hardware comes on the market
-* *No custom code necessary.* Because all hardware metadata (min/max ranges, etc) can be defined in the JSON mapping file, developers should not need to add code checks for specific `Gamepad.id`. Aberrant user agent behavior can also be documented in the schema as bugs are discovered.
+* *Distributable and modifiable.* The content in this repository is available under MIT licence.  Take this schema and modify it for your own purposes.
+* *Forward compatible.* The schema, validation tests, and tools are designed to make it straightforward to submit a pull request with new mapping files and assets as new XR hardware comes on the market.  Additionally, fallback assets and mappings are included to handle unknown motion controllers.
+* *No custom code necessary.* The schema enables enumerating all hardware metadata necessary to write a single code path for handling motion controller hardware.  Developers should not need to add code checks for specific `Gamepad.id` as aberrant user agent behavior is also documentable in the schema as bugs are discovered.
 * *WebXR optimized, WebVR compatible.* While WebVR is still available in several user agents, the future of XR on the web is in the standards-track API, WebXR. As such, when faced with tradeoffs, the design was optimized to simplify the schema for WebXR usage while still maintaining a path for WebVR usage.
 
 ## Adding New Hardware
-> TODO fill in the steps for adding a folder for a new XR device, testing the change, and submitting for PR
+> **TODO** fill in the steps for adding a folder for a new XR device, testing the change, and submitting for PR
 
-> Create an issue template for new hardware PRs
+> **TODO** Create an issue template for new hardware PRs
 
 ## Filing A Bug
-> TODO fill in the steps for filing a bug
+> **TODO** fill in the steps for filing a bug
 
-> Create an issue template for bugs
+> **TODO** Create an issue template for bugs
 
 # Concepts
 ![Diagram of top-level schema parts](./figures/Concepts.png)
 
 ## Data Sources
-> REFER TO BRANDON'S PR ON HOW BUTTONS AND AXES ARE SLOTTED FOR WEBXR
-
 Motion controllers are made up of various parts such as thumbsticks, touchpads, triggers, buttons, or dpads.  The [Gamepad API](https://www.w3.org/TR/gamepad/) communicates the state of these parts via the `Gamepad.buttons` array and the `Gamepad.axes` array. However, a single physical part is divided into separate, unrelated attributes. 
 
 For example, a thumbstick's left-right motion is communicated as a double value in an entry in the `Gamepad.axes` array while the top-bottom motion is in a separate `Gamepad.axes` entry. Furthermore if the thumbstick can be clicked straight down, that pressed/touched/value information is communicated by a `GamepadButton` in the `Gamepad.buttons` array.  The `Gamepad` does not provide any indication that these three array entries are related in any way, despite all representing different aspects of the same physical part.
 
-Each element in this schema's `"dataSources"` section provides the missing information necessary to group the related parts of a `Gamepad` object back together.  All entries in the `"dataSources"` array must include an `"id"` property which is unique among all other entries in the array.  For clarity sake, a `"dataSourceType"` is also included to indicate which subschema is being used to describe the physical properties of a single part.
+Each element in the `dataSources` array provides the missing information necessary to group the related parts of a `Gamepad` object back together.  All entries in the `dataSources` array must include an `id` property which is unique among all other entries in the array.  For clarity sake, a `dataSourceType` is also included to indicate which subschema is being used to describe the physical properties of a single part.
 
 ### Buttons
 A single button (including analog triggers and touchable thumbrests) is represented by an entry in the `dataSources` array with the `dataSourceType` property set to `buttonSource`.  It must also include a `buttonIndex` property with a value representing the index in the `Gamepad.buttons` array at which to find the button's data.  For example:
@@ -98,7 +97,7 @@ When representing a button that can report a touched state but not a pressed sta
 ### Dpads
 A dpad is a physical part that rocks in two directions, left-right and top-bottom button. These parts are built such that only adjacent directions can be depressed at the same time.  For example, a dpad could be pressed in the top and left directions at the same time, but could not be pressed in the left and right directions at the same time.
 
-The `standard` mapping defined in the (Gamepad API)[https://www.w3.org/TR/gamepad/#remapping] suggests that dpad parts should be divided into 4 separate entries in the `Gamepad.buttons` array.  It has been observed, however, that some hardware may report dpads as two entries in the `Gamepad.axes` array instead.  As a result, this schema provides two different subschemas for use with a dpad as appropriate
+The `standard` mapping defined in the [Gamepad API](https://www.w3.org/TR/gamepad/#remapping) suggests that dpad parts should be divided into four separate entries in the `Gamepad.buttons` array.  It has been observed, however, that some hardware may report dpads as two entries in the `Gamepad.axes` array instead.  As a result, this schema provides two different subschemas that may be used to represent dpads.
 
 #### Dpads From Buttons
 A data source of this type is defined as one with the `dataSourceType` property set to `dpadFromButtonsSource`. It must include `leftIndex`, `rightIndex`, `upIndex`, and `downIndex` properties with values representing the indices in the `Gamepad.buttons` array at which to find the related data.  For example:
@@ -143,7 +142,7 @@ A data source of this type is defined as one with the `dataSourceType` property 
 ### Thumbsticks And Touchpads
 Thumbsticks are a physical part sticking up from the surface of a controller which can be rocked left/right and top/bottom with a circular range.  Often, thumbsticks can also be depressed in a button-like manner.  Touchpads are a physical part, usually circular, that are able to detect the position of a finger placed on their surface.  Often, touchpads can be depressed in the middle in a button-lime manner or at the edges in a dpad-like manner.
 
-Both thumbsticks and touchpads are represented by an entry in the `dataSources` array with the `dataSourceType` property set to `thumbstickAndTouchpadSource`.  It must include `xAxisIndex` and `yAxisIndex` properties with values representing the indices in the `Gamepad.axes` array at which to find the related data.  For example:
+Both thumbsticks and touchpads are represented by an entry in the `dataSources` array with the `dataSourceType` property set to `thumbstickSource` and `touchpadSource` respectively.  Both variations must include `xAxisIndex` and `yAxisIndex` properties with values representing the indices in the `Gamepad.axes` array at which to find the related data.  For example:
 
 ```json
 {
@@ -285,7 +284,9 @@ In either case, the algorithm for interpolating the `target` properties is rough
 ```
 
 ## Components
-For example, here component mapping for a single button.
+Components connect a dataSource with the information necessary to correctly visualize it. A component must contain a `dataSource` property which points to an index in the file's `dataSources` array. It must also contain a `root` property which references the topmost node in an asset hierarchy that is associated with the physical part. A component mut also contain a `labelTransform` property which references a node in the asset hierarchy at which a legend label could be placed.  It is expected that this node is located a safe distance from the body of the motion controller and oriented in a position appropriate for a label to be read.
+
+For example, here is component mapping for a single button.
 ```json
 {
     "gamepad" : {
@@ -307,7 +308,7 @@ For example, here component mapping for a single button.
 }
 ```
 
-However, most components will also include one or more `visualResponses` such as the example below.
+In addition, most components will also include the `visualResponses` array property.  The elements of this array are indices into the file's `visualResponses` array.  For example:
 
 ```json
 {
@@ -340,10 +341,15 @@ However, most components will also include one or more `visualResponses` such as
 ```
 
 ## Hands
-> Hands are the binding of individual components into motion controllers.  Explain that hands come in `neutral`, `left`, and `right`.
+Hands connect component parts with the information necessary to correctly visualize entire motion controllers.  The `hands` object must be populated by properties in one of the following configurations:
 
-### Neutral
-> Explain the parts of a hand
+* *`left` and `right`.* This option should be used when the underlying XR platform is expected to always report a handedness.  This may be because the motion controllers are intrinsically unique such as the Oculus Touch.  It may also be due to a system-level configuration setting which causes an intrinsically unhanded controller to report itself as either left or right such as the Google Daydream Controller.
+* *`neutral`.* This option should be used for motion controllers which are incapable of reporting handedness.  It does not imply that only one motion controller will be tracked at a time.
+* *`neutral`, `left`, and `right`.* This options should be used for motion controllers that are capable of but not guaranteed to report handedness. For example, HTC Vive Controllers are not intrinsically handed, but the underlying XR system is able to interpret usage based on relative position over time.  As a result, these controllers are capable of reporting all three types of handedness.
+
+All three of these properties are the same type and must contain an `asset`, a `root`, and a `components` property.  The `asset` property points to a .glTF or .glB file representing the motion controller; extensions will be made available for additional file formats.  The `root` property references the topmost node in the asset hierarchy associated with the motion controller.  The `components` array must not be empty and contains indices into the file's `components` array.
+
+For example:
 
 ```json
 {
@@ -360,7 +366,7 @@ However, most components will also include one or more `visualResponses` such as
 }
 ```
 
-> Explain about primaryButtonComponent and primaryAxisComponent
+The `neutral`, `left`, and `right` objects may also contain two additional properties.  When present, the `primaryButtonComponent` property contains the index into the file's `components` array at which position the motion controller's "default" button can be found.  For many motion controllers this is a trigger-style button.  When present, the `primaryAxesComponent` property contains the index into the file's `components` array at which position the motion controller's "default" thumbstick or touchpad can be found.
 
 ```json
 {
@@ -379,73 +385,28 @@ However, most components will also include one or more `visualResponses` such as
 }
 ```
 
-#### Left and Right
-> Explain about motion controllers that always report a handedness property
-
-```json
-{
-    "gamepad" : {
-        "id" : "motion-controller-id",
-        "hands" : {
-            "left" : {
-                "asset" : "some-url",
-                "root" : "left-handedness-controller",
-                "components" : [0]
-            },
-            "right" : {
-                "asset" : "some-url",
-                "root" : "right-handedness-controller",
-                "components" : [0]
-            }
-        }
-    }
-}
-```
-
-#### Dynamic Handedness
-> Explain about motion controllers than can't distinguish right vs left, but report that way anyway
-
-```json
-{
-    "gamepad" : {
-        "id" : "motion-controller-id",
-        "hands" : {
-            "neutral" : {
-                "asset" : "some-url",
-                "root" : "neutral-handedness-controller",
-                "components" : [0]
-            },
-            "left" : {
-                "asset" : "some-url",
-                "root" : "neutral-handedness-controller",
-                "components" : [0]
-            },
-            "right" : {
-                "asset" : "some-url",
-                "root" : "neutral-handedness-controller",
-                "components" : [0]
-            }
-        }
-    }
-}
-```
-
 # Appendices
 
-## Known hardware
-* [Windows Mixed Reality](mappings/045E-065D)
-* Windows Mixed Reality for Samsung Odyssey
-* [HTC Vive Controller](mappings/HTCViveController)
-* [Oculus Touch](mappings/OculusTouch)
+## Licence
+Per the [LICENSE.md](LICENCE.md) file, this repository is made available under an MIT license and is copyright Amazon 2019.
+
+## Hardware
+
+### Supported
 * [Gear VR](mappings/GearVR)
+* [HTC Vive Controller](mappings/HTCViveController)
 * [Oculus Go](mappings/OculusGo)
-* Vive Focus
-* Magic Leap
-* Daydream
-* Mirage Solo
-* [Valve Knuckles](mappings/ValveKnuckles)
-* HoloLens Clicker
-* Oculus Remote
+* [Oculus Touch](mappings/OculusTouch)
+* [Windows Mixed Reality](mappings/045E-065D)
+
+### Missing Mapping and/or Assets
+* Google Daydream
+* Google Mirage Solo
+* HTC Vive Focus
+* Magic Leap One
+* Oculus Quest
+* Valve Knuckles
+* Windows Mixed Reality for Samsung Odyssey
 
 ## References
 * [GitHub - stewdio/THREE.VRController: Support hand controllers for Oculus, Vive, Windows Mixed Reality, Daydream, GearVR, and more by adding VRController to your existing Three.js-based WebVR project.](https://github.com/stewdio/THREE.VRController)
@@ -453,7 +414,3 @@ However, most components will also include one or more `visualResponses` such as
 * [Unity - Manual:  Input for OpenVR controllers](https://docs.unity3d.com/Manual/OpenVRControllers.html)
 * [Steam VR Template -        Unreal Engine Forums](https://forums.unrealengine.com/development-discussion/vr-ar-development/78620-steam-vr-template?106609-Steam-VR-Template=)
 * [Mapping Oculus Controller Input to Blueprint Events](https://developer.oculus.com/documentation/unreal/latest/concepts/unreal-controller-input-mapping-reference/)
-* [Events in the Gamepad spec?](https://github.com/w3c/gamepad/pull/15)
-
-## Licence
-Per the [LICENSE.md](LICENCE.md) file, this repo is made available under an MIT license and is copyright Amazon 2019.
