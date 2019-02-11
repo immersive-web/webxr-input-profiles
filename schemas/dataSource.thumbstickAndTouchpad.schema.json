@@ -14,6 +14,7 @@
         "xAxisIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
         "yAxisIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
         "buttonIndex": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/gamepadIndex" }] },
+        "pressUnsupported": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/pressUnsupported" }] },
         "analogButtonValues": { "allOf": [{ "$ref": "dataSource.properties.schema.json#/definitions/analogValues" }] }
     }
 }

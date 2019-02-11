@@ -159,7 +159,7 @@ Both thumbsticks and touchpads are represented by an entry in the `dataSources` 
 }
 ```
 
-If the thumbstick or touchpad is able to be depressed, the data source must also include a `buttonIndex` property with a value representing the index in the `Gamepad.buttons` array at which to find the button's data. On touchpads with a dpad-like physical behavior, the x-axis and y-axis values can be used to determine which quadrant(s) are being pressed. For example:
+Some thumbsticks and touchpads may be able to be depressed or they may also have a center deadzone in which axis data isn't reported but a "touched" status is.  In both cases, the data source must also include a `buttonIndex` property with a value representing the index in the `Gamepad.buttons` array at which to find the button's data. On touchpads with a dpad-like physical behavior, the x-axis and y-axis values can be used to determine which quadrant(s) are being pressed. For example:
 
 ```json
 {
@@ -177,7 +177,7 @@ If the thumbstick or touchpad is able to be depressed, the data source must also
 }
 ```
 
-If the thumbstick or touchpad is able to be depressed in an analog manner, the data source must also include an `analogButtonValues` property with a value of `true`.
+If the thumbstick or touchpad is able to be depressed in an analog manner, the data source must also include an `analogButtonValues` property with a value of `true`.  If the thumbstick or touchpad is capable of reporting a deadzone "touched" status but cannot be pressed, the data source must also include a `pressUnsupported` property with a value of `true`.
 
 ## Visual Responses
 The visual representation of a motion controller in a VR must respond to reflect its physical state in the real-world.  For example, when a physical thumbstick is moved to the left, the virtual thumbstick should also move to the left.  In order to do this without requiring custom code for each `Gamepad.id`, the schema defines an array of `visualResponse` objects.
