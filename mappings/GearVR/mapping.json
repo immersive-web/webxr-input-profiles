@@ -6,7 +6,7 @@
             "neutral" : {
                 "asset" : "some-url",
                 "root" : "neutral-controller-node",
-                "components" : [0, 1, 2],
+                "components" : [0, 1],
                 "primaryButtonComponent" : 0,
                 "primaryAxesComponent" : 0
             }

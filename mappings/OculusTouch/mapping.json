@@ -7,15 +7,15 @@
                 "asset" : "some-url",
                 "root" : "left-controller-node",
                 "components" : [0, 1, 2, 3, 4, 7],
-                "primaryButtonComponent" : 0,
-                "primaryAxesComponent" : 1
+                "primaryButtonComponent" : 1,
+                "primaryAxesComponent" : 0
             },
             "right" : {
                 "asset" : "some-url",
                 "root" : "right-controller-node",
                 "components" : [0, 1, 2, 5, 6, 7],
-                "primaryButtonComponent" : 0,
-                "primaryAxesComponent" : 1
+                "primaryButtonComponent" : 1,
+                "primaryAxesComponent" : 0
             }
         },
         "components" : [
@@ -111,7 +111,7 @@
                 "id" : "thumbrest",
                 "dataSourceType": "buttonSource",
                 "buttonIndex" : 5,
-                "pressUnstopported": true
+                "pressUnsupported": true
             }
         ],
         "visualResponses" : [
