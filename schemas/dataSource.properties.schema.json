@@ -1,6 +1,6 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema",
-    "id": "https://immersive-web/gamepad-mapping/0.1.0/dataSource.properties.schema.json",
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://immersive-web/gamepad-mapping/0.1.0/dataSource.properties.schema.json",
     "definitions": {
         "id": {
             "description" : "An identifier for the data source",

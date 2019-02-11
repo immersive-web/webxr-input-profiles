@@ -1,0 +1,20 @@
+{
+  "name": "xr-gamepad-mappings",
+  "version": "0.1.0",
+  "description": "",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/immersive-web/Gamepad-mappings.git"
+  },
+  "dependencies": {
+    "ajv": "^6.7.0"
+  },
+  "devDependencies": {
+    "jest": "^24.0.0"
+  }
+}
