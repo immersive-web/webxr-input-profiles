@@ -1,4 +1,4 @@
-const MappingDescriptions = require("../../src/mappingDescriptions.js");
+const TestHelpers = require("../testHelpers.js");
 const MockComponent = require("./mockComponent.js");
 
 class MockGamepadButton {
@@ -13,9 +13,9 @@ class MockGamepadButton {
   }
 
   setValues(values) {
-    this.pressed = values.pressed;
-    this.touched = values.touched;
-    this.value = values.value;
+    this.pressed = values.pressed || this.pressed;
+    this.touched = values.touched || this.touched;
+    this.value = (values.value == undefined) ? this.value : values.value;
   }
 
   getValues() {
@@ -28,8 +28,10 @@ class MockGamepadButton {
 };
 
 class MockGamepad {
-  constructor(id, handedness) {
-    this.id = id;
+  constructor(mapping, handedness) {
+    this.hand = mapping.hands[handedness];
+
+    this.id = mapping.id;
     this.index = -1;
     this.connected = true;
     this.timestamp = 0;
@@ -38,11 +40,8 @@ class MockGamepad {
     this.buttons = [];
     this.mockComponents = {};
 
-    this.mapping = MappingDescriptions.getMappingById(this.id);
-    this.hand = this.mapping.hands[handedness];
-
     this.hand.components.forEach( (componentIndex) => {
-      let mockComponent = new MockComponent(componentIndex, this);
+      let mockComponent = new MockComponent(componentIndex, mapping, this);
       this.mockComponents[mockComponent.id] = mockComponent;
     });
   }
@@ -54,7 +53,7 @@ class MockGamepad {
   }
 
   addGamepadAxis(axisIndex) {
-    while (this.axes.length < axisIndex) {
+    while (this.axes.length <= axisIndex) {
       this.axes.push(0);
     }
   }

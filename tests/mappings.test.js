@@ -1,11 +1,10 @@
-const testHelpers = require("./testHelpers.js");
-const validator = testHelpers.getValidator();
+const TestHelpers = require("./testHelpers.js");
+const validator = TestHelpers.getValidator();
 
-const mappingDescriptions = require("../src/mappingDescriptions.js");
-const mappingList = mappingDescriptions.getList();
+const mappingList = TestHelpers.getMappingsList();
 
 describe.each(mappingList)("validateMapping.%s", (gamepadId) => {
-  const mapping = mappingDescriptions.getMappingById(gamepadId);
+  const mapping = TestHelpers.getMappingById(gamepadId);
 
   test("Mapping exists and passes schema validation", () => {
     expect(mapping).not.toBeNull();

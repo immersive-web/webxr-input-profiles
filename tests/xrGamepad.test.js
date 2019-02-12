@@ -1,5 +1,6 @@
 const TestHelpers = require("./testHelpers.js");
 const MockGamepad = require("./mockGamepad/mockGamepad.js");
+const XRGamepad = require("../src/xrGamepad.js");
 
 let testTable = [];
 const mappingList = TestHelpers.getMappingsList();
@@ -10,7 +11,14 @@ mappingList.forEach((gamepadId) => {
   });
 });
 
-test.each(testTable)("mockGamepad.%s.%s", (gamepadId, handedness, mapping) => {
-  let mockGamepad = new MockGamepad(mapping, handedness);
-  expect(mockGamepad).toBeDefined();
+describe.each(testTable)("xrGamepad.%s.%s", (gamepadId, handedness, mapping) => {
+
+  test("Create an XRGamepad", () => {
+    let mockGamepad = new MockGamepad(mapping, handedness);
+    expect(mockGamepad).toBeDefined();
+    
+    let xrGamepad = new XRGamepad(mockGamepad, handedness, mapping);
+    expect(xrGamepad);
+  });
+
 });

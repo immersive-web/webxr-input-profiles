@@ -1,8 +1,8 @@
 class MockComponent {
-  constructor(componentIndex, mockGamepad) {
+  constructor(componentIndex, mapping, mockGamepad) {
     this.mockGamepad = mockGamepad;
-    let component = this.mockGamepad.mapping.components[componentIndex];
-    this.dataSource = this.mockGamepad.mapping.dataSources[component.dataSource];
+    let component = mapping.components[componentIndex];
+    this.dataSource = mapping.dataSources[component.dataSource];
 
     this.hasAxes = (this.dataSource.dataSourceType == "dpadFromAxesSource" ||
                     this.dataSource.dataSourceType == "thumbstickSource" ||

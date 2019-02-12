@@ -1,20 +1,20 @@
 var XRVisualResponse = require("./xrVisualResponse.js");
 
 class XRGamepadComponent {
-  constructor(componentIndex, xrGamepad) {
+  constructor(componentIndex, mapping, xrGamepad) {
     this.xrGamepad = xrGamepad;
-    this.component = this.xrGamepad.mapping.components[componentIndex];
-    this.dataSource = this.xrGamepad.mapping.dataSources[this.component.dataSource];
-    this.visualResponses = {};
+    this.component = mapping.components[componentIndex];
+    this.dataSource = mapping.dataSources[this.component.dataSource];
+    this.visualResponses = [];
 
     let validateAxisIndex = (index) => {
-      if (index >= this.xrGamepad.axes.length) {
+      if (index >= this.xrGamepad.gamepad.axes.length) {
         throw new Error("Gamepad '" + this.xrGamepad.id + "' has no axis at index " + index);
       }
     };
 
     let validateButtonIndex = (index) => {
-      if (index >= this.xrGamepad.buttons.length) {
+      if (index >= this.xrGamepad.gamepad.buttons.length) {
         throw new Error("Gamepad '" + this.xrGamepad.id + "' has no button at index " + index);
       }
     };
@@ -43,7 +43,7 @@ class XRGamepadComponent {
     // Set up visual responses
     if (this.component.visualResponses) {
       this.component.visualResponses.forEach((visualResponseIndex) => {
-        this.visualResponses.push(new XRVisualResponse(this.mapping.visualResponses[visualResponseIndex], this.xrGamepad));
+        this.visualResponses.push(new XRVisualResponse(mapping.visualResponses[visualResponseIndex], this));
       });
     }
   }
@@ -63,8 +63,8 @@ class XRGamepadComponent {
   getAxesData() {
     let axesData = {};
     if (this.hasAxes) {
-      axesData.xAxis = this.xrGamepad.axes[this.dataSource.xAxisIndex];
-      axesData.yAxis = this.xrGamepad.axes[this.dataSource.yAxisIndex];
+      axesData.xAxis = this.xrGamepad.gamepad.axes[this.dataSource.xAxisIndex];
+      axesData.yAxis = this.xrGamepad.gamepad.axes[this.dataSource.yAxisIndex];
     }
     // @TODO this would be where we normalize or invert the values if the override specifies it
     return axesData;
@@ -73,20 +73,17 @@ class XRGamepadComponent {
   getButtonsData() {
     let buttonsData = {};
 
-    let extractButtonData = function (key) {
-      let index = this.dataSource[key + "Index"];
-      ({value, touched, pressed} = this.xrGamepad.buttons[index]);
-      // @TODO this would be where we normalize the values if the override specifies it
-      buttonsData[key] = {value, touched, pressed};
-    };
+    let extractButtonData = ({value, touched, pressed}) => ({value, touched, pressed});
+
+    let buttons = this.xrGamepad.gamepad.buttons;
 
     if (this.dataSource.buttonIndex != undefined) {
-      extractButtonData("button");
+      buttonsData.button = extractButtonData(buttons[this.dataSource.buttonIndex]);
     } else if (this.dataSource.dataSourceType == "dpadFromButtonsSource") {
-      extractButtonData("left");
-      extractButtonData("right");
-      extractButtonData("top");
-      extractButtonData("bottom");
+      buttonsData.left = extractButtonData(buttons[this.dataSource.leftButtonIndex]);
+      buttonsData.right = extractButtonData(buttons[this.dataSource.rightButtonIndex]);
+      buttonsData.top = extractButtonData(buttons[this.dataSource.topButtonIndex]);
+      buttonsData.bottom = extractButtonData(buttons[this.dataSource.bottomButtonIndex]);
 
       if (buttonsData.left.value > 0 && buttonsData.right.value > 0) {
         console.warn("Gamepad '" + this.xrGamepad.id + "' with dpad '" + this.dataSource.id + "' is reporting left and right values > 0");
