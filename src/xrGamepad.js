@@ -8,7 +8,7 @@ class XRGamepad {
 
     // @TODO set this up to use the jest mocking system for testing
     this.mapping = MappingDescriptions.getMappingById(gamepad.id);
-    this.hand = this.mapping.gamepad.hands[handedness];
+    this.hand = this.mapping.hands[handedness];
     if (!this.hand) {
       throw "No " + this.handedness + " hand exists for " + this.gamepad.id;
     }

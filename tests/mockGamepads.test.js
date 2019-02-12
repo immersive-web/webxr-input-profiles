@@ -4,7 +4,7 @@ const mappingList = MappingDescriptions.getList();
 let testTable = [];
 mappingList.forEach((gamepadId) => {
   const mapping = MappingDescriptions.getMappingById(gamepadId);
-  Object.keys(mapping.gamepad.hands).forEach((handedness) => {
+  Object.keys(mapping.hands).forEach((handedness) => {
     testTable.push([gamepadId, handedness]);
   });
 });

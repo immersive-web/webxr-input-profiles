@@ -39,7 +39,7 @@ class MockGamepad {
     this.mockComponents = {};
 
     this.mapping = MappingDescriptions.getMappingById(this.id);
-    this.hand = this.mapping.gamepad.hands[handedness];
+    this.hand = this.mapping.hands[handedness];
 
     this.hand.components.forEach( (componentIndex) => {
       let mockComponent = new MockComponent(componentIndex, this);

@@ -1,7 +1,7 @@
 class XRVisualResponse {
-  constructor(visualResponseIndex, mapping, xrComponent) {
+  constructor(visualResponse, xrComponent) {
     this.xrComponent = xrComponent;
-    this.visualResponse = mapping.gamepad.visualResponses[visualResponseIndex];
+    this.visualResponse = visualResponse;
 
     this.axesOfMovement = 0;
     if (this.visualResponse.buttonMin && this.visualResponse.buttonMax) {

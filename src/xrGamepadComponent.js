@@ -3,8 +3,8 @@ var XRVisualResponse = require("./xrVisualResponse.js");
 class XRGamepadComponent {
   constructor(componentIndex, xrGamepad) {
     this.xrGamepad = xrGamepad;
-    this.component = this.xrGamepad.mapping.gamepad.components[componentIndex];
-    this.dataSource = this.xrGamepad.mapping.gamepad.dataSources[this.component.dataSource];
+    this.component = this.xrGamepad.mapping.components[componentIndex];
+    this.dataSource = this.xrGamepad.mapping.dataSources[this.component.dataSource];
     this.visualResponses = {};
 
     let validateAxisIndex = (index) => {
@@ -43,7 +43,7 @@ class XRGamepadComponent {
     // Set up visual responses
     if (this.component.visualResponses) {
       this.component.visualResponses.forEach((visualResponseIndex) => {
-        this.visualResponses.push(new XRVisualResponse(visualResponseIndex, this.xrGamepad));
+        this.visualResponses.push(new XRVisualResponse(this.mapping.visualResponses[visualResponseIndex], this.xrGamepad));
       });
     }
   }
