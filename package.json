@@ -9,7 +9,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/immersive-web/Gamepad-mappings.git"
+    "url": "https://github.com/immersive-web/xr-gamepad-mappings.git"
   },
   "dependencies": {
     "ajv": "^6.7.0"
