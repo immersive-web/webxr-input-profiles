@@ -1,11 +1,10 @@
-const testHelpers = require("./testHelpers.js");
-const validator = testHelpers.getValidator();
+const TestHelpers = require("./testHelpers.js");
+const validator = TestHelpers.getValidator();
 
-const mappingDescriptions = require("../src/mappingDescriptions.js");
-const mappingList = mappingDescriptions.getList();
+const mappingList = TestHelpers.getMappingsList();
 
 describe.each(mappingList)("validateMapping.%s", (gamepadId) => {
-  const mapping = mappingDescriptions.getMappingById(gamepadId);
+  const mapping = TestHelpers.getMappingById(gamepadId);
 
   test("Mapping exists and passes schema validation", () => {
     expect(mapping).not.toBeNull();
@@ -86,6 +85,19 @@ describe.each(mappingList)("validateMapping.%s", (gamepadId) => {
 
     let unusedComponents = mapping.components.filter((component, index) => !usedComponentIndices[index]);
     expect(unusedComponents).toHaveLength(0);
+  });
+
+  test("No unused visualResponses", () => {
+    let usedVisualResponseIndicies = Array(mapping.visualResponses.length);
+
+    mapping.components.forEach((component) => {
+      component.visualResponses.forEach((visualResponseIndex) => {
+        usedVisualResponseIndicies[visualResponseIndex] = true;
+      });
+    });
+
+    let unusedVisualResponses = mapping.visualResponses.filter((visualResponse, index) => !usedVisualResponseIndicies[index]);
+    expect(unusedVisualResponses).toHaveLength(0);
   });
 
 });

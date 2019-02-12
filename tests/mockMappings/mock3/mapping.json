@@ -1,0 +1,130 @@
+{
+    "version": "0.1.0",
+    "id": "mock1",
+    "hands": {
+      "neutral": {
+        "asset": "asset.glb",
+        "root": "ROOT_NODE",
+        "components": [0, 1, 2, 3, 4]
+      }
+    },
+    "components": [
+      {
+        "dataSource": 0,
+        "root": "BUTTON_ROOT_NODE",
+        "labelTransform": "BUTTON_LABEL_NODE",
+        "visualResponses": [0]
+      },
+      {
+        "dataSource": 1,
+        "root": "TOUCHPAD_ROOT_NODE",
+        "labelTransform": "TOUCHPAD_LABEL_NODE",
+        "visualResponses": [1]
+      },
+      {
+        "dataSource": 2,
+        "root": "THUMBSTICK_ROOT_NODE",
+        "labelTransform": "THUMBSTICK_LABEL_NODE",
+        "visualResponses": [2]
+      },
+      {
+        "dataSource": 3,
+        "root": "DPAD_FROM_AXES_ROOT_NODE",
+        "labelTransform": "DPAD_FROM_AXES_LABEL_NODE",
+        "visualResponses": [1]
+      },
+      {
+        "dataSource": 4,
+        "root": "DPAD_FROM_BUTTONS_ROOT_NODE",
+        "labelTransform": "DPAD_FROM_BUTTONS_LABEL_NODE",
+        "visualResponses": [1]
+      }
+    ],
+    "dataSources": [
+      {
+        "id": "button",
+        "dataSourceType": "buttonSource",
+        "buttonIndex": 0
+      },
+      {
+        "id": "touchpad",
+        "dataSourceType": "touchpadSource",
+        "xAxisIndex": 0,
+        "yAxisIndex": 1
+      },
+      {
+        "id": "thumbstick",
+        "dataSourceType": "thumbstickSource",
+        "xAxisIndex": 2,
+        "yAxisIndex": 3,
+        "buttonIndex": 1
+      },
+      {
+        "id": "dpadFromAxes",
+        "dataSourceType": "dpadFromAxesSource",
+        "xAxisIndex": 4,
+        "yAxisIndex": 5
+      },
+      {
+        "id": "dpadFromButtons",
+        "dataSourceType": "dpadFromButtonsSource",
+        "leftButtonIndex": 2,
+        "rightButtonIndex": 3,
+        "bottomButtonIndex": 4,
+        "topButtonIndex": 5
+      }
+    ],
+    "visualResponses": [
+      {
+        "target": "1DOF_NODE",
+        "onTouch": {
+          "degreesOfFreedom": 1,
+          "buttonMin": "BUTTONMIN_TOUCH",
+          "buttonMax": "BUTTONMAX_TOUCH"
+        },
+        "onPress": {
+          "degreesOfFreedom": 1,
+          "buttonMin": "BUTTONMIN_PRESS",
+          "buttonMax": "BUTTONMAX_PRESS"
+        }
+      },
+      {
+        "target": "2DOF_NODE",
+        "onTouch": {
+          "degreesOfFreedom": 2,
+          "left": "LEFT_TOUCH",
+          "right": "RIGHT_TOUCH",
+          "top": "TOP_TOUCH",
+          "bottom": "BOTTOM_TOUCH"
+        },
+        "onPress": {
+          "degreesOfFreedom": 2,
+          "left": "LEFT_PRESS",
+          "right": "RIGHT_PRESS",
+          "top": "TOP_PRESS",
+          "bottom": "BOTTOM_PRESS"
+        }
+      },
+      {
+        "target": "3DOF_NODE",
+        "onTouch":{
+          "degreesOfFreedom": 3,
+          "buttonMin": "BUTTONMIN_TOUCH",
+          "buttonMax": "BUTTONMAX_TOUCH",
+          "left": "LEFT_TOUCH",
+          "right": "RIGHT_TOUCH",
+          "top": "TOP_TOUCH",
+          "bottom": "BOTTOM_TOUCH"
+        },
+        "onPress": {
+          "degreesOfFreedom": 3,
+          "buttonMin": "BUTTONMIN_PRESS",
+          "buttonMax": "BUTTONMAX_PRESS",
+          "left": "LEFT_TOUCH",
+          "right": "RIGHT_TOUCH",
+          "top": "TOP_TOUCH",
+          "bottom": "BOTTOM_TOUCH"
+        }
+      }
+    ]
+  }

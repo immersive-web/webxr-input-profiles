@@ -1,30 +1,6 @@
 const testHelpers = require("../testHelpers.js");
 const validator = testHelpers.getValidator();
-const validMapping = Object.freeze({
-  version: "0.1.0",
-  id: "Gamepad.id",
-  hands: {
-    neutral: {
-      asset: "asset name",
-      root: "root name",
-      components: [0]
-    }
-  },
-  components: [
-    {
-      dataSource: 0,
-      root: "component root name",
-      labelTransform: "label transform name"
-    }
-  ],
-  dataSources: [
-    {
-      id: "a button",
-      dataSourceType: "buttonSource",
-      buttonIndex: 0
-    }
-  ]
-});
+const validMapping = Object.freeze(testHelpers.getMappingById("mock1", true));
 
 test("Valid mapping", () => {
   let valid = false;
@@ -36,10 +12,12 @@ test("Valid mapping", () => {
   }
 
   const visualResponse = {
-    "userAction": "onTouch",
     "target": "target node",
-    "buttonMin": "buttonMin node",
-    "buttonMax": "buttonMax node"
+    "onTouch": {
+      "degreesOfFreedom": 1,
+      "buttonMin": "buttonMin node",
+      "buttonMax": "buttonMax node"
+    }
   };
   mapping.visualResponses = [visualResponse];
   valid = validator(mapping);

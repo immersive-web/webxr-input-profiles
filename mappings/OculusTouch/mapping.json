@@ -115,56 +115,72 @@
     ],
     "visualResponses" : [
         {
-            "userAction": "onPress",
             "target" : "thumbstick-transform-node",
-            "left" : "thumbstick-transform-left-node",
-            "right" : "thumbstick-right-transform-right-node",
-            "top" : "thumbstick-transform-top-node",
-            "bottom" : "thumbstick-transform-bottom-node",
-            "buttonMin": "thumbstick-transform-centerMin-node",
-            "buttonMax": "thumbstick-transform-centerMax-node"
+            "onPress": {
+                "degreesOfFreedom": 3,
+                "left" : "thumbstick-transform-left-node",
+                "right" : "thumbstick-right-transform-right-node",
+                "top" : "thumbstick-transform-top-node",
+                "bottom" : "thumbstick-transform-bottom-node",
+                "buttonMin": "thumbstick-transform-centerMin-node",
+                "buttonMax": "thumbstick-transform-centerMax-node"
+            }
         },
         {
-            "userAction": "onTouch",
             "target" : "trigger-transform-node",
-            "buttonMin": "trigger-min-transform-node",
-            "buttonMax": "trigger-max-transform-node"
+            "onTouch": {
+                "degreesOfFreedom": 1,
+                "buttonMin": "trigger-min-transform-node",
+                "buttonMax": "trigger-max-transform-node"
+            }
         },
         {
-            "userAction": "onPress",
             "target" : "grip-transform-node",
-            "buttonMin": "grip-min-transform-node",
-            "buttonMax": "grip-max-transform-node"
+            "onPress": {
+                "degreesOfFreedom": 1,
+                "buttonMin": "grip-min-transform-node",
+                "buttonMax": "grip-max-transform-node"
+            }
         },
         {
-            "userAction": "onPress",
             "target" : "x-transform-node",
-            "buttonMin": "x-min-transform-node",
-            "buttonMax": "x-max-transform-node"
+            "onPress": {
+                "degreesOfFreedom": 1,
+                "buttonMin": "x-min-transform-node",
+                "buttonMax": "x-max-transform-node"
+            }
         },
         {
-            "userAction": "onPress",
             "target" : "y-transform-node",
-            "buttonMin": "y-min-transform-node",
-            "buttonMax": "y-max-transform-node"
+            "onPress": {
+                "degreesOfFreedom": 1,
+                "buttonMin": "y-min-transform-node",
+                "buttonMax": "y-max-transform-node"
+            }
         },
         {
-            "userAction": "onPress",
             "target" : "a-transform-node",
-            "buttonMin": "a-min-transform-node",
-            "buttonMax": "a-max-transform-node"
+            "onPress": {
+                "degreesOfFreedom": 1,
+                "buttonMin": "a-min-transform-node",
+                "buttonMax": "a-max-transform-node"
+            }
         },
         {
-            "userAction": "onPress",
             "target" : "b-transform-node",
-            "buttonMin": "b-min-transform-node",
-            "buttonMax": "b-max-transform-node"
+            "onPress": {
+                "degreesOfFreedom": 1,
+                "buttonMin": "b-min-transform-node",
+                "buttonMax": "b-max-transform-node"
+            }
         },
         {
-            "userAction": "onTouch",
             "target" : "thumbrest-touchpoint-node",
-            "buttonMin": "thumbrest-min-touchpoint-node",
-            "buttonMax": "thumbrest-max-touchpoint-node"
+            "onTouch": {
+                "degreesOfFreedom": 1,
+                "buttonMin": "thumbrest-min-touchpoint-node",
+                "buttonMax": "thumbrest-max-touchpoint-node"
+                }
         }
     ]
 }
