@@ -1,85 +1,83 @@
 {
     "version" : "0.1.0",
-    "gamepad" : {
-        "id" : "HTC-Vive-Controller",
-        "hands" : {
-            "neutral" : {
-                "asset" : "some-url",
-                "root" : "neutral-controller-node",
-                "components" : [ 0, 1, 2],
-                "primaryButtonComponent" : 0,
-                "primaryAxesComponent" : 0
-            }
+    "id" : "HTC-Vive-Controller",
+    "hands" : {
+        "neutral" : {
+            "asset" : "some-url",
+            "root" : "neutral-controller-node",
+            "components" : [ 0, 1, 2],
+            "primaryButtonComponent" : 0,
+            "primaryAxesComponent" : 0
+        }
+    },
+    "components" : [
+        {
+            "dataSource" : 0,
+            "root" : "trackpad-node",
+            "labelTransform" : "trackpad-label-transform",
+            "visualResponses": [0, 1]
         },
-        "components" : [
-            {
-                "dataSource" : 0,
-                "root" : "trackpad-node",
-                "labelTransform" : "trackpad-label-transform",
-                "visualResponses": [0, 1]
-            },
-            {
-                "dataSource" : 1,
-                "root" : "trigger-node",
-                "labelTransform" : "trigger-label-transform",
-                "visualResponses": [2]
-            },
-            {
-                "dataSource" : 2,
-                "root" : "faceButton-node",
-                "labelTransform" : "faceButton-label-transform",
-                "visualResponses": [3]
-            }
-        ],
-        "dataSources" : [
-            {
-                "id" : "trackpad",
-                "dataSourceType": "touchpadSource",
-                "xAxisIndex" : 0,
-                "yAxisIndex" : 1,
-                "buttonIndex" : 0
-            },
-            {
-                "id" : "trigger",
-                "dataSourceType": "buttonSource",
-                "buttonIndex" : 1,
-                "analogValues" : true
-            },
-            {
-                "id" : "grip",
-                "dataSourceType": "buttonSource",
-                "buttonIndex" : 2
-            }
-        ],
-        "visualResponses" : [
-            {
-                "userAction": "onPress",
-                "target" : "touchpad-transform-node",
-                "left" : "touchpad-transform-left-node",
-                "right" : "touchpad-transform-right-node",
-                "top" : "touchpad-transform-top-node",
-                "bottom" : "touchpad-transform-bottom-node"
-            },
-            {
-                "userAction": "onTouch",
-                "target" : "touchpad-touchpoint-node",
-                "left" : "touchpad-touchpoint-left-node",
-                "right" : "touchpad-touchpoint-right-node",
-                "top" : "touchpad-touchpoint-top-node",
-                "bottom" : "touchpad-touchpoint-bottom-node"
-            },
-            {
-                "userAction": "onTouch",
-                "target" : "trigger-transform-node",
-                "buttonMin": "trigger-min-transform-node",
-                "buttonMax": "trigger-max-transform-node"
-            },
-            {
-                "userAction": "onPress",
-                "target" : "grip-transform-node",
-                "buttonMin": "grip-min-transform-node",
-                "buttonMax": "grip-max-transform-node"
-            }
-        ]
-    }
+        {
+            "dataSource" : 1,
+            "root" : "trigger-node",
+            "labelTransform" : "trigger-label-transform",
+            "visualResponses": [2]
+        },
+        {
+            "dataSource" : 2,
+            "root" : "faceButton-node",
+            "labelTransform" : "faceButton-label-transform",
+            "visualResponses": [3]
+        }
+    ],
+    "dataSources" : [
+        {
+            "id" : "trackpad",
+            "dataSourceType": "touchpadSource",
+            "xAxisIndex" : 0,
+            "yAxisIndex" : 1,
+            "buttonIndex" : 0
+        },
+        {
+            "id" : "trigger",
+            "dataSourceType": "buttonSource",
+            "buttonIndex" : 1,
+            "analogValues" : true
+        },
+        {
+            "id" : "grip",
+            "dataSourceType": "buttonSource",
+            "buttonIndex" : 2
+        }
+    ],
+    "visualResponses" : [
+        {
+            "userAction": "onPress",
+            "target" : "touchpad-transform-node",
+            "left" : "touchpad-transform-left-node",
+            "right" : "touchpad-transform-right-node",
+            "top" : "touchpad-transform-top-node",
+            "bottom" : "touchpad-transform-bottom-node"
+        },
+        {
+            "userAction": "onTouch",
+            "target" : "touchpad-touchpoint-node",
+            "left" : "touchpad-touchpoint-left-node",
+            "right" : "touchpad-touchpoint-right-node",
+            "top" : "touchpad-touchpoint-top-node",
+            "bottom" : "touchpad-touchpoint-bottom-node"
+        },
+        {
+            "userAction": "onTouch",
+            "target" : "trigger-transform-node",
+            "buttonMin": "trigger-min-transform-node",
+            "buttonMax": "trigger-max-transform-node"
+        },
+        {
+            "userAction": "onPress",
+            "target" : "grip-transform-node",
+            "buttonMin": "grip-min-transform-node",
+            "buttonMax": "grip-max-transform-node"
+        }
+    ]
 }

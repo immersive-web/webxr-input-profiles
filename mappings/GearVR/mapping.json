@@ -1,68 +1,66 @@
 {
     "version" : "0.1.0",
-    "gamepad" : {
-        "id" : "Gear-VR",
-        "hands" : {
-            "neutral" : {
-                "asset" : "some-url",
-                "root" : "neutral-controller-node",
-                "components" : [0, 1],
-                "primaryButtonComponent" : 0,
-                "primaryAxesComponent" : 0
-            }
+    "id" : "Gear-VR",
+    "hands" : {
+        "neutral" : {
+            "asset" : "some-url",
+            "root" : "neutral-controller-node",
+            "components" : [0, 1],
+            "primaryButtonComponent" : 0,
+            "primaryAxesComponent" : 0
+        }
+    },
+    "components" : [
+        {
+            "dataSource" : 0,
+            "root" : "thumbstick-node",
+            "labelTransform" : "thumbstick-label-transform",
+            "visualResponses": [0, 1]
         },
-        "components" : [
-            {
-                "dataSource" : 0,
-                "root" : "thumbstick-node",
-                "labelTransform" : "thumbstick-label-transform",
-                "visualResponses": [0, 1]
-            },
-            {
-                "dataSource" : 1,
-                "root" : "faceButton-node",
-                "labelTransform" : "faceButton-label-transform",
-                "visualResponses": [2]
-            }
-        ],
-        "dataSources" : [
-            {
-                "id" : "thumbstick",
-                "dataSourceType": "thumbstickSource",
-                "xAxisIndex" : 0,
-                "yAxisIndex" : 1,
-                "buttonIndex" : 0
-            },
-            {
-                "id" : "faceButton",
-                "dataSourceType": "buttonSource",
-                "buttonIndex" : 1
-            }
-        ],
-        "visualResponses" : [
-            {
-                "userAction": "onPress",
-                "target" : "touchpad-transform-node",
-                "left" : "touchpad-transform-left-node",
-                "right" : "touchpad-transform-right-node",
-                "top" : "touchpad-transform-top-node",
-                "bottom" : "touchpad-transform-bottom-node"
+        {
+            "dataSource" : 1,
+            "root" : "faceButton-node",
+            "labelTransform" : "faceButton-label-transform",
+            "visualResponses": [2]
+        }
+    ],
+    "dataSources" : [
+        {
+            "id" : "thumbstick",
+            "dataSourceType": "thumbstickSource",
+            "xAxisIndex" : 0,
+            "yAxisIndex" : 1,
+            "buttonIndex" : 0
+        },
+        {
+            "id" : "faceButton",
+            "dataSourceType": "buttonSource",
+            "buttonIndex" : 1
+        }
+    ],
+    "visualResponses" : [
+        {
+            "userAction": "onPress",
+            "target" : "touchpad-transform-node",
+            "left" : "touchpad-transform-left-node",
+            "right" : "touchpad-transform-right-node",
+            "top" : "touchpad-transform-top-node",
+            "bottom" : "touchpad-transform-bottom-node"
 
-            },
-            {
-                "userAction": "onTouch",
-                "target" : "touchpad-touchpoint-node",
-                "left" : "touchpad-touchpoint-left-node",
-                "right" : "touchpad-touchpoint-right-node",
-                "top" : "touchpad-touchpoint-top-node",
-                "bottom" : "touchpad-touchpoint-bottom-node"
-            },
-            {
-                "userAction": "onPress",
-                "target" : "faceButton-transform-node",
-                "buttonMin": "faceButton-min-transform-node",
-                "buttonMax": "faceButton-max-transform-node"
-            }
-        ]
-    }
+        },
+        {
+            "userAction": "onTouch",
+            "target" : "touchpad-touchpoint-node",
+            "left" : "touchpad-touchpoint-left-node",
+            "right" : "touchpad-touchpoint-right-node",
+            "top" : "touchpad-touchpoint-top-node",
+            "bottom" : "touchpad-touchpoint-bottom-node"
+        },
+        {
+            "userAction": "onPress",
+            "target" : "faceButton-transform-node",
+            "buttonMin": "faceButton-min-transform-node",
+            "buttonMax": "faceButton-max-transform-node"
+        }
+    ]
 }
