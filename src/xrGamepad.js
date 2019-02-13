@@ -9,13 +9,13 @@ class XRGamepad {
     this.mapping = mapping;
     this.hand = this.mapping.hands[handedness];
     if (!this.hand) {
-      throw "No " + this.handedness + " hand exists for " + this.gamepad.id;
+      throw new Error("No ${this.handedness} hand exists for ${this.gamepad.id}");
     }
     
-    this.components = {};
+    this.xrGamepadComponents = {};
     this.hand.components.forEach((componentIndex) => {
       let component = new XRGamepadComponent(componentIndex, mapping, this);
-      this.components[component.id] = component;
+      this.xrGamepadComponents[component.id] = component;
 
       if (this.hand.primaryButtonComponent == componentIndex) {
         this.primaryButtonComponent = component;

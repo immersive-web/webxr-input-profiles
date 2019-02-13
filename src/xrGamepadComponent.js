@@ -1,21 +1,22 @@
-var XRVisualResponse = require("./xrVisualResponse.js");
+var XRGamepadVisualResponse = require("./xrGamepadVisualResponse.js");
 
 class XRGamepadComponent {
   constructor(componentIndex, mapping, xrGamepad) {
     this.xrGamepad = xrGamepad;
     this.component = mapping.components[componentIndex];
     this.dataSource = mapping.dataSources[this.component.dataSource];
-    this.visualResponses = [];
+    this.xrGamepadVisualResponses = {};
 
+    // Define validation helper functions
     let validateAxisIndex = (index) => {
       if (index >= this.xrGamepad.gamepad.axes.length) {
-        throw new Error("Gamepad '" + this.xrGamepad.id + "' has no axis at index " + index);
+        throw new Error("Gamepad '${this.xrGamepad.id}' has no axis at index ${index}");
       }
     };
 
     let validateButtonIndex = (index) => {
       if (index >= this.xrGamepad.gamepad.buttons.length) {
-        throw new Error("Gamepad '" + this.xrGamepad.id + "' has no button at index " + index);
+        throw new Error("Gamepad '${this.xrGamepad.id}' has no button at index ${index}");
       }
     };
 
@@ -43,7 +44,16 @@ class XRGamepadComponent {
     // Set up visual responses
     if (this.component.visualResponses) {
       this.component.visualResponses.forEach((visualResponseIndex) => {
-        this.visualResponses.push(new XRVisualResponse(mapping.visualResponses[visualResponseIndex], this));
+        let visualResponse = mapping.visualResponses[visualResponseIndex];
+
+        // If either an onPress or onTouch response has been previously encountered, add this to it
+        // Otherwise, create a new object to hold the pairing
+        // @TODO talk to Brandon about moving this back to the mapping
+        if (this.xrGamepadVisualResponses[visualResponse.target]) {
+          this.xrGamepadVisualResponses[visualResponse.target].addVisualResponse(visualResponse);
+        } else {
+          this.xrGamepadVisualResponses[visualResponse.target] = new XRGamepadVisualResponse(visualResponse, this);
+        }
       });
     }
   }
@@ -60,6 +70,49 @@ class XRGamepadComponent {
     return this.component.labelTransform;
   }
 
+  isTouched() {
+    let buttonsData = this.getButtonsData();
+    let axesData = this.getAxesData();
+    let isTouched = false;
+
+    // Checks if any of the associated GamepadButtons is touched.
+    // Also, to be on the safe side, check for pressed because a button isn't 
+    // supposed to be pressed without being touched per the Gamepad spec
+    Object.values(buttonsData).forEach( (buttonData) => {
+      if (buttonData.touched || buttonData.pressed) {
+        isTouched = true;
+      }
+    })
+    
+    // If no button exists or is reporting touched, the component is still
+    // considered touched if axes are present and they have moved outside
+    // a known deadzone
+    if (!isTouched) {
+      const touchDeadzoneThreshold = 0.1;
+      Object.values(axesData).forEach( (axisData) => {
+        if (Math.abs(axisData) > touchDeadzoneThreshold) {
+          isTouched = true;
+        }
+      });
+    }
+
+    return isTouched;
+  }
+
+  isPressed() {
+    let buttonsData = this.getButtonsData();
+    let isPressed = false;
+
+    // Checks if any of the associated GamepadButtons is pressed
+    Object.values(buttonsData).forEach((buttonData) => {
+      if (buttonData.pressed) {
+        isPressed = true;
+      }
+    })
+    
+    return isPressed;
+  }
+
   getAxesData() {
     let axesData = {};
     if (this.hasAxes) {
@@ -71,10 +124,11 @@ class XRGamepadComponent {
   }
 
   getButtonsData() {
-    let buttonsData = {};
-
+    // Define helper function for destructuring assignment
     let extractButtonData = ({value, touched, pressed}) => ({value, touched, pressed});
 
+    // Copy button data 
+    let buttonsData = {};
     let buttons = this.xrGamepad.gamepad.buttons;
 
     if (this.dataSource.buttonIndex != undefined) {
@@ -85,16 +139,26 @@ class XRGamepadComponent {
       buttonsData.top = extractButtonData(buttons[this.dataSource.topButtonIndex]);
       buttonsData.bottom = extractButtonData(buttons[this.dataSource.bottomButtonIndex]);
 
+      // Warn about unexpected behavio
+      // @TODO talk to Christine about how she'd prefer we handle this
       if (buttonsData.left.value > 0 && buttonsData.right.value > 0) {
-        console.warn("Gamepad '" + this.xrGamepad.id + "' with dpad '" + this.dataSource.id + "' is reporting left and right values > 0");
+        console.warn("Gamepad '${this.xrGamepad.id}' with dpad '${this.dataSource.id}' is reporting left and right values > 0");
       }
 
       if (buttonsData.top.value > 0 && buttonsData.bottom.value > 0) {
-        console.warn("Gamepad '" + this.xrGamepad.id + "' with dpad '" + this.dataSource.id + "' is reporting top and bottom values > 0");
+        console.warn("Gamepad '${this.xrGamepad.id}' with dpad '${this.dataSource.id}' is reporting top and bottom values > 0");
       }
     }
     // @TODO this would be where we normalize the values if the override specifies it
     return buttonsData;
+  }
+
+  getWeightedVisualizations() {
+    let weightedVisualizations = {};
+    Object.keys(this.xrGamepadVisualResponses).forEach((key) => {
+      weightedVisualizations[key] = this.xrGamepadVisualResponses[key].getWeightedVisualization();
+    });
+    return weightedVisualizations;
   }
 };
 

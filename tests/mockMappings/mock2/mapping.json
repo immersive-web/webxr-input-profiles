@@ -26,9 +26,9 @@
     "visualResponses": [
       {
         "userAction": "onTouch",
-        "target": "target node",
-        "buttonMin": "buttonMin node",
-        "buttonMax": "buttonMax node"
+        "target": "targetNode",
+        "buttonMin": "buttonMinNode",
+        "buttonMax": "buttonMaxNode"
       }
     ]
   }

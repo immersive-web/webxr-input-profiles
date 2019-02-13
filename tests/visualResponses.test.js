@@ -20,16 +20,18 @@ test.each(testTable)("visualResponseTest.%s", (gamepadId, mapping) => {
   expect(xrGamepad).toBeDefined();
 
   let mockComponent = mockGamepad.mockComponents["a button"];
-  let expectedValues = { button: {value: .2} };
+  let expectedValues = { button: {value: .2, touched: true} };
   mockComponent.setValues(expectedValues);
   let actualValues = mockComponent.getValues();
   expect(actualValues).toMatchObject(expectedValues);
 
-  let component = Object.values(xrGamepad.components)[0];
-  let visualResponse = component.visualResponses[0];
-  expect(visualResponse).toBeDefined();
-
-  let actualNodeWeights = visualResponse.getNodeWeights();
-  let expectedNodeWeights = { "buttonMin": 0.8, "buttonMax": 0.2 };
-  expect(actualNodeWeights).toEqual(expectedNodeWeights);
+  let component = Object.values(xrGamepad.xrGamepadComponents)[0];
+  let actualWeightedVisualzations = component.getWeightedVisualizations();
+  let expectedWeightedVisualzations = {
+    "targetNode": {
+      buttonMin: { weight: 0.8, node: "buttonMinNode" },
+      buttonMax: { weight: 0.2, node: "buttonMaxNode" }
+    }
+  }
+  expect(actualWeightedVisualzations).toEqual(expectedWeightedVisualzations);
 });
