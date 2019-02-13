@@ -17,17 +17,17 @@ describe.each(mappingList)("validateMapping.%s", (gamepadId) => {
 
   test("Mapping has unique data source ids", () => {
     let dataSourceIds = {};
-    mapping.gamepad.dataSources.forEach((dataSource) => {
+    mapping.dataSources.forEach((dataSource) => {
       expect(dataSourceIds[dataSource.id]).toBeUndefined();
       dataSourceIds[dataSource.id] = true;
     });
   });
 
   test("Each hand has unique dataSources", () => {
-    Object.values(mapping.gamepad.hands).forEach((hand) => {
+    Object.values(mapping.hands).forEach((hand) => {
       let dataSourceIndices = {};
       hand.components.forEach((componentIndex) => {
-        let component = mapping.gamepad.components[componentIndex];
+        let component = mapping.components[componentIndex];
         expect(dataSourceIndices[component.dataSource]).toBeUndefined();
         dataSourceIndices[component.dataSource] = true;
       });
@@ -35,56 +35,56 @@ describe.each(mappingList)("validateMapping.%s", (gamepadId) => {
   });
 
   test("Component references are valid", () => {
-    mapping.gamepad.components.forEach((component) => {
-      expect(component.dataSource).toBeLessThan(mapping.gamepad.dataSources.length);
+    mapping.components.forEach((component) => {
+      expect(component.dataSource).toBeLessThan(mapping.dataSources.length);
       component.visualResponses.forEach((visualResponse) => {
-        expect(visualResponse).toBeLessThan(mapping.gamepad.visualResponses.length);
+        expect(visualResponse).toBeLessThan(mapping.visualResponses.length);
       });
     });
   });
 
   test("Hand references are valid", () => {
-    Object.values(mapping.gamepad.hands).forEach((hand) => {
+    Object.values(mapping.hands).forEach((hand) => {
       hand.components.forEach((component) => {
-        expect(component).toBeLessThan(mapping.gamepad.components.length);
+        expect(component).toBeLessThan(mapping.components.length);
       });
 
       if (hand.primaryButtonComponent) {
-        expect(hand.primaryButtonComponent).toBeLessThan(mapping.gamepad.components.length);
-        let component = mapping.gamepad.components[hand.primaryButtonComponent];
-        let dataSource = mapping.gamepad.dataSources[component.dataSource];
+        expect(hand.primaryButtonComponent).toBeLessThan(mapping.components.length);
+        let component = mapping.components[hand.primaryButtonComponent];
+        let dataSource = mapping.dataSources[component.dataSource];
         expect(dataSource.dataSourceType).toBe("buttonSource");
       }
       
       if (hand.primaryAxesComponent) {
-        expect(hand.primaryAxesComponent).toBeLessThan(mapping.gamepad.components.length);
-        let component = mapping.gamepad.components[hand.primaryAxesComponent];
-        let dataSource = mapping.gamepad.dataSources[component.dataSource];
+        expect(hand.primaryAxesComponent).toBeLessThan(mapping.components.length);
+        let component = mapping.components[hand.primaryAxesComponent];
+        let dataSource = mapping.dataSources[component.dataSource];
         expect(dataSource.dataSourceType).toMatch(/thumbstickSource|touchpadSource/);
       }
     })
   });
 
   test("No unused data sources", () => {
-    let usedDataSourceIndices = Array(mapping.gamepad.dataSources.length);
-    mapping.gamepad.components.forEach((component) => {
+    let usedDataSourceIndices = Array(mapping.dataSources.length);
+    mapping.components.forEach((component) => {
       usedDataSourceIndices[component.dataSource] = true;
     });
 
-    let unusedDataSources = mapping.gamepad.dataSources.filter((dataSource, index) => !usedDataSourceIndices[index]);
+    let unusedDataSources = mapping.dataSources.filter((dataSource, index) => !usedDataSourceIndices[index]);
     expect(unusedDataSources).toHaveLength(0);
   });
 
   test("No unused components", () => {
-    let usedComponentIndices = Array(mapping.gamepad.components.length);
+    let usedComponentIndices = Array(mapping.components.length);
 
-    Object.values(mapping.gamepad.hands).forEach((hand) => {
+    Object.values(mapping.hands).forEach((hand) => {
       hand.components.forEach((componentIndex) => {
         usedComponentIndices[componentIndex] = true;
       });
     });
 
-    let unusedComponents = mapping.gamepad.components.filter((component, index) => !usedComponentIndices[index]);
+    let unusedComponents = mapping.components.filter((component, index) => !usedComponentIndices[index]);
     expect(unusedComponents).toHaveLength(0);
   });
 

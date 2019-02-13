@@ -1,132 +1,130 @@
 {
     "version" : "0.1.0",
-    "gamepad" : {
-        "id" : "045E-065D",
-        "hands" : {
-            "left" : {
-                "asset" : "some-url",
-                "root" : "left-controller-node",
-                "components" : [ 0, 1, 2, 3, 4],
-                "primaryButtonComponent" : 0,
-                "primaryAxesComponent" : 1
-            },
-            "right" : {
-                "asset" : "some-url",
-                "root" : "right-controller-node",
-                "components" : [ 0, 1, 2, 3, 4],
-                "primaryButtonComponent" : 0,
-                "primaryAxesComponent" : 1
-            }
+    "id" : "045E-065D",
+    "hands" : {
+        "left" : {
+            "asset" : "some-url",
+            "root" : "left-controller-node",
+            "components" : [ 0, 1, 2, 3, 4],
+            "primaryButtonComponent" : 0,
+            "primaryAxesComponent" : 1
         },
-        "components" : [
-            {
-                "dataSource" : 0,
-                "root" : "trigger-node",
-                "labelTransform" : "trigger-label",
-                "visualResponses": [0]
-            },
-            {
-                "dataSource" : 1,
-                "root" : "thumbstick-node",
-                "labelTransform" : "thumbstick-label",
-                "visualResponses": [1]
-            },
-            {
-                "dataSource" : 2,
-                "root" : "grip-node",
-                "labelTransform" : "grip-label",
-                "visualResponses": [2]
-            },
-            {
-                "dataSource" : 3,
-                "root" : "grip-node",
-                "labelTransform" : "grip-label",
-                "visualResponses": [3, 4]
-            },
-            {
-                "dataSource" : 4,
-                "root" : "menu-node",
-                "labelTransform" : "menu-label",
-                "visualResponses": [5]
-            }
-        ],
-        "dataSources" : [
-            {
-                "id" : "trigger",
-                "dataSourceType": "buttonSource",
-                "buttonIndex": 0,
-                "analogValues": true
-            },
-            {
-                "id" : "thumbstick",
-                "dataSourceType": "thumbstickSource",
-                "xAxisIndex" : 0,
-                "yAxisIndex" : 1,
-                "buttonIndex" : 1
-            },
-            {
-                "id" : "grip",
-                "dataSourceType": "buttonSource",
-                "buttonIndex" : 2
-            },
-            {
-                "id" : "touchpad",
-                "dataSourceType": "touchpadSource",
-                "xAxisIndex" : 2,
-                "yAxisIndex" : 3,
-                "buttonIndex" : 3
-            },
-            {
-                "id" : "menu",
-                "dataSourceType": "buttonSource",
-                "buttonIndex" : 4
-            }
-        ],
-        "visualResponses" : [
-            {
-                "userAction": "onTouch",
-                "target" : "trigger-transform-node",
-                "buttonMin": "trigger-min-transform-node",
-                "buttonMax": "trigger-max-transform-node"
-            },
-            {
-                "userAction": "onTouch",
-                "target" : "thumbstick-transform-node",
-                "left" : "thumbstick-transform-left-node",
-                "right" : "thumbstick-right-transform-right-node",
-                "top" : "thumbstick-transform-top-node",
-                "bottom" : "thumbstick-transform-bottom-node",
-                "buttonMin": "thumbstick-transform-min-node",
-                "buttonMax": "thumbstick-transform-max-node"
-            },
-            {
-                "userAction": "onPress",
-                "target" : "grip-transform-node",
-                "buttonMin": "grip-min-transform-node",
-                "buttonMax": "grip-max-transform-node"
-            },
-            {
-                "userAction": "onPress",
-                "target" : "touchpad-transform-node",
-                "left" : "touchpad-transform-left-node",
-                "right" : "touchpad-transform-right-node",
-                "top" : "touchpad-transform-top-node",
-                "bottom" : "touchpad-transform-bottom-node"
-            },
-            {
-                "userAction": "onTouch",
-                "target" : "touchpad-touchpoint-node",
-                "left" : "touchpad-touchpoint-left-node",
-                "right" : "touchpad-touchpoint-right-node",
-                "top" : "touchpad-touchpoint-top-node",
-                "bottom" : "touchpad-touchpoint-bottom-node"
-            },
-            {
-                "userAction": "onPress",
-                "target" : "menu-transform-node",
-                "buttonMin": "menu-min-transform-node",
-                "buttonMax": "menu-max-transform-node"
-            }
-        ]
-    }
+        "right" : {
+            "asset" : "some-url",
+            "root" : "right-controller-node",
+            "components" : [ 0, 1, 2, 3, 4],
+            "primaryButtonComponent" : 0,
+            "primaryAxesComponent" : 1
+        }
+    },
+    "components" : [
+        {
+            "dataSource" : 0,
+            "root" : "trigger-node",
+            "labelTransform" : "trigger-label",
+            "visualResponses": [0]
+        },
+        {
+            "dataSource" : 1,
+            "root" : "thumbstick-node",
+            "labelTransform" : "thumbstick-label",
+            "visualResponses": [1]
+        },
+        {
+            "dataSource" : 2,
+            "root" : "grip-node",
+            "labelTransform" : "grip-label",
+            "visualResponses": [2]
+        },
+        {
+            "dataSource" : 3,
+            "root" : "grip-node",
+            "labelTransform" : "grip-label",
+            "visualResponses": [3, 4]
+        },
+        {
+            "dataSource" : 4,
+            "root" : "menu-node",
+            "labelTransform" : "menu-label",
+            "visualResponses": [5]
+        }
+    ],
+    "dataSources" : [
+        {
+            "id" : "trigger",
+            "dataSourceType": "buttonSource",
+            "buttonIndex": 0,
+            "analogValues": true
+        },
+        {
+            "id" : "thumbstick",
+            "dataSourceType": "thumbstickSource",
+            "xAxisIndex" : 0,
+            "yAxisIndex" : 1,
+            "buttonIndex" : 1
+        },
+        {
+            "id" : "grip",
+            "dataSourceType": "buttonSource",
+            "buttonIndex" : 2
+        },
+        {
+            "id" : "touchpad",
+            "dataSourceType": "touchpadSource",
+            "xAxisIndex" : 2,
+            "yAxisIndex" : 3,
+            "buttonIndex" : 3
+        },
+        {
+            "id" : "menu",
+            "dataSourceType": "buttonSource",
+            "buttonIndex" : 4
+        }
+    ],
+    "visualResponses" : [
+        {
+            "userAction": "onTouch",
+            "target" : "trigger-transform-node",
+            "buttonMin": "trigger-min-transform-node",
+            "buttonMax": "trigger-max-transform-node"
+        },
+        {
+            "userAction": "onTouch",
+            "target" : "thumbstick-transform-node",
+            "left" : "thumbstick-transform-left-node",
+            "right" : "thumbstick-right-transform-right-node",
+            "top" : "thumbstick-transform-top-node",
+            "bottom" : "thumbstick-transform-bottom-node",
+            "buttonMin": "thumbstick-transform-min-node",
+            "buttonMax": "thumbstick-transform-max-node"
+        },
+        {
+            "userAction": "onPress",
+            "target" : "grip-transform-node",
+            "buttonMin": "grip-min-transform-node",
+            "buttonMax": "grip-max-transform-node"
+        },
+        {
+            "userAction": "onPress",
+            "target" : "touchpad-transform-node",
+            "left" : "touchpad-transform-left-node",
+            "right" : "touchpad-transform-right-node",
+            "top" : "touchpad-transform-top-node",
+            "bottom" : "touchpad-transform-bottom-node"
+        },
+        {
+            "userAction": "onTouch",
+            "target" : "touchpad-touchpoint-node",
+            "left" : "touchpad-touchpoint-left-node",
+            "right" : "touchpad-touchpoint-right-node",
+            "top" : "touchpad-touchpoint-top-node",
+            "bottom" : "touchpad-touchpoint-bottom-node"
+        },
+        {
+            "userAction": "onPress",
+            "target" : "menu-transform-node",
+            "buttonMin": "menu-min-transform-node",
+            "buttonMax": "menu-max-transform-node"
+        }
+    ]
 }
