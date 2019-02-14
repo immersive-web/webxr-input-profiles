@@ -1,40 +1,18 @@
 class XRGamepadVisualResponse {
   constructor(visualResponse, xrComponent) {
     this.xrComponent = xrComponent;
-    this.addVisualResponse(visualResponse);
-    this.target = visualResponse.target;
+    this.visualResponse = visualResponse;
   }
 
-  addVisualResponse(visualResponse) {
-    if (this.target && this.target != visualResponse.target) {
-      throw new Error("Cannot add a visual response targeting '${visualResponse.target}' to one targeting '${this.target}'");
-    }
-    // Validate visualResponse doesn't conflict
-    if (this[visualResponse.userAction]) {
-      throw new Error("Cannot have two visual responses targeting '${visualResponse.target}' for '${visualResponse.userAction}'");
-    }
-
-    let degreesOfFreedom = 0;
-    if (visualResponse.buttonMin && visualResponse.buttonMax) {
-      degreesOfFreedom = 1;
-    }
-
-    if (visualResponse.left && visualResponse.right && visualResponse.top && visualResponse.bottom) {
-      degreesOfFreedom += 2;
-    }
-
-    if (degreesOfFreedom < 1 || degreesOfFreedom > 3) {
-      throw new Error("Unable to determine the number of degrees of freedom");
-    }
-
-    this[visualResponse.userAction] = {visualResponse: visualResponse, degreesOfFreedom: degreesOfFreedom};
+  get target() {
+    return this.visualResponse.target;
   }
 
   getWeightedVisualization() {
-    if (this.xrComponent.isPressed() && this.onPress) {
-      var {visualResponse, degreesOfFreedom} = this.onPress;
-    } else if (this.xrComponent.isTouched() && this.onTouch) {
-      var {visualResponse, degreesOfFreedom} = this.onTouch;
+    if (this.xrComponent.isPressed() && this.visualResponse.onPress) {
+      var visualResponse = this.visualResponse.onPress;
+    } else if (this.xrComponent.isTouched() && this.visualResponse.onTouch) {
+      var visualResponse = this.visualResponse.onTouch;
     } else {
       return;
     }
@@ -43,7 +21,7 @@ class XRGamepadVisualResponse {
     let buttonsData = this.xrComponent.getButtonsData();
     let axesData = this.xrComponent.getAxesData();
 
-    switch (degreesOfFreedom) {
+    switch (visualResponse.degreesOfFreedom) {
       case 1:
         weightedResponse.buttonMin = { node: visualResponse.buttonMin, weight: 1 - buttonsData.button.value };
         weightedResponse.buttonMax = { node: visualResponse.buttonMax, weight: buttonsData.button.value };

@@ -45,15 +45,8 @@ class XRGamepadComponent {
     if (this.component.visualResponses) {
       this.component.visualResponses.forEach((visualResponseIndex) => {
         let visualResponse = mapping.visualResponses[visualResponseIndex];
-
-        // If either an onPress or onTouch response has been previously encountered, add this to it
-        // Otherwise, create a new object to hold the pairing
-        // @TODO talk to Brandon about moving this back to the mapping
-        if (this.xrGamepadVisualResponses[visualResponse.target]) {
-          this.xrGamepadVisualResponses[visualResponse.target].addVisualResponse(visualResponse);
-        } else {
-          this.xrGamepadVisualResponses[visualResponse.target] = new XRGamepadVisualResponse(visualResponse, this);
-        }
+        let xrGamepadVisualResponse = new XRGamepadVisualResponse(visualResponse, this);
+        this.xrGamepadVisualResponses[xrGamepadVisualResponse.target] = xrGamepadVisualResponse;
       });
     }
   }

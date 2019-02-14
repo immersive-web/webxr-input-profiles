@@ -25,10 +25,12 @@
     ],
     "visualResponses": [
       {
-        "userAction": "onTouch",
         "target": "targetNode",
-        "buttonMin": "buttonMinNode",
-        "buttonMax": "buttonMaxNode"
+        "onTouch": {
+          "degreesOfFreedom": 1,
+          "buttonMin": "buttonMinNode",
+          "buttonMax": "buttonMaxNode"
+        }
       }
     ]
   }

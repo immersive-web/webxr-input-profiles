@@ -12,10 +12,12 @@ test("Valid mapping", () => {
   }
 
   const visualResponse = {
-    "userAction": "onTouch",
     "target": "target node",
-    "buttonMin": "buttonMin node",
-    "buttonMax": "buttonMax node"
+    "onTouch": {
+      "degreesOfFreedom": 1,
+      "buttonMin": "buttonMin node",
+      "buttonMax": "buttonMax node"
+    }
   };
   mapping.visualResponses = [visualResponse];
   valid = validator(mapping);
