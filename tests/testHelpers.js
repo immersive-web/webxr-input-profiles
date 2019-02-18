@@ -205,23 +205,30 @@ const TestHelpers = {
     return data;
   },
 
-  makeData: function(partsCount, parameters={}) {
+  makeData: function(dataSource, parameters={}, asButtons) {
+    let partsCount = Object.keys(dataSource).filter((key) => key.endsWith("Index")).length;
+
     let data;
     switch(partsCount) {
       case 1:
         data = TestHelpers.makeData1DOF(parameters);
         break;
       case 2:
-        data = TestHelpers.makeData2DOFAxes(parameters);
+        if (asButtons) {
+          data = TestHelpers.makeData2DOFButtons(parameters);
+        } else {
+          data = TestHelpers.makeData2DOFAxes(parameters);
+        }
         break;
       case 3:
-        data = TestHelpers.makeData3DOFAxes(parameters);
+        if (asButtons) {
+          data = TestHelpers.makeData3DOFButtons(parameters);
+        } else {
+          data = TestHelpers.makeData3DOFAxes(parameters);
+        }
         break;
       case 4:
         data = TestHelpers.makeData2DOFButtons(parameters);
-        break;
-      case 5:
-        data = TestHelpers.makeData3DOFButtons(parameters);
         break;
       default:
         throw new Error(`Cannot make data for parts count = ${partsCount}`);

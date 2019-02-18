@@ -9,67 +9,181 @@ let mockGamepad;
 
 const mapping = Object.freeze(TestHelpers.getMappingById(gamepadId, handedness));
 
-const defaultTestValues = [
-  [ "default", {}, null ]
-]
+const testDescriptions = {
+  "default": {
+    dataSourceIds: ["button", "touchpad", "thumbstick", "dpadFromAxes", "dpadFromButtons"],
+  },
+  "button touched": {
+    dataSourceIds: ["button", "thumbstick"],
+    mockGamepadValues: { button: 0.4 }
+  },
+  "button pressed": {
+    dataSourceIds: ["button", "thumbstick"],
+    mockGamepadValues: { button: 1 }
+  },
 
-const buttonTestValues = [
-  [ "button touched", { button: 0.4 },  null ],
-  [ "button pressed", { button: 1 },    null ]
-];
+  "xAxis negative": {
+    dataSourceIds: ["touchpad", "thumbstick", "dpadFromAxes"],
+    mockGamepadValues: { xAxis: -0.4 },
+    dataAsButtons: { left: 0.4 }
+  },
+  "xAxis positive": {
+    dataSourceIds: ["touchpad", "thumbstick", "dpadFromAxes"],
+    mockGamepadValues: { xAxis: 0.4 },
+    dataAsButtons: { right: 0.4 } 
+  },
+  "yAxis negative": {
+    dataSourceIds: ["touchpad", "thumbstick", "dpadFromAxes"],
+    mockGamepadValues: { yAxis: -0.4 },
+    dataAsButtons: { top: 0.4 }
+  },
+  "yAxis positive": {
+    dataSourceIds: ["touchpad", "thumbstick", "dpadFromAxes"],
+    mockGamepadValues: { yAxis: 0.4 },
+    dataAsButtons: { bottom: 0.4 } 
+  },
 
-const axesTestValues = [
-  [ "xAxis negative", { xAxis: -0.4 },  { left: 0.4 } ],
-  [ "xAxis positive", { xAxis: 0.4 },   { right: 0.4 } ],
-  [ "yAxis negative", { yAxis: -0.4 },  { top: 0.4 } ],
-  [ "yAxis positive", { yAxis: 0.4 },   { bottom: 0.4 } ],
+  "xAxis negative and yAxis positive": {
+    dataSourceIds: ["touchpad", "thumbstick", "dpadFromAxes"],
+    mockGamepadValues: { xAxis: -0.3, yAxis: 0.4 },
+    dataAsButtons: { left: 0.3, bottom: 0.4 }
+  },
+  "xAxis positive and yAxis positive": {
+    dataSourceIds: ["touchpad", "thumbstick", "dpadFromAxes"],
+    mockGamepadValues: { xAxis: 0.3, yAxis: 0.4 },
+    dataAsButtons: { right: 0.3, bottom: 0.4 }
+  },
+  "xAxis negative and yAxis negative": {
+    dataSourceIds: ["touchpad", "thumbstick", "dpadFromAxes"],
+    mockGamepadValues: { xAxis: -0.3, yAxis: -0.4 },
+    dataAsButtons: { left: 0.3, top: 0.4 }
+  },
+  "xAxis positive and yAxis negative": {
+    dataSourceIds: ["touchpad", "thumbstick", "dpadFromAxes"],
+    mockGamepadValues: { xAxis: 0.3, yAxis: -0.4 },
+    dataAsButtons: { right: 0.3, top: 0.4 }
+  },
+  
+  "xAxis negative and button touched": {
+    dataSourceIds: ["thumbstick"],
+    mockGamepadValues: { xAxis: -0.4, button: 0.7 },
+    dataAsButtons: { left: 0.4, button: 0.7 }
+  },
+  "xAxis positive and button pressed": {
+    dataSourceIds: ["thumbstick"],
+    mockGamepadValues: { xAxis: 0.4, button: 1 },
+    dataAsButtons: { right: 0.4, button: 1 }
+  },
+  "xAxis negative and yAxis positive and button touched": {
+    dataSourceIds: ["thumbstick"],
+    mockGamepadValues: { xAxis: -0.3, yAxis: 0.4, button: 0.7 },
+    dataAsButtons: { left: 0.3, bottom: 0.4, button: 0.7 }
+  },
+  "xAxis positive and yAxis negative and button pressed": {
+    dataSourceIds: ["thumbstick"],
+    mockGamepadValues: { xAxis: 0.3, yAxis: -0.4, button: 1 },
+    dataAsButtons: { right: 0.3, top: 0.4, button: 1 }
+  },
+  
+  "left touched": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { left: 0.4 }
+  },
+  "left pressed": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { left: 1 }
+  },
+  "right touched": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { right: 0.4 }
+  },
+  "right pressed": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { right: 1 }
+  },
+  "top touched": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { top: 0.4 }
+  },
+  "top pressed": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { top: 1 }
+  },
+  "bottom touched": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { bottom: 0.4 }
+  },
+  "bottom pressed": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { bottom: 1 }
+  },
 
-  [ "xAxis negative and yAxis positive", { xAxis: -0.3, yAxis: 0.4 },   { left: 0.3, bottom: 0.4 } ],
-  [ "xAxis positive and yAxis positive", { xAxis: 0.3, yAxis: 0.4 },    { right: 0.3, bottom: 0.4 } ],
-  [ "xAxis negative and yAxis negative", { xAxis: -0.3, yAxis: -0.4 },  { left: 0.3, top: 0.4 } ],
-  [ "xAxis positive and yAxis negative", { xAxis: 0.3, yAxis: -0.4 },   { right: 0.3, top: 0.4 } ]
-];
+  "left and top touched": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { left: 0.3, top: 0.4 }
+  },
+  "right and top touched": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { right: 0.3, top: 0.4 }
+  },
+  "left and bottom touched": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { left: 0.3, bottom: 0.4 }
+  },
+  "right and bottom touched": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { right: 0.3, bottom: 0.4 }
+  },
 
-const buttonsAxesTestValues = [
-  [ "xAxis negative and button touched", { xAxis: -0.4, button: 0.7 },  { left: 0.4, button: 0.7 } ],
-  [ "xAxis positive and button pressed", { xAxis: 0.4, button: 1 },   { right: 0.4, button: 1 } ],
+  "left and top pressed": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { left: 1, top: 1 }
+  },
+  "right and top pressed": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { right: 1, top: 1 }
+  },
+  "left and bottom pressed": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { left: 1, bottom: 1 }
+  },
+  "right and bottom pressed": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { right: 1, bottom: 1 }
+  },
 
-  [ "xAxis negative and yAxis positive and button touched", { xAxis: -0.3, yAxis: 0.4, button: 0.7 }, { left: 0.3, bottom: 0.4, button: 0.7 } ],
-  [ "xAxis positive and yAxis negative and button pressed", { xAxis: 0.3, yAxis: -0.4, button: 1 },   { right: 0.3, top: 0.4, button: 1 } ]
-];
+  "left touched and top pressed": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { left: 0.4, top: 1 }
+  },
+  "right touched and top pressed": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { right: 0.4, top: 1 }
+  },
+  "left touched and bottom pressed": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { left: 0.4, bottom: 1 }
+  },
+  "right touched and bottom pressed": {
+    dataSourceIds: ["dpadFromButtons"],
+    mockGamepadValues: { right: 0.4, bottom: 1 }
+  }
+};
 
-const dpadFromButtonsTestValues = [
-  [ "left touched",   { left: 0.4 },    null ],
-  [ "left pressed",   { left: 1 },      null ],
-  [ "right touched",  { right: 0.4 },   null ],
-  [ "right pressed",  { right: 1 },     null ],
-  [ "top touched",    { top: 0.4 },     null ],
-  [ "top pressed",    { top: 1 },       null ],
-  [ "bottom touched", { bottom: 0.4 },  null ],
-  [ "bottom pressed", { bottom: 1 },    null ],
-
-  [ "left and top touched",     { left: 0.3, top: 0.4 },      null ],
-  [ "right and top touched",    { right: 0.3, top: 0.4 },     null ],
-  [ "left and bottom touched",  { left: 0.3, bottom: 0.4 },   null ],
-  [ "right and bottom touched", { right: 0.3, bottom: 0.4 },  null ],
-
-  [ "left and top pressed",     { left: 1, top: 1 },      null ],
-  [ "right and top pressed",    { right: 1, top: 1 },     null ],
-  [ "left and bottom pressed",  { left: 1, bottom: 1 },   null ],
-  [ "right and bottom pressed", { right: 1, bottom: 1 },  null ],
-
-  [ "left touched and top pressed",     { left: 0.4, top: 1 },      null ],
-  [ "right touched and top pressed",    { right: 0.4, top: 1 },     null ],
-  [ "left touched and bottom pressed",  { left: 0.4, bottom: 1 },   null ],
-  [ "right touched and bottom pressed", { right: 0.4, bottom: 1 },  null ],
-];
+const filterTests = function(dataSourceId) {
+  return Object.entries(testDescriptions).filter((entry) => {
+    if (entry[1].dataSourceIds.includes(dataSourceId)) {
+      return true;
+    }
+  });
+};
 
 const testsTable = [
-  ["button",          0, [...defaultTestValues, ...buttonTestValues]],
-  ["touchpad",        1, [...defaultTestValues, ...axesTestValues]],
-  ["thumbstick",      2, [...defaultTestValues, ...buttonTestValues, ...axesTestValues, ...buttonsAxesTestValues]],
-  ["dpadFromAxes",    3, [...defaultTestValues, ...axesTestValues]],
-  ["dpadFromButtons", 4, [...defaultTestValues, ...dpadFromButtonsTestValues]],
+  ["button",          0, filterTests("button") ],
+  ["touchpad",        1, filterTests("touchpad") ],
+  ["thumbstick",      2, filterTests("thumbstick") ],
+  ["dpadFromAxes",    3, filterTests("dpadFromAxes") ],
+  ["dpadFromButtons", 4, filterTests("dpadFromButtons") ]
 ];
 
 beforeAll(() => {
@@ -95,23 +209,6 @@ describe.each(testsTable)("xrGamepadComponent.%s", (dataSourceId, componentIndex
     let xrGamepadComponent = new XRGamepadComponent(componentIndex, mapping, mockGamepad);
     expect(xrGamepadComponent);
     expect(xrGamepadComponent.id).toEqual(dataSourceId);
-    switch(dataSourceId) {
-      case "dpadFromButtons":
-        expect(xrGamepadComponent.partsCount).toEqual(4);
-        break;
-      case "thumbstick":
-        expect(xrGamepadComponent.partsCount).toEqual(3);
-        break;
-      case "touchpad":
-      case "dpadFromAxes":
-        expect(xrGamepadComponent.partsCount).toEqual(2);
-        break;
-      case "button":
-        expect(xrGamepadComponent.partsCount).toEqual(1);
-        break;
-      default:
-        throw new Error("Unexpected data source in mock mapping file");
-    }
   });
 
   test("Get Component State", () => {
@@ -120,63 +217,49 @@ describe.each(testsTable)("xrGamepadComponent.%s", (dataSourceId, componentIndex
     expect(componentState).toEqual(Constants.ComponentState.DEFAULT);
   });
 
-  test.each(dataTestsTable)(`GetData w/ %s`, (testName, dataOverrides, dataAsButtons) => {
+  test.each(dataTestsTable)(`GetData w/ %s`, (testName, {mockData, mockDataAsButtons=mockData}) => {
     let xrGamepadComponent = new XRGamepadComponent(componentIndex, mapping, mockGamepad);
 
-    let expectedData = TestHelpers.makeData(xrGamepadComponent.partsCount, dataOverrides);
-    mockGamepad.mockComponents[dataSourceId].setValues(expectedData);
+    let expectedData = TestHelpers.makeData(xrGamepadComponent.dataSource, mockData);
+    mockGamepad.mockComponents[dataSourceId].setValues(mockData);
 
     let actualData = xrGamepadComponent.getData();
     expect(actualData).toMatchObject(expectedData);
 
-    if (dataAsButtons) {
-      expectedData = TestHelpers.makeData(xrGamepadComponent.partsCount + 2, dataAsButtons);
-      actualData = xrGamepadComponent.getData(true);
-      expect(actualData).toMatchObject(expectedData);
-    }
+    const asButtons = true;
+    expectedData = TestHelpers.makeData(xrGamepadComponent.dataSource, mockDataAsButtons, asButtons);
+    actualData = xrGamepadComponent.getData(asButtons);
+    expect(actualData).toMatchObject(expectedData);
   });
 
-  test.todo("getWeightedVisualizations");
-  /*
-  test.each(Object.entries(testData))("getWeightedVisualization.%s", (name, data) => {
-    const mapping = TestHelpers.getMappingById(gamepadId, handedness);
-    const visualResponse = mapping.visualResponses[visualResponseIndex];
+  test.each(dataTestsTable)("getWeightedVisualizations w/ %s", (testName, {mockData, mockDataAsButtons=mockData}) => {
+    let xrGamepadComponent = new XRGamepadComponent(componentIndex, mapping, mockGamepad);
+
+    mockGamepad.mockComponents[dataSourceId].setValues(
+      TestHelpers.makeData(xrGamepadComponent.dataSource, mockData));
     
-    const xrGamepadVisualResponse = new XRGamepadVisualResponse(visualResponse);
-    const actualResult = xrGamepadVisualResponse.getWeightedVisualization(data);
-    expect(actualResult).toBeDefined();
+    const asButtons = true;
+    let expectedData = TestHelpers.makeData(xrGamepadComponent.dataSource, mockDataAsButtons, asButtons);
 
-    // Confirm the correct number of entries is present
-    if (name == "default") {
-      expect(Object.keys(actualResult)).toHaveLength(0);
-    } else {
-      switch (category) {
-        case "1DOF":
-          var expectedLength = 2;
-          break;
-        case "2DOF.Buttons":
-        case "2DOF.Axes":
-          var expectedLength = 4;
-          break;
-        case "3DOF":
-          var expectedLength = 6;
-          break;
-      }
-      expect(Object.keys(actualResult)).toHaveLength(expectedLength);
+    let actualVisualizations = xrGamepadComponent.getWeightedVisualizations();
 
-      if (data.isPressed) {
-        var regexp = /PRESS$/;
+    let visualResponseIndices = mapping.components[componentIndex].visualResponses;
+    visualResponseIndices.forEach((visualResponseIndex) => {
+      let visualResponse = mapping.visualResponses[visualResponseIndex];
+      let actualVisualResponse = actualVisualizations[visualResponse.target];
+      let expectedVisualResponse = visualResponse[expectedData.state];
+      if (!expectedVisualResponse) {
+        expect(actualVisualResponse).toBeUndefined();
       } else {
-        var regexp = /TOUCH$/;
+        expect(Object.keys(actualVisualResponse)).toHaveLength(Object.keys(expectedVisualResponse).length - 1);
+        Object.keys(expectedVisualResponse).forEach((node) => {
+          if (node != "degreesOfFreedom") {
+            expect(actualVisualResponse[node].name).toEqual(expectedVisualResponse[node]);
+            expect(actualVisualResponse[node].weight).toEqual(expectedData.buttons[node].value);
+          }
+        });
       }
-      
-      Object.values(actualResult).forEach(element => {
-        // Check that all the keys are for the right user action
-        expect(element.node).toEqual(expect.stringMatching(regexp));
-      });
-    }
-    
+    });
   });
-  */
 });
 

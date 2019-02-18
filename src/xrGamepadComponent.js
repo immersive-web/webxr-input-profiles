@@ -70,10 +70,6 @@ class XRGamepadComponent {
     return this.component.labelTransform;
   }
 
-  get partsCount() {
-    return Object.keys(this.buttons).length + Object.keys(this.axes).length;
-  }
-
   getComponentState() {
     let isPressed = false;
     let isTouched = false;
@@ -154,15 +150,16 @@ class XRGamepadComponent {
     let data = this.getData(axesAsButtons);
 
     this.visualResponses.forEach((visualResponse) => {
-      if (visualResponse[data.state]) {
-        let visualResponseState = visualResponse[data.state];
+      let visualResponseState = visualResponse[data.state];
+      if (visualResponseState) {
         let weightedVisualResponse = {};
         Object.keys(visualResponseState).forEach((node) => {
-          weightedVisualResponse[node] = { name: visualResponseState[node], weight: data.buttons[node].value };
+          if (node != "degreesOfFreedom") {
+            weightedVisualResponse[node] = { name: visualResponseState[node], weight: data.buttons[node].value };
+          }
         });
-        weightedVisualResponses.push(weightedResponse);
+        weightedVisualResponses[visualResponse.target] = weightedVisualResponse;
       }
-
     });
     return weightedVisualResponses;
   }
