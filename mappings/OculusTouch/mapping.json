@@ -118,68 +118,60 @@
             "target" : "thumbstick-transform-node",
             "onPress": {
                 "degreesOfFreedom": 3,
+                "button": "thumbstick-transform-button-node",
                 "left" : "thumbstick-transform-left-node",
                 "right" : "thumbstick-right-transform-right-node",
                 "top" : "thumbstick-transform-top-node",
-                "bottom" : "thumbstick-transform-bottom-node",
-                "buttonMin": "thumbstick-transform-centerMin-node",
-                "buttonMax": "thumbstick-transform-centerMax-node"
+                "bottom" : "thumbstick-transform-bottom-node"
             }
         },
         {
             "target" : "trigger-transform-node",
             "onTouch": {
                 "degreesOfFreedom": 1,
-                "buttonMin": "trigger-min-transform-node",
-                "buttonMax": "trigger-max-transform-node"
+                "button": "trigger-transform-button-node"
             }
         },
         {
             "target" : "grip-transform-node",
             "onPress": {
                 "degreesOfFreedom": 1,
-                "buttonMin": "grip-min-transform-node",
-                "buttonMax": "grip-max-transform-node"
+                "button": "grip-transform-button-node"                
             }
         },
         {
             "target" : "x-transform-node",
             "onPress": {
                 "degreesOfFreedom": 1,
-                "buttonMin": "x-min-transform-node",
-                "buttonMax": "x-max-transform-node"
+                "button": "x-transform-button-node"
             }
         },
         {
             "target" : "y-transform-node",
             "onPress": {
                 "degreesOfFreedom": 1,
-                "buttonMin": "y-min-transform-node",
-                "buttonMax": "y-max-transform-node"
+                "button": "y-transform-button-node"
             }
         },
         {
             "target" : "a-transform-node",
             "onPress": {
                 "degreesOfFreedom": 1,
-                "buttonMin": "a-min-transform-node",
-                "buttonMax": "a-max-transform-node"
+                "button": "a-transform-button-node"
             }
         },
         {
             "target" : "b-transform-node",
             "onPress": {
                 "degreesOfFreedom": 1,
-                "buttonMin": "b-min-transform-node",
-                "buttonMax": "b-max-transform-node"
+                "button": "b-transform-button-node"
             }
         },
         {
             "target" : "thumbrest-touchpoint-node",
             "onTouch": {
                 "degreesOfFreedom": 1,
-                "buttonMin": "thumbrest-min-touchpoint-node",
-                "buttonMax": "thumbrest-max-touchpoint-node"
+                "button": "thumbrest-touchpoint-button-node"
                 }
         }
     ]

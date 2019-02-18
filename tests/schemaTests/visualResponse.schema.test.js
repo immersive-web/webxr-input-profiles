@@ -3,8 +3,7 @@ const validator = testHelpers.getValidator("visualResponses.schema.json", ["visu
 
 const visualResponse1DOF = Object.freeze({
   "degreesOfFreedom": 1,
-  "buttonMin": "buttonMin node",
-  "buttonMax": "buttonMax node"
+  "button": "button node"
 });
 
 const visualResponse2DOF = Object.freeze({
@@ -21,8 +20,7 @@ const visualResponse3DOF = Object.freeze({
   "right": "right node",
   "bottom": "bottom node",
   "top": "top node",
-  "buttonMin": "buttonMin node",
-  "buttonMax": "buttonMax node"
+  "button": "button node"
 });
 
 

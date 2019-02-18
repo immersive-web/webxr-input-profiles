@@ -28,8 +28,7 @@
         "target": "targetNode",
         "onTouch": {
           "degreesOfFreedom": 1,
-          "buttonMin": "buttonMinNode",
-          "buttonMax": "buttonMaxNode"
+          "button": "buttonNode"
         }
       }
     ]

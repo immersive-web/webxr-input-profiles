@@ -82,16 +82,14 @@
             "target" : "trigger-transform-node",
             "onTouch": {
                 "degreesOfFreedom": 1,
-                "buttonMin": "trigger-min-transform-node",
-                "buttonMax": "trigger-max-transform-node"
+                "button": "trigger-transform-button-node"
             }
         },
         {
             "target" : "faceButton-transform-node",
             "onPress": {
                 "degreesOfFreedom": 1,
-                "buttonMin": "faceButton-min-transform-node",
-                "buttonMax": "faceButton-max-transform-node"
+                "button": "faceButton-transform-button-node"
             }
         }
     ]

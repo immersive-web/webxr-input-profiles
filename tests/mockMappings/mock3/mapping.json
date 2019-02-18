@@ -79,13 +79,11 @@
         "target": "1DOF_NODE",
         "onTouch": {
           "degreesOfFreedom": 1,
-          "buttonMin": "BUTTONMIN_TOUCH",
-          "buttonMax": "BUTTONMAX_TOUCH"
+          "button": "BUTTON_TOUCH"
         },
         "onPress": {
           "degreesOfFreedom": 1,
-          "buttonMin": "BUTTONMIN_PRESS",
-          "buttonMax": "BUTTONMAX_PRESS"
+          "button": "BUTTON_PRESS"
         }
       },
       {
@@ -109,8 +107,7 @@
         "target": "3DOF_NODE",
         "onTouch":{
           "degreesOfFreedom": 3,
-          "buttonMin": "BUTTONMIN_TOUCH",
-          "buttonMax": "BUTTONMAX_TOUCH",
+          "button": "BUTTON_TOUCH",
           "left": "LEFT_TOUCH",
           "right": "RIGHT_TOUCH",
           "top": "TOP_TOUCH",
@@ -118,8 +115,7 @@
         },
         "onPress": {
           "degreesOfFreedom": 3,
-          "buttonMin": "BUTTONMIN_PRESS",
-          "buttonMax": "BUTTONMAX_PRESS",
+          "button": "BUTTON_PRESS",
           "left": "LEFT_TOUCH",
           "right": "RIGHT_TOUCH",
           "top": "TOP_TOUCH",

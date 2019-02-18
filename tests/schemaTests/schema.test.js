@@ -15,8 +15,7 @@ test("Valid mapping", () => {
     "target": "target node",
     "onTouch": {
       "degreesOfFreedom": 1,
-      "buttonMin": "buttonMin node",
-      "buttonMax": "buttonMax node"
+      "button": "button node"
     }
   };
   mapping.visualResponses = [visualResponse];

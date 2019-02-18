@@ -73,8 +73,7 @@
             "target" : "touchpad-transform-node",
             "onPress": {
                 "degreesOfFreedom": 1,
-                "buttonMin": "touchpad-transform-min-node",
-                "buttonMax": "touchpad-transform-max-node"
+                "button": "b-transform-button-node"
             }
         },
         {
@@ -91,24 +90,21 @@
             "target" : "trigger-transform-node",
             "onTouch": {
                 "degreesOfFreedom": 1,
-                "buttonMin": "trigger-min-transform-node",
-                "buttonMax": "trigger-max-transform-node"
+                "button": "trigger-transform-button-node"
             }
         },
         {
             "target" : "innerFaceButton-transform-node",
             "onPress": {
                 "degreesOfFreedom": 1,
-                "buttonMin": "innerFaceButton-min-transform-node",
-                "buttonMax": "innerFaceButton-max-transform-node"
+                "button": "innerFaceButton-transform-button-node"
             }
         },
         {
             "target" : "outerFaceButton-transform-node",
             "onPress": {
                 "degreesOfFreedom": 1,
-                "buttonMin": "outerFaceButton-min-transform-node",
-                "buttonMax": "outerFaceButton-max-transform-node"
+                "button": "outerFaceButton-transform-button-node"
             }
         }
     ]
