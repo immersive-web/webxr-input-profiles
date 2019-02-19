@@ -1,6 +1,6 @@
 {
     "version": "0.1.0",
-    "id": "mock1",
+    "id": "mock3",
     "hands": {
       "neutral": {
         "asset": "asset.glb",

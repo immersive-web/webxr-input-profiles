@@ -4,10 +4,9 @@ const XRGamepadComponent = require("../src/xrGamepadComponent.js");
 const Constants = require("../src/constants.js");
 
 const gamepadId = "mock3";
-const handedness = "neutral";
-let mockGamepad;
-
+const handedness = Constants.Handedness.NEUTRAL;
 const mapping = Object.freeze(TestHelpers.getMappingById(gamepadId, handedness));
+const mockGamepad = new MockGamepad(mapping, handedness);
 
 const testDescriptions = {
   "default": {
@@ -187,8 +186,6 @@ const testsTable = [
 ];
 
 beforeAll(() => {
-  // Double check the mapping file is good
-  // TODO consider validating all mock files in mappings.test.js?
   expect(mapping).not.toBeNull();
 
   const validator = TestHelpers.getValidator();
@@ -199,26 +196,47 @@ beforeAll(() => {
 });
 
 beforeEach(() => {
-  mockGamepad = new MockGamepad(mapping, handedness);
-  expect(mockGamepad).toBeDefined();
+  mockGamepad.reset();
+});
+
+test("Constructor - invalid gamepad", () => {
+  expect(() => {
+    let xrGamepad = new XRGamepadComponent(null, mapping, 0);
+  }).toThrow();
+});
+
+test("Constructor - invalid mapping", () => {
+  expect(() => {
+    let xrGamepad = new XRGamepadComponent(mockGamepad, null, 0);
+  }).toThrow();
+});
+
+test("Constructor - invalid componentIndex", () => {
+  expect(() => {
+    let xrGamepad = new XRGamepadComponent(mockGamepad, mapping, -1);
+  }).toThrow();
+
+  expect(() => {
+    let xrGamepad = new XRGamepadComponent(mockGamepad, mapping, 100);
+  }).toThrow();
 });
 
 describe.each(testsTable)("xrGamepadComponent.%s", (dataSourceId, componentIndex, dataTestsTable) => {
 
   test("Create XRGamepadComponent", () => {
-    let xrGamepadComponent = new XRGamepadComponent(componentIndex, mapping, mockGamepad);
+    let xrGamepadComponent = new XRGamepadComponent(mockGamepad, mapping, componentIndex);
     expect(xrGamepadComponent);
     expect(xrGamepadComponent.id).toEqual(dataSourceId);
   });
 
   test("Get Component State", () => {
-    let xrGamepadComponent = new XRGamepadComponent(componentIndex, mapping, mockGamepad);
+    let xrGamepadComponent = new XRGamepadComponent(mockGamepad, mapping, componentIndex);
     let componentState = xrGamepadComponent.getComponentState();
     expect(componentState).toEqual(Constants.ComponentState.DEFAULT);
   });
 
   test.each(dataTestsTable)(`GetData w/ %s`, (testName, {mockData, mockDataAsButtons=mockData}) => {
-    let xrGamepadComponent = new XRGamepadComponent(componentIndex, mapping, mockGamepad);
+    let xrGamepadComponent = new XRGamepadComponent(mockGamepad, mapping, componentIndex);
 
     let expectedData = TestHelpers.makeData(xrGamepadComponent.dataSource, mockData);
     mockGamepad.mockComponents[dataSourceId].setValues(mockData);
@@ -233,7 +251,7 @@ describe.each(testsTable)("xrGamepadComponent.%s", (dataSourceId, componentIndex
   });
 
   test.each(dataTestsTable)("getWeightedVisualizations w/ %s", (testName, {mockData, mockDataAsButtons=mockData}) => {
-    let xrGamepadComponent = new XRGamepadComponent(componentIndex, mapping, mockGamepad);
+    let xrGamepadComponent = new XRGamepadComponent(mockGamepad, mapping, componentIndex);
 
     mockGamepad.mockComponents[dataSourceId].setValues(
       TestHelpers.makeData(xrGamepadComponent.dataSource, mockData));
@@ -261,5 +279,9 @@ describe.each(testsTable)("xrGamepadComponent.%s", (dataSourceId, componentIndex
       }
     });
   });
+
+  test.todo("Add tests for no visual responses on component");
+  test.todo("Add tests for only press response on component");
+  test.todo("Add tests for only touch response on component");
 });
 

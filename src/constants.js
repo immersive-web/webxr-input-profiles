@@ -1,4 +1,10 @@
 module.exports = {
+  Handedness: Object.freeze({
+    NEUTRAL: "neutral",
+    LEFT: "left",
+    RIGHT: "right"
+  }),
+
   ComponentState: Object.freeze({
     DEFAULT: "default",
     TOUCHED: "onTouch",
