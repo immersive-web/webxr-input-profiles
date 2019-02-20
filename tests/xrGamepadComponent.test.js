@@ -235,36 +235,131 @@ describe.each(testsTable)("xrGamepadComponent.%s", (dataSourceId, componentIndex
     expect(componentState).toEqual(Constants.ComponentState.DEFAULT);
   });
 
-  test.each(dataTestsTable)(`GetData w/ %s`, (testName, {mockData, mockDataAsButtons=mockData}) => {
+  test.each(dataTestsTable)(`GetData w/ %s`, (testName, {mockData}) => {
+    // Create the object to test
     let xrGamepadComponent = new XRGamepadComponent(mockGamepad, mapping, componentIndex);
 
+    // Build the expected data object
     let expectedData = TestHelpers.makeData(xrGamepadComponent.dataSource, mockData);
     mockGamepad.mockComponents[dataSourceId].setValues(mockData);
 
+    // Validate getData() returns the expected values
     let actualData = xrGamepadComponent.getData();
     expect(actualData).toMatchObject(expectedData);
+  });
 
+  test.each(dataTestsTable)(`GetData asButtons w/ %s`, (testName, {mockData, mockDataAsButtons=mockData}) => {
     const asButtons = true;
+    
+    // Create the object to test
+    let xrGamepadComponent = new XRGamepadComponent(mockGamepad, mapping, componentIndex);
+
+    // Set the mock gamepad to the values being tested
+    let data = TestHelpers.makeData(xrGamepadComponent.dataSource, mockData);
+    mockGamepad.mockComponents[dataSourceId].setValues(data);
+
+    // Build the expected data object
     expectedData = TestHelpers.makeData(xrGamepadComponent.dataSource, mockDataAsButtons, asButtons);
+
+    // Validate getData() returns the expected values
     actualData = xrGamepadComponent.getData(asButtons);
     expect(actualData).toMatchObject(expectedData);
   });
 
-  test.each(dataTestsTable)("getWeightedVisualizations w/ %s", (testName, {mockData, mockDataAsButtons=mockData}) => {
+  test.each(dataTestsTable)("No visualResponses w/ %s", (testName, {mockData}) => {
+    // Remove all visualizations
+    let modifiedMapping = TestHelpers.copyJsonObject(mapping);
+    delete modifiedMapping.components[componentIndex].visualResponses;
+
+    // Create the object to test
+    let xrGamepadComponent = new XRGamepadComponent(mockGamepad, modifiedMapping, componentIndex);
+
+    // Set the mock gamepad to the values being tested
+    let data = TestHelpers.makeData(xrGamepadComponent.dataSource, mockData);
+    mockGamepad.mockComponents[dataSourceId].setValues(data);
+    
+    // Get the weighted visualizations and ensure they do not exist
+    let actualVisualizations = xrGamepadComponent.getWeightedVisualizations();
+    expect(Object.keys(actualVisualizations)).toHaveLength(0);
+  });
+
+  test.each(dataTestsTable)("Only onTouch visualResponses w/ %s", (testName, {mockData, mockDataAsButtons=mockData}) => {
+    // Remove onPress visualizations
+    let modifiedMapping = TestHelpers.copyJsonObject(mapping);
+    modifiedMapping.components[componentIndex].visualResponses.forEach((visualResponseIndex) => {
+      let visualResponse = modifiedMapping.visualResponses[visualResponseIndex];
+      delete visualResponse.onPress;
+    });
+
+    // Create the object to test
     let xrGamepadComponent = new XRGamepadComponent(mockGamepad, mapping, componentIndex);
 
-    mockGamepad.mockComponents[dataSourceId].setValues(
-      TestHelpers.makeData(xrGamepadComponent.dataSource, mockData));
+    // Set the mock gamepad to the values being tested
+    let data = TestHelpers.makeData(xrGamepadComponent.dataSource, mockData);
+    mockGamepad.mockComponents[dataSourceId].setValues(data);
     
+    // Build the expected data object
+    const asButtons = true;
+    let expectedData = TestHelpers.makeData(xrGamepadComponent.dataSource, mockDataAsButtons, asButtons);
+    if (expectedData.state == Constants.ComponentState.PRESSED) {
+      expectedData.state = Constants.ComponentState.TOUCHED;
+    }
+
+    // Get the visualizations and validate them
+    let actualVisualizations = xrGamepadComponent.getWeightedVisualizations();
+    validateWeightedResponse(mapping, expectedData, actualVisualizations);
+  });
+
+  test.each(dataTestsTable)("Only onPress visualResponses w/ %s", (testName, {mockData, mockDataAsButtons=mockData}) => {
+    // Remove onPress visualizations
+    let modifiedMapping = TestHelpers.copyJsonObject(mapping);
+    modifiedMapping.components[componentIndex].visualResponses.forEach((visualResponseIndex) => {
+      let visualResponse = modifiedMapping.visualResponses[visualResponseIndex];
+      delete visualResponse.onTouch;
+    });
+
+    // Create the object to test
+    let xrGamepadComponent = new XRGamepadComponent(mockGamepad, modifiedMapping, componentIndex);
+
+    // Set the mock gamepad to the values being tested
+    let data = TestHelpers.makeData(xrGamepadComponent.dataSource, mockData);
+    mockGamepad.mockComponents[dataSourceId].setValues(data);
+    
+    // Build the expected data object
+    const asButtons = true;
+    let expectedData = TestHelpers.makeData(xrGamepadComponent.dataSource, mockDataAsButtons, asButtons);
+    if (expectedData.state == Constants.ComponentState.TOUCHED) {
+      expectedData.state = Constants.ComponentState.DEFAULT;
+    }
+
+    // Get the visualizations and validate them
+    let actualVisualizations = xrGamepadComponent.getWeightedVisualizations();
+    validateWeightedResponse(mapping, expectedData, actualVisualizations);
+  });
+
+  test.each(dataTestsTable)("Both visualResponses w/ %s", (testName, {mockData, mockDataAsButtons=mockData}) => {
+    // Create the object to test
+    let xrGamepadComponent = new XRGamepadComponent(mockGamepad, mapping, componentIndex);
+
+    // Set the mock gamepad to the values being tested
+    let data = TestHelpers.makeData(xrGamepadComponent.dataSource, mockData);
+    mockGamepad.mockComponents[dataSourceId].setValues(data);
+
+    // Build the expected data object
     const asButtons = true;
     let expectedData = TestHelpers.makeData(xrGamepadComponent.dataSource, mockDataAsButtons, asButtons);
 
+    // Get the visualizations and validate them
     let actualVisualizations = xrGamepadComponent.getWeightedVisualizations();
+    validateWeightedResponse(mapping, expectedData, actualVisualizations);
+  });
 
+  function validateWeightedResponse(mapping, expectedData, actualVisualizations) {
     let visualResponseIndices = mapping.components[componentIndex].visualResponses;
     visualResponseIndices.forEach((visualResponseIndex) => {
       let visualResponse = mapping.visualResponses[visualResponseIndex];
       let actualVisualResponse = actualVisualizations[visualResponse.target];
+      
       let expectedVisualResponse = visualResponse[expectedData.state];
       if (!expectedVisualResponse) {
         expect(actualVisualResponse).toBeUndefined();
@@ -278,10 +373,7 @@ describe.each(testsTable)("xrGamepadComponent.%s", (dataSourceId, componentIndex
         });
       }
     });
-  });
+  }
 
-  test.todo("Add tests for no visual responses on component");
-  test.todo("Add tests for only press response on component");
-  test.todo("Add tests for only touch response on component");
 });
 
