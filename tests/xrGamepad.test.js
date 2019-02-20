@@ -60,7 +60,8 @@ test("Constructor - valid handedness variations", () => {
 
 test("Constructor - mismatched ids", () => {
   const {mockGamepad, mapping, handedness} = constructorOptions;
-  const modifiedMapping = Object.assign({}, mapping, { id: "SOME NONSENSE" } );
+  let modifiedMapping = TestHelpers.copyJsonObject(mapping);
+  modifiedMapping.id = "SOME NONSENSE";
 
   expect(() => {
     let xrGamepad = new XRGamepad(mockGamepad, modifiedMapping, handedness);

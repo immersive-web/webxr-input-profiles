@@ -1,5 +1,5 @@
-const testHelpers = require("../testHelpers.js");
-const validator = testHelpers.getValidator("dataSource.thumbstickAndTouchpad.schema.json", ["dataSource.properties.schema.json"]);
+const TestHelpers = require("../testHelpers.js");
+const validator = TestHelpers.getValidator("dataSource.thumbstickAndTouchpad.schema.json", ["dataSource.properties.schema.json"]);
 const validDataSource = Object.freeze({
   "id": "a thumbstick or touchpad",
   "dataSourceType": "thumbstickSource",
@@ -9,7 +9,7 @@ const validDataSource = Object.freeze({
 
 test("Valid thumbstick sources", () => {
   let valid = false;
-  let dataSource = Object.assign({}, validDataSource);
+  let dataSource = TestHelpers.copyJsonObject(validDataSource);
   
   valid = validator(dataSource);
   if (!valid) {
@@ -31,7 +31,7 @@ test("Valid thumbstick sources", () => {
 
 test("Valid touchpad source", () => {
   let valid = false;
-  let dataSource = Object.assign({}, validDataSource);
+  let dataSource = TestHelpers.copyJsonObject(validDataSource);
   dataSource.dataSourceType = "touchpadSource";
   
   valid = validator(dataSource);
@@ -41,13 +41,13 @@ test("Valid touchpad source", () => {
 });
 
 test("No id", () => {
-  let dataSource = Object.assign({}, validDataSource);
+  let dataSource = TestHelpers.copyJsonObject(validDataSource);
   delete dataSource.id;
   expect(validator(dataSource)).toBe(false);
 });
 
 test("Invalid dataSourceType", () => {
-  let dataSource = Object.assign({}, validDataSource);
+  let dataSource = TestHelpers.copyJsonObject(validDataSource);
   
   delete dataSource.dataSourceType;
   expect(validator(dataSource)).toBe(false);
@@ -57,34 +57,34 @@ test("Invalid dataSourceType", () => {
 });
 
 test("Invalid xAxisIndex", () => {
-  let dataSource = Object.assign({}, validDataSource);
+  let dataSource = TestHelpers.copyJsonObject(validDataSource);
   
   dataSource.xAxisIndex = -1;
   expect(validator(dataSource)).toBe(false);
 });
 
 test("Invalid yAxisIndex", () => {
-  let dataSource = Object.assign({}, validDataSource);
+  let dataSource = TestHelpers.copyJsonObject(validDataSource);
   
   dataSource.yAxisIndex = -1;
   expect(validator(dataSource)).toBe(false);
 });
 
 test("Invalid buttonIndex", () => {
-  let dataSource = Object.assign({}, validDataSource);
+  let dataSource = TestHelpers.copyJsonObject(validDataSource);
   
   dataSource.buttonIndex = -1;
   expect(validator(dataSource)).toBe(false);
 });
 
 test("Invalid analogButtonValues", () => {
-  let dataSource = Object.assign({}, validDataSource);
+  let dataSource = TestHelpers.copyJsonObject(validDataSource);
   dataSource.analogButtonValues = true;
   expect(validator(dataSource)).toBe(false);
 });
 
 test("invalid additional properties", () => {
-  let dataSource = Object.assign({}, validDataSource);
+  let dataSource = TestHelpers.copyJsonObject(validDataSource);
   dataSource.someNonsense = {};
   expect(validator(dataSource)).toBe(false);
 });

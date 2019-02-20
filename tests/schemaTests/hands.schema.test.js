@@ -1,5 +1,5 @@
-const testHelpers = require("../testHelpers.js");
-const validator = testHelpers.getValidator("hands.schema.json", ["hand.schema.json", "mapping.index.schema.json"]);
+const TestHelpers = require("../testHelpers.js");
+const validator = TestHelpers.getValidator("hands.schema.json", ["hand.schema.json", "mapping.index.schema.json"]);
 const validHand = Object.freeze({
   "asset": "asset uri",
   "root": "root node",

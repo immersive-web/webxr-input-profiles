@@ -1,5 +1,5 @@
-const testHelpers = require("../testHelpers.js");
-const validator = testHelpers.getValidator("visualResponses.schema.json", ["visualResponse.properties.schema.json"]);
+const TestHelpers = require("../testHelpers.js");
+const validator = TestHelpers.getValidator("visualResponses.schema.json", ["visualResponse.properties.schema.json"]);
 
 const visualResponse1DOF = Object.freeze({
   "degreesOfFreedom": 1,
@@ -113,19 +113,19 @@ test("Duplicates invalid", () => {
 });
 
 test("Invalid extra properties", () => {
-  let visualResponse = Object.assign({}, validVisualResponse);
+  let visualResponse = TestHelpers.copyJsonObject(validVisualResponse);
   visualResponse.someNonsense = false;
   expect(validator([visualResponse])).toBe(false);
 })
 
 test("Missing target", () => {
-  let visualResponse = Object.assign({}, validVisualResponse);
+  let visualResponse = TestHelpers.copyJsonObject(validVisualResponse);
   delete visualResponse.target;
   expect(validator([visualResponse])).toBe(false);
 });
 
 test("Missing actions", () => {
-  let visualResponse = Object.assign({}, validVisualResponse);
+  let visualResponse = TestHelpers.copyJsonObject(validVisualResponse);
   delete visualResponse.onPress;
   expect(validator([visualResponse])).toBe(false);
 });
@@ -144,7 +144,7 @@ Object.keys(visualResponse3DOF).forEach(key => {
 test.each(missingElements)("Missing %s on %s", (key, DOFtype, visualResponseDOF) => {
   let visualResponse = {
     "target": "TargetNode",
-    "onPress": Object.assign({}, visualResponseDOF)
+    "onPress": TestHelpers.copyJsonObject(visualResponseDOF)
   };
   delete visualResponse.onPress[key];
   expect(validator([visualResponse])).toBe(false);
@@ -153,7 +153,7 @@ test.each(missingElements)("Missing %s on %s", (key, DOFtype, visualResponseDOF)
 test("1DOF invalid additional properties", () => {
   let visualResponse = {
     "target": "TargetNode",
-    "onPress": Object.assign({}, visualResponse1DOF)
+    "onPress": TestHelpers.copyJsonObject(visualResponse1DOF)
   };
   visualResponse.onPress.someNonsense = {};
   expect(validator([visualResponse])).toBe(false);
@@ -162,7 +162,7 @@ test("1DOF invalid additional properties", () => {
 test("2DOF invalid additional properties", () => {
   let visualResponse = {
     "target": "TargetNode",
-    "onPress": Object.assign({}, visualResponse2DOF)
+    "onPress": TestHelpers.copyJsonObject(visualResponse2DOF)
   };
   visualResponse.onPress.someNonsense = {};
   expect(validator([visualResponse])).toBe(false);
@@ -171,7 +171,7 @@ test("2DOF invalid additional properties", () => {
 test("3DOF invalid additional properties", () => {
   let visualResponse = {
     "target": "TargetNode",
-    "onPress": Object.assign({}, visualResponse3DOF)
+    "onPress": TestHelpers.copyJsonObject(visualResponse3DOF)
   };
   visualResponse.onPress.someNonsense = {};
   expect(validator([visualResponse])).toBe(false);

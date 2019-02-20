@@ -144,7 +144,12 @@ class XRGamepadComponent {
     // Adds entries for each GamepadButton associated with the component
     Object.keys(this.buttons).forEach((name) => {
       let index = this.buttons[name];
-      data.buttons[name] = Object.assign({}, this.gamepad.buttons[index]);
+      let gamepadButton = this.gamepad.buttons[index];
+      data.buttons[name] = {
+        value: gamepadButton.value,
+        touched: gamepadButton.touched,
+        pressed: gamepadButton.pressed,
+      }
     });
 
     // Adds entries for each axis associated with the component

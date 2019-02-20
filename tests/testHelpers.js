@@ -333,6 +333,15 @@ const TestHelpers = {
     }
 
     return data;
+  },
+
+  /**
+   * @description Makes a deep copy of JSON-compatible objects
+   * @param {Object} objectToCopy - The object to copy
+   * @returns {Object} A copy of the object
+   */
+  copyJsonObject: function (objectToCopy) {
+    return JSON.parse(JSON.stringify(objectToCopy));
   }
 
 };
