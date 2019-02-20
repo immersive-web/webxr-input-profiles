@@ -2,16 +2,19 @@ const Constants = require("./constants.js");
 const XRGamepadComponent = require("./xrGamepadComponent.js");
 
 /**
-  * @description This class connects an XR gamepad, as described in a mapping.json file,
-  * with a Gamepad object, as defined by https://www.w3.org/TR/gamepad/
+  * @description This class connects an XR gamepad, as described in a 
+  * mapping.json file, with a Gamepad object, as defined 
+  * by https://www.w3.org/TR/gamepad/
   * @author Nell Waliczek / https://github.com/NellWaliczek
 */
 class XRGamepad {
 
   /**
-   * @param {Gamepad} gamepad - The Gamepad object provided by the user agent
-   * @param {dictionary} mapping - The mapping file text in dictionary form
-   * @param {string} handedness - "neutral", "left", or "right"
+   * @param {Object} gamepad - The Gamepad object provided by the user agent as 
+   * defined by https://www.w3.org/TR/gamepad/
+   * @param {Object} mapping - The mapping file text in dictionary form
+   * @param {String} handedness - An enum value as defined by Handedness in 
+   * constants.js
    */
   constructor(gamepad, mapping, handedness) {
     if (!gamepad || !mapping) {
@@ -22,24 +25,26 @@ class XRGamepad {
       throw new Error(`Gamepad id ${gamepad.id} and mapping id ${mapping.id} do not match`);
     }
 
+    if (gamepad.handedness && gamepad.handedness != handedness) {
+      throw new Error(`Gamepad.handedness ${gamepad.handedness} does not match handedness parameter ${handedness}`);
+    }
+
+    handedness = (!handedness || handedness === "") ? Constants.Handedness.NEUTRAL : handedness;
+    if (!Object.values(Constants.Handedness).includes(handedness)) {
+      throw new Error(`Cannot create XRGamepad for unknown handedness ${handedness}`);
+    }
+
+    if (!mapping.hands[handedness]) {
+      throw new Error(`No ${handedness} hand exists in mapping for ${gamepad.id}`);
+    }
+
     this.gamepad = gamepad;
     this.mapping = mapping;
-
-    if (this.gamepad.handedness && this.gamepad.handedness != handedness) {
-      throw new Error(`Gamepad.handedness ${this.gamepad.handedness} does not match handedness parameter ${handedness}`);
-    }
-
-    this.handedness = (!handedness || handedness === "") ? Constants.Handedness.NEUTRAL : handedness;
-    if (!Object.values(Constants.Handedness).includes(this.handedness)) {
-      throw new Error(`Cannot create XRGamepad for unknown handedness ${this.handedness}`);
-    }
-
+    this.handedness = handedness;
     this.hand = this.mapping.hands[this.handedness];
-    if (!this.hand) {
-      throw new Error(`No ${this.handedness} hand exists in mapping for ${this.gamepad.id}`);
-    }
     
-    // Create component objects for each component described in the gamepad's mapping file
+    // Create component objects for each component described in the gamepad's
+    // mapping file
     this.xrGamepadComponents = {};
     this.hand.components.forEach((componentIndex) => {
       let component = new XRGamepadComponent(this.gamepad, mapping, componentIndex);

@@ -20,5 +20,6 @@ module.exports = {
   }),
 
   TouchThreshold: 0.2,
+  
   PressThreshold: 0.95
 }

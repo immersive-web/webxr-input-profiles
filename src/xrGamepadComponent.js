@@ -1,16 +1,17 @@
 const Constants = require("./constants.js");
 
 /**
-  * @description This class connects a component, as described in a mapping.json file,
-  * with a Gamepad object, as defined by https://www.w3.org/TR/gamepad/
+  * @description This class connects a component, as described in a mapping.json
+  * file, with a Gamepad object, as defined by https://www.w3.org/TR/gamepad/
   * @author Nell Waliczek / https://github.com/NellWaliczek
 */
 class XRGamepadComponent {
 
   /**
-   * @param {Gamepad} gamepad - The Gamepad object provided by the user agent
-   * @param {dictionary} mapping - The mapping file text in dictionary form
-   * @param {integer} componentIndex - The index of the component in the mapping file's components array
+   * @param {Object} gamepad - The Gamepad object provided by the user agent
+   * @param {Object} mapping - The mapping file text in dictionary form
+   * @param {number} componentIndex - The index of the component in the mapping 
+   * file's components array
    */
   constructor(gamepad, mapping, componentIndex) {
     if (!gamepad || !mapping || componentIndex === undefined) {
@@ -92,7 +93,7 @@ class XRGamepadComponent {
 
   /**
     * @desc Reports if the button is touched, pressed, or in its default state.
-    * @return enum - defined as ComponentState in constants.js
+    * @returns {String} - An enum value as defined by ComponentState in constants.js
   */
   getComponentState() {
     let isPressed = false;
@@ -129,9 +130,9 @@ class XRGamepadComponent {
 
   /**
     * @desc gathers current data from the associated Gamepad
-    * @param bool $axesAsButtons - indicates that x/y axis data should be 
+    * @param {boolean} axesAsButtons - indicates that x/y axis data should be 
     * returned as left/right/top/bottom buttons
-    * @return object - the current data from the associated Gamepad
+    * @returns {Object} - the current data from the associated Gamepad
   */
   getData(axesAsButtons) {
     let data = {
@@ -189,7 +190,7 @@ class XRGamepadComponent {
   /**
     * @desc builds an object representing how to weight asset nodes based on 
     * current gamepad state
-    * @return object - an object with keys for each node to be modified. values
+    * @returns {Object} - an object with keys for each node to be modified. values
     * of each key are the nodes/weights pairing to modify based on
   */
   getWeightedVisualizations() {
