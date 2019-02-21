@@ -266,7 +266,7 @@ describe.each(testsTable)("xrGamepadComponent.%s", (dataSourceId, componentIndex
     expect(actualData).toMatchObject(expectedData);
   });
 
-  test.each(dataTestsTable)("No visualResponses w/ %s", (testName, {mockData}) => {
+  test.each(dataTestsTable)("No visualResponse states w/ %s", (testName, {mockData}) => {
     // Remove all visualizations
     let modifiedMapping = TestHelpers.copyJsonObject(mapping);
     delete modifiedMapping.components[componentIndex].visualResponses;
@@ -283,7 +283,7 @@ describe.each(testsTable)("xrGamepadComponent.%s", (dataSourceId, componentIndex
     expect(Object.keys(actualVisualizations)).toHaveLength(0);
   });
 
-  test.each(dataTestsTable)("Only onTouch visualResponses w/ %s", (testName, {mockData, mockDataAsButtons=mockData}) => {
+  test.each(dataTestsTable)("Only onTouch visualResponse state w/ %s", (testName, {mockData, mockDataAsButtons=mockData}) => {
     // Remove onPress visualizations
     let modifiedMapping = TestHelpers.copyJsonObject(mapping);
     modifiedMapping.components[componentIndex].visualResponses.forEach((visualResponseIndex) => {
@@ -310,7 +310,7 @@ describe.each(testsTable)("xrGamepadComponent.%s", (dataSourceId, componentIndex
     validateWeightedResponse(mapping, expectedData, actualVisualizations);
   });
 
-  test.each(dataTestsTable)("Only onPress visualResponses w/ %s", (testName, {mockData, mockDataAsButtons=mockData}) => {
+  test.each(dataTestsTable)("Only onPress visualResponse state w/ %s", (testName, {mockData, mockDataAsButtons=mockData}) => {
     // Remove onPress visualizations
     let modifiedMapping = TestHelpers.copyJsonObject(mapping);
     modifiedMapping.components[componentIndex].visualResponses.forEach((visualResponseIndex) => {
@@ -337,7 +337,7 @@ describe.each(testsTable)("xrGamepadComponent.%s", (dataSourceId, componentIndex
     validateWeightedResponse(mapping, expectedData, actualVisualizations);
   });
 
-  test.each(dataTestsTable)("Both visualResponses w/ %s", (testName, {mockData, mockDataAsButtons=mockData}) => {
+  test.each(dataTestsTable)("Both visualResponse states w/ %s", (testName, {mockData, mockDataAsButtons=mockData}) => {
     // Create the object to test
     let xrGamepadComponent = new XRGamepadComponent(mockGamepad, mapping, componentIndex);
 

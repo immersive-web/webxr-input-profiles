@@ -13,31 +13,31 @@
         "dataSource": 0,
         "root": "BUTTON_ROOT_NODE",
         "labelTransform": "BUTTON_LABEL_NODE",
-        "visualResponses": [0]
+        "visualResponses": [0, 1]
       },
       {
         "dataSource": 1,
         "root": "TOUCHPAD_ROOT_NODE",
         "labelTransform": "TOUCHPAD_LABEL_NODE",
-        "visualResponses": [1]
+        "visualResponses": [2, 3]
       },
       {
         "dataSource": 2,
         "root": "THUMBSTICK_ROOT_NODE",
         "labelTransform": "THUMBSTICK_LABEL_NODE",
-        "visualResponses": [2]
+        "visualResponses": [4, 5]
       },
       {
         "dataSource": 3,
         "root": "DPAD_FROM_AXES_ROOT_NODE",
         "labelTransform": "DPAD_FROM_AXES_LABEL_NODE",
-        "visualResponses": [1]
+        "visualResponses": [2, 3]
       },
       {
         "dataSource": 4,
         "root": "DPAD_FROM_BUTTONS_ROOT_NODE",
         "labelTransform": "DPAD_FROM_BUTTONS_LABEL_NODE",
-        "visualResponses": [1]
+        "visualResponses": [2, 3]
       }
     ],
     "dataSources": [
@@ -87,6 +87,17 @@
         }
       },
       {
+        "target": "ADDITIONAL_1DOF_NODE",
+        "onTouch": {
+          "degreesOfFreedom": 1,
+          "button": "ADDITIONAL_BUTTON_TOUCH"
+        },
+        "onPress": {
+          "degreesOfFreedom": 1,
+          "button": "ADDITIONAL_BUTTON_PRESS"
+        }
+      },
+      {
         "target": "2DOF_NODE",
         "onTouch": {
           "degreesOfFreedom": 2,
@@ -104,6 +115,23 @@
         }
       },
       {
+        "target": "ADDITIONAL_2DOF_NODE",
+        "onTouch": {
+          "degreesOfFreedom": 2,
+          "left": "ADDITIONAL_LEFT_TOUCH",
+          "right": "ADDITIONAL_RIGHT_TOUCH",
+          "top": "ADDITIONAL_TOP_TOUCH",
+          "bottom": "ADDITIONAL_BOTTOM_TOUCH"
+        },
+        "onPress": {
+          "degreesOfFreedom": 2,
+          "left": "ADDITIONAL_LEFT_PRESS",
+          "right": "ADDITIONAL_RIGHT_PRESS",
+          "top": "ADDITIONAL_TOP_PRESS",
+          "bottom": "ADDITIONAL_BOTTOM_PRESS"
+        }
+      },
+      {
         "target": "3DOF_NODE",
         "onTouch":{
           "degreesOfFreedom": 3,
@@ -116,10 +144,29 @@
         "onPress": {
           "degreesOfFreedom": 3,
           "button": "BUTTON_PRESS",
-          "left": "LEFT_TOUCH",
-          "right": "RIGHT_TOUCH",
-          "top": "TOP_TOUCH",
-          "bottom": "BOTTOM_TOUCH"
+          "left": "LEFT_PRESS",
+          "right": "RIGHT_PRESS",
+          "top": "TOP_PRESS",
+          "bottom": "BOTTOM_PRESS"
+        }
+      },
+      {
+        "target": "ADDITIONAL_3DOF_NODE",
+        "onTouch":{
+          "degreesOfFreedom": 3,
+          "button": "ADDITIONAL_BUTTON_TOUCH",
+          "left": "ADDITIONAL_LEFT_TOUCH",
+          "right": "ADDITIONAL_RIGHT_TOUCH",
+          "top": "ADDITIONAL_TOP_TOUCH",
+          "bottom": "ADDITIONAL_BOTTOM_TOUCH"
+        },
+        "onPress": {
+          "degreesOfFreedom": 3,
+          "button": "ADDITIONAL_BUTTON_PRESS",
+          "left": "ADDITIONAL_LEFT_PRESS",
+          "right": "ADDITIONAL_RIGHT_PRESS",
+          "top": "ADDITIONAL_TOP_PRESS",
+          "bottom": "ADDITIONAL_BOTTOM_PRESS"
         }
       }
     ]
