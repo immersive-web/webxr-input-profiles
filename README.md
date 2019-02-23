@@ -340,12 +340,12 @@ In addition, most components will also include the `visualResponses` array prope
 }
 ```
 
-## Hands
-Hands connect component parts with the information necessary to correctly visualize entire motion controllers.  The `hands` object must be populated by properties in one of the following configurations:
+## Handedness
+Handedness objects connect component parts with the information necessary to correctly visualize entire motion controllers.  The `handedness` object must be populated by properties in one of the following configurations:
 
 * *`left` and `right`.* This option should be used when the underlying XR platform is expected to always report a handedness.  This may be because the motion controllers are intrinsically unique such as the Oculus Touch.  It may also be due to a system-level configuration setting which causes an intrinsically unhanded controller to report itself as either left or right such as the Google Daydream Controller.
-* *`neutral`.* This option should be used for motion controllers which are incapable of reporting handedness.  It does not imply that only one motion controller will be tracked at a time.
-* *`neutral`, `left`, and `right`.* This options should be used for motion controllers that are capable of but not guaranteed to report handedness. For example, HTC Vive Controllers are not intrinsically handed, but the underlying XR system is able to interpret usage based on relative position over time.  As a result, these controllers are capable of reporting all three types of handedness.
+* *`none`.* This option should be used for motion controllers which are incapable of reporting handedness.  It does not imply that only one motion controller will be tracked at a time.
+* *`none`, `left`, and `right`.* This options should be used for motion controllers that are capable of but not guaranteed to report handedness. For example, HTC Vive Controllers are not intrinsically handed, but the underlying XR system is able to interpret usage based on relative position over time.  As a result, these controllers are capable of reporting all three types of handedness.
 
 All three of these properties are the same type and must contain an `asset`, a `root`, and a `components` property.  The `asset` property points to a .glTF or .glB file representing the motion controller; extensions will be made available for additional file formats.  The `root` property references the topmost node in the asset hierarchy associated with the motion controller.  The `components` array must not be empty and contains indices into the file's `components` array.
 
@@ -355,10 +355,10 @@ For example:
 {
     "gamepad" : {
         "id" : "motion-controller-id",
-        "hands" : {
-            "neutral" : {
+        "handedness" : {
+            "none" : {
                 "asset" : "some-url",
-                "root" : "neutral-handedness-controller",
+                "root" : "none-handedness-controller",
                 "components" : [0]
             }
         }
@@ -366,16 +366,16 @@ For example:
 }
 ```
 
-The `neutral`, `left`, and `right` objects may also contain two additional properties.  When present, the `primaryButtonComponent` property contains the index into the file's `components` array at which position the motion controller's "default" button can be found.  For many motion controllers this is a trigger-style button.  When present, the `primaryAxesComponent` property contains the index into the file's `components` array at which position the motion controller's "default" thumbstick or touchpad can be found.
+The `none`, `left`, and `right` objects may also contain two additional properties.  When present, the `primaryButtonComponent` property contains the index into the file's `components` array at which position the motion controller's "default" button can be found.  For many motion controllers this is a trigger-style button.  When present, the `primaryAxesComponent` property contains the index into the file's `components` array at which position the motion controller's "default" thumbstick or touchpad can be found.
 
 ```json
 {
     "gamepad" : {
         "id" : "motion-controller-id",
-        "hands" : {
-            "neutral" : {
+        "handedness" : {
+            "none" : {
                 "asset" : "some-url",
-                "root" : "neutral-handedness-controller",
+                "root" : "none-handedness-controller",
                 "components" : [0],
                 "primaryButtonComponent" : 0,
                 "primaryAxisComponent" : 1

@@ -29,19 +29,19 @@ class XRGamepad {
       throw new Error(`Gamepad.handedness ${gamepad.handedness} does not match handedness parameter ${handedness}`);
     }
 
-    handedness = (!handedness || handedness === "") ? Constants.Handedness.NEUTRAL : handedness;
+    handedness = (!handedness || handedness === "") ? Constants.Handedness.NONE : handedness;
     if (!Object.values(Constants.Handedness).includes(handedness)) {
       throw new Error(`Cannot create XRGamepad for unknown handedness ${handedness}`);
     }
 
-    if (!mapping.hands[handedness]) {
+    if (!mapping.handedness[handedness]) {
       throw new Error(`No ${handedness} hand exists in mapping for ${gamepad.id}`);
     }
 
     this.gamepad = gamepad;
     this.mapping = mapping;
     this.handedness = handedness;
-    this.hand = this.mapping.hands[this.handedness];
+    this.hand = this.mapping.handedness[this.handedness];
     
     // Create component objects for each component described in the gamepad's
     // mapping file

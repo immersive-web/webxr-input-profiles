@@ -1,7 +1,7 @@
 {
     "version" : "0.1.0",
     "id" : "Oculus-Touch",
-    "hands" : {
+    "handedness" : {
         "left" : {
             "asset" : "some-url",
             "root" : "left-controller-node",

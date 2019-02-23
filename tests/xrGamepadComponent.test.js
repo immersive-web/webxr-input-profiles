@@ -4,7 +4,7 @@ const XRGamepadComponent = require("../src/xrGamepadComponent.js");
 const Constants = require("../src/constants.js");
 
 const gamepadId = "mock3";
-const handedness = Constants.Handedness.NEUTRAL;
+const handedness = Constants.Handedness.NONE;
 const mapping = Object.freeze(TestHelpers.getMappingById(gamepadId, handedness));
 const mockGamepad = new MockGamepad(mapping, handedness);
 

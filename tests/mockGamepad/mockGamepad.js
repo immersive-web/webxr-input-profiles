@@ -19,7 +19,7 @@ class MockGamepad {
       throw new Error(`Cannot create XRGamepad for unknown handedness ${handedness}`);
     }
 
-    this.hand = mapping.hands[handedness];
+    this.hand = mapping.handedness[handedness];
 
     this.id = mapping.id;
     this.index = -1;

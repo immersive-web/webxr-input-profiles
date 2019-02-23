@@ -1,6 +1,6 @@
 module.exports = {
   Handedness: Object.freeze({
-    NEUTRAL: "neutral",
+    NONE: "none",
     LEFT: "left",
     RIGHT: "right"
   }),

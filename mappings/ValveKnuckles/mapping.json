@@ -1,7 +1,7 @@
 {
     "version" : "0.1.0",
     "id" : "Knuckles",
-    "hands" : {
+    "handedness" : {
         "left" : {
             "asset" : "some-url",
             "root" : "left-controller-node",
