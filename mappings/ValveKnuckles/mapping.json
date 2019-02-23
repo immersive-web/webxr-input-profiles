@@ -70,36 +70,42 @@
     ],
     "visualResponses" : [
         {
-            "userAction": "onPress",
             "target" : "touchpad-transform-node",
-            "buttonMin": "touchpad-transform-min-node",
-            "buttonMax": "touchpad-transform-max-node"
+            "onPress": {
+                "degreesOfFreedom": 1,
+                "button": "b-transform-button-node"
+            }
         },
         {
-            "userAction": "onTouch",
             "target" : "touchpad-touchpoint-node",
-            "left" : "touchpad-touchpoint-left-node",
-            "right" : "touchpad-touchpoint-right-node",
-            "top" : "touchpad-touchpoint-top-node",
-            "bottom" : "touchpad-touchpoint-bottom-node"
+            "onTouch": {
+                "degreesOfFreedom": 2,
+                "left" : "touchpad-touchpoint-left-node",
+                "right" : "touchpad-touchpoint-right-node",
+                "top" : "touchpad-touchpoint-top-node",
+                "bottom" : "touchpad-touchpoint-bottom-node"
+            }
         },
         {
-            "userAction": "onTouch",
             "target" : "trigger-transform-node",
-            "buttonMin": "trigger-min-transform-node",
-            "buttonMax": "trigger-max-transform-node"
+            "onTouch": {
+                "degreesOfFreedom": 1,
+                "button": "trigger-transform-button-node"
+            }
         },
         {
-            "userAction": "onPress",
             "target" : "innerFaceButton-transform-node",
-            "buttonMin": "innerFaceButton-min-transform-node",
-            "buttonMax": "innerFaceButton-max-transform-node"
+            "onPress": {
+                "degreesOfFreedom": 1,
+                "button": "innerFaceButton-transform-button-node"
+            }
         },
         {
-            "userAction": "onPress",
             "target" : "outerFaceButton-transform-node",
-            "buttonMin": "outerFaceButton-min-transform-node",
-            "buttonMax": "outerFaceButton-max-transform-node"
+            "onPress": {
+                "degreesOfFreedom": 1,
+                "button": "outerFaceButton-transform-button-node"
+            }
         }
     ]
 }

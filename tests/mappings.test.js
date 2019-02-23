@@ -1,11 +1,11 @@
-const testHelpers = require("./testHelpers.js");
-const validator = testHelpers.getValidator();
+const TestHelpers = require("./testHelpers.js");
+const validator = TestHelpers.getValidator();
+const Constants = require("../src/constants.js");
 
-const mappingDescriptions = require("../src/mappingDescriptions.js");
-const mappingList = mappingDescriptions.getList();
+const mappingList = TestHelpers.getMappingsList();
 
 describe.each(mappingList)("validateMapping.%s", (gamepadId) => {
-  const mapping = mappingDescriptions.getMappingById(gamepadId);
+  const mapping = TestHelpers.getMappingById(gamepadId);
 
   test("Mapping exists and passes schema validation", () => {
     expect(mapping).not.toBeNull();
@@ -65,6 +65,51 @@ describe.each(mappingList)("validateMapping.%s", (gamepadId) => {
     })
   });
 
+  test("Visualizations are of a valid type for the dataSource", () => {
+    // Iterate through all components and confirm the visualResponses are
+    // valid for the dataSourceType
+    Object.values(mapping.components).forEach((component) => {
+      let dataSource = mapping.dataSources[component.dataSource];
+
+      component.visualResponses.forEach((visualResponseIndex) => {
+        let visualResponse = mapping.visualResponses[visualResponseIndex];
+
+        // Helper function to confirm visualResponse degreesOfFreedom
+        // is valid for the dataSourceType
+        const validateDegreesOfFreedom = (degreesOfFreedom) => {
+          switch(dataSource.dataSourceType) {
+            case Constants.DataSourceType.BUTTON:
+              expect(degreesOfFreedom).toEqual(1);
+              break;
+            case Constants.DataSourceType.DPAD_FROM_AXES:
+            case Constants.DataSourceType.DPAD_FROM_BUTTONS:
+              expect(degreesOfFreedom).toEqual(2);
+              break;
+            case Constants.DataSourceType.THUMBSTICK:
+            case Constants.DataSourceType.TOUCHPAD:
+              if (dataSource.buttonIndex != undefined) {
+                expect(degreesOfFreedom).toBeGreaterThanOrEqual(1);
+                expect(degreesOfFreedom).toBeLessThanOrEqual(3);
+              } else {
+                expect(degreesOfFreedom).toEqual(2);
+              }
+              break;
+            default:
+              throw new Error(`Unknown ${dataSource.dataSourceType}`);
+          }
+        };
+
+        if (visualResponse.onPress) {
+          validateDegreesOfFreedom(visualResponse.onPress.degreesOfFreedom);
+        }
+
+        if (visualResponse.onTouch) {
+          validateDegreesOfFreedom(visualResponse.onTouch.degreesOfFreedom);
+        }
+      });
+    });
+  });
+
   test("No unused data sources", () => {
     let usedDataSourceIndices = Array(mapping.dataSources.length);
     mapping.components.forEach((component) => {
@@ -86,6 +131,19 @@ describe.each(mappingList)("validateMapping.%s", (gamepadId) => {
 
     let unusedComponents = mapping.components.filter((component, index) => !usedComponentIndices[index]);
     expect(unusedComponents).toHaveLength(0);
+  });
+
+  test("No unused visualResponses", () => {
+    let usedVisualResponseIndicies = Array(mapping.visualResponses.length);
+
+    mapping.components.forEach((component) => {
+      component.visualResponses.forEach((visualResponseIndex) => {
+        usedVisualResponseIndicies[visualResponseIndex] = true;
+      });
+    });
+
+    let unusedVisualResponses = mapping.visualResponses.filter((visualResponse, index) => !usedVisualResponseIndicies[index]);
+    expect(unusedVisualResponses).toHaveLength(0);
   });
 
 });

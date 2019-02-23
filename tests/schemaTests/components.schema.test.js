@@ -1,5 +1,5 @@
-const testHelpers = require("../testHelpers.js");
-const validator = testHelpers.getValidator("components.schema.json", ["mapping.index.schema.json"]);
+const TestHelpers = require("../testHelpers.js");
+const validator = TestHelpers.getValidator("components.schema.json", ["mapping.index.schema.json"]);
 const validComponent = Object.freeze({
   "dataSource": 0,
   "root": "root node",
@@ -8,7 +8,7 @@ const validComponent = Object.freeze({
 
 test("Valid component", () => {
   let valid = false;
-  let component = Object.assign({}, validComponent);
+  let component = TestHelpers.copyJsonObject(validComponent);
   
   valid = validator([component]);
   if (!valid) {
@@ -31,29 +31,26 @@ test("Duplicates invalid", () => {
 });
 
 test("Invalid dataSource", () => {
-  let component = Object.assign({}, validComponent);
-  
+  let component = TestHelpers.copyJsonObject(validComponent);
   delete component.dataSource;
   expect(validator([component])).toBe(false);
 });
 
 test("Invalid root", () => {
-  let component = Object.assign({}, validComponent);
-  
+  let component = TestHelpers.copyJsonObject(validComponent);
   delete component.root;
   expect(validator([component])).toBe(false);
 });
 
 test("Invalid labelTransform", () => {
-  let component = Object.assign({}, validComponent);
-  
+  let component = TestHelpers.copyJsonObject(validComponent);
   delete component.labelTransform;
   expect(validator([component])).toBe(false);
 });
 
 test("Invalid visualResponses", () => {
-  let component = Object.assign({}, validComponent);
-  
+  let component = TestHelpers.copyJsonObject(validComponent);
+
   component.visualResponses = [];
   expect(validator([component])).toBe(false);
   
@@ -62,7 +59,7 @@ test("Invalid visualResponses", () => {
 });
 
 test("invalid additional properties", () => {
-  let component = Object.assign({}, validComponent);
+  let component = TestHelpers.copyJsonObject(validComponent);
   component.someNonsense = {};
   expect(validator([component])).toBe(false);
 });

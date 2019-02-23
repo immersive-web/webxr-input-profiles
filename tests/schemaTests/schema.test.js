@@ -1,34 +1,10 @@
-const testHelpers = require("../testHelpers.js");
-const validator = testHelpers.getValidator();
-const validMapping = Object.freeze({
-  version: "0.1.0",
-  id: "Gamepad.id",
-  hands: {
-    neutral: {
-      asset: "asset name",
-      root: "root name",
-      components: [0]
-    }
-  },
-  components: [
-    {
-      dataSource: 0,
-      root: "component root name",
-      labelTransform: "label transform name"
-    }
-  ],
-  dataSources: [
-    {
-      id: "a button",
-      dataSourceType: "buttonSource",
-      buttonIndex: 0
-    }
-  ]
-});
+const TestHelpers = require("../testHelpers.js");
+const validator = TestHelpers.getValidator();
+const validMapping = Object.freeze(TestHelpers.getMappingById("mock1", true));
 
 test("Valid mapping", () => {
   let valid = false;
-  let mapping = Object.assign({}, validMapping);
+  let mapping = TestHelpers.copyJsonObject(validMapping);
   
   valid = validator(mapping);
   if (!valid) {
@@ -36,10 +12,11 @@ test("Valid mapping", () => {
   }
 
   const visualResponse = {
-    "userAction": "onTouch",
     "target": "target node",
-    "buttonMin": "buttonMin node",
-    "buttonMax": "buttonMax node"
+    "onTouch": {
+      "degreesOfFreedom": 1,
+      "button": "button node"
+    }
   };
   mapping.visualResponses = [visualResponse];
   valid = validator(mapping);
@@ -49,31 +26,31 @@ test("Valid mapping", () => {
 });
 
 test("Invalid missing version", () => {
-  let mapping = Object.assign({}, validMapping);
+  let mapping = TestHelpers.copyJsonObject(validMapping);
   delete mapping.version;
   expect(validator(mapping)).toBe(false);
 });
 
 test("Invalid missing id", () => {
-  let mapping = Object.assign({}, validMapping);
+  let mapping = TestHelpers.copyJsonObject(validMapping);
   delete mapping.id;
   expect(validator(mapping)).toBe(false);
 });
 
 test("Invalid missing hands", () => {
-  let mapping = Object.assign({}, validMapping);
+  let mapping = TestHelpers.copyJsonObject(validMapping);
   delete mapping.hands;
   expect(validator(mapping)).toBe(false);
 });
 
 test("Invalid missing components", () => {
-  let mapping = Object.assign({}, validMapping);
+  let mapping = TestHelpers.copyJsonObject(validMapping);
   delete mapping.components;
   expect(validator(mapping)).toBe(false);
 });
 
 test("Invalid missing dataSources", () => {
-  let mapping = Object.assign({}, validMapping);
+  let mapping = TestHelpers.copyJsonObject(validMapping);
   delete mapping.dataSources;
   expect(validator(mapping)).toBe(false);
 });

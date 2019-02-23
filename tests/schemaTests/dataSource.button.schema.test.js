@@ -1,5 +1,5 @@
-const testHelpers = require("../testHelpers.js");
-const validator = testHelpers.getValidator("dataSource.button.schema.json", ["dataSource.properties.schema.json"]);
+const TestHelpers = require("../testHelpers.js");
+const validator = TestHelpers.getValidator("dataSource.button.schema.json", ["dataSource.properties.schema.json"]);
 const validDataSource = Object.freeze({
   "id": "a button",
   "dataSourceType": "buttonSource",
@@ -8,7 +8,7 @@ const validDataSource = Object.freeze({
 
 test("Valid button sources", () => {
   let valid = false;
-  let dataSource = Object.assign({}, validDataSource);
+  let dataSource = TestHelpers.copyJsonObject(validDataSource);
   
   valid = validator(dataSource);
   if (!valid) {
@@ -29,13 +29,13 @@ test("Valid button sources", () => {
 });
 
 test("No id", () => {
-  let dataSource = Object.assign({}, validDataSource);
+  let dataSource = TestHelpers.copyJsonObject(validDataSource);
   delete dataSource.id;
   expect(validator(dataSource)).toBe(false);
 });
 
 test("Invalid dataSourceType", () => {
-  let dataSource = Object.assign({}, validDataSource);
+  let dataSource = TestHelpers.copyJsonObject(validDataSource);
   
   delete dataSource.dataSourceType;
   expect(validator(dataSource)).toBe(false);
@@ -45,7 +45,7 @@ test("Invalid dataSourceType", () => {
 });
 
 test("Invalid buttonIndex", () => {
-  let dataSource = Object.assign({}, validDataSource);
+  let dataSource = TestHelpers.copyJsonObject(validDataSource);
   
   delete dataSource.buttonIndex;
   expect(validator(dataSource)).toBe(false);
@@ -55,7 +55,7 @@ test("Invalid buttonIndex", () => {
 });
 
 test("invalid additional properties", () => {
-  let dataSource = Object.assign({}, validDataSource);
+  let dataSource = TestHelpers.copyJsonObject(validDataSource);
   dataSource.someNonsense = {};
   expect(validator(dataSource)).toBe(false);
 });

@@ -1,65 +1,103 @@
-const testHelpers = require("../testHelpers.js");
-const validator = testHelpers.getValidator("visualResponses.schema.json");
-const buttonVisualResponse = Object.freeze({
-  "userAction": "onTouch",
-  "target": "target node",
-  "buttonMin": "buttonMin node",
-  "buttonMax": "buttonMax node"
+const TestHelpers = require("../testHelpers.js");
+const validator = TestHelpers.getValidator("visualResponses.schema.json", ["visualResponse.properties.schema.json"]);
+
+const visualResponse1DOF = Object.freeze({
+  "degreesOfFreedom": 1,
+  "button": "button node"
 });
-const dpadVisualResponse = Object.freeze({
-  "userAction": "onTouch",
-  "target": "target node",
+
+const visualResponse2DOF = Object.freeze({
+  "degreesOfFreedom": 2,
   "left": "left node",
   "right": "right node",
   "bottom": "bottom node",
   "top": "top node"
 });
-const axesVisualResponse = Object.freeze({
-  "userAction": "onTouch",
-  "target": "target node",
+
+const visualResponse3DOF = Object.freeze({
+  "degreesOfFreedom": 3,
   "left": "left node",
   "right": "right node",
   "bottom": "bottom node",
   "top": "top node",
-  "buttonMin": "buttonMin node",
-  "buttonMax": "buttonMax node"
+  "button": "button node"
 });
 
-test("Valid button visual response", () => {
+
+const validVisualResponse = {
+  "target": "TargetNode",
+  "onPress": visualResponse3DOF
+};
+
+test("Valid 1DOF visual response", () => {
   let valid = false;
-  let visualResponse = Object.assign({}, buttonVisualResponse);
-  
+
+  let visualResponse = {
+    "target": "TargetNode",
+    "onPress": visualResponse1DOF
+  };
+  valid = validator([visualResponse]);
+  if (!valid) {
+    expect(validator.errors).toBeNull();
+  }
+
+  visualResponse.onTouch = visualResponse1DOF;
+  valid = validator([visualResponse]);
+  if (!valid) {
+    expect(validator.errors).toBeNull();
+  }
+
+  delete visualResponse.onPress;
   valid = validator([visualResponse]);
   if (!valid) {
     expect(validator.errors).toBeNull();
   }
 });
 
-test("Valid dpad visual response", () => {
+test("Valid 2DOF visual response", () => {
   let valid = false;
-  let visualResponse = Object.assign({}, dpadVisualResponse);
-  
+
+  let visualResponse = {
+    "target": "TargetNode",
+    "onPress": visualResponse2DOF
+  };
+  valid = validator([visualResponse]);
+  if (!valid) {
+    expect(validator.errors).toBeNull();
+  }
+
+  visualResponse.onTouch = visualResponse2DOF;
+  valid = validator([visualResponse]);
+  if (!valid) {
+    expect(validator.errors).toBeNull();
+  }
+
+  delete visualResponse.onPress;
   valid = validator([visualResponse]);
   if (!valid) {
     expect(validator.errors).toBeNull();
   }
 });
 
-test("Valid axes visual response", () => {
+test("Valid 3DOF visual response", () => {
   let valid = false;
-  let visualResponse = Object.assign({}, axesVisualResponse);
-  
+
+  let visualResponse = {
+    "target": "TargetNode",
+    "onPress": visualResponse3DOF
+  };
   valid = validator([visualResponse]);
   if (!valid) {
     expect(validator.errors).toBeNull();
   }
-});
 
-test("Valid onPress type", () => {
-  let valid = false;
-  let visualResponse = Object.assign({}, dpadVisualResponse);
-  visualResponse.userAction = "onPress";
-  
+  visualResponse.onTouch = visualResponse3DOF;
+  valid = validator([visualResponse]);
+  if (!valid) {
+    expect(validator.errors).toBeNull();
+  }
+
+  delete visualResponse.onPress;
   valid = validator([visualResponse]);
   if (!valid) {
     expect(validator.errors).toBeNull();
@@ -71,75 +109,70 @@ test("Invalid array length", () => {
 });
 
 test("Duplicates invalid", () => {
-  expect(validator([buttonVisualResponse, buttonVisualResponse])).toBe(false);
+  expect(validator([validVisualResponse, validVisualResponse])).toBe(false);
 });
 
-test("Invalid type", () => {
-  let visualResponse = Object.assign({}, buttonVisualResponse);
-  
-  delete visualResponse.userAction;
+test("Invalid extra properties", () => {
+  let visualResponse = TestHelpers.copyJsonObject(validVisualResponse);
+  visualResponse.someNonsense = false;
   expect(validator([visualResponse])).toBe(false);
+})
 
-  visualResponse.userAction = "some nonsense";
-  expect(validator([visualResponse])).toBe(false);
-});
-
-test("Invalid target", () => {
-  let visualResponse = Object.assign({}, buttonVisualResponse);
+test("Missing target", () => {
+  let visualResponse = TestHelpers.copyJsonObject(validVisualResponse);
   delete visualResponse.target;
   expect(validator([visualResponse])).toBe(false);
 });
 
-test("Invalid buttonMin on dpad", () => {
-  let visualResponse = Object.assign({}, dpadVisualResponse);
-  visualResponse.buttonMin = "buttonMin node";
+test("Missing actions", () => {
+  let visualResponse = TestHelpers.copyJsonObject(validVisualResponse);
+  delete visualResponse.onPress;
   expect(validator([visualResponse])).toBe(false);
 });
 
-test("Invalid buttonMax on dpad", () => {
-  let visualResponse = Object.assign({}, dpadVisualResponse);
-  visualResponse.buttonMax = "buttonMax node";
+let missingElements = [];
+Object.keys(visualResponse1DOF).forEach(key => {
+  missingElements.push([key, "1DOF", visualResponse1DOF]);
+});
+Object.keys(visualResponse2DOF).forEach(key => {
+  missingElements.push([key, "2DOF", visualResponse2DOF]);
+});
+Object.keys(visualResponse3DOF).forEach(key => {
+  missingElements.push([key, "3DOF", visualResponse3DOF]);
+});
+
+test.each(missingElements)("Missing %s on %s", (key, DOFtype, visualResponseDOF) => {
+  let visualResponse = {
+    "target": "TargetNode",
+    "onPress": TestHelpers.copyJsonObject(visualResponseDOF)
+  };
+  delete visualResponse.onPress[key];
   expect(validator([visualResponse])).toBe(false);
 });
 
-test("Missing buttonMin on button", () => {
-  let visualResponse = Object.assign({}, buttonVisualResponse);
-  delete visualResponse.buttonMin;
+test("1DOF invalid additional properties", () => {
+  let visualResponse = {
+    "target": "TargetNode",
+    "onPress": TestHelpers.copyJsonObject(visualResponse1DOF)
+  };
+  visualResponse.onPress.someNonsense = {};
   expect(validator([visualResponse])).toBe(false);
 });
 
-test("Missing buttonMax on button", () => {
-  let visualResponse = Object.assign({}, buttonVisualResponse);
-  delete visualResponse.buttonMax;
+test("2DOF invalid additional properties", () => {
+  let visualResponse = {
+    "target": "TargetNode",
+    "onPress": TestHelpers.copyJsonObject(visualResponse2DOF)
+  };
+  visualResponse.onPress.someNonsense = {};
   expect(validator([visualResponse])).toBe(false);
 });
 
-test("Invalid missing left node", () => {
-  let visualResponse = Object.assign({}, dpadVisualResponse);
-  delete visualResponse.left;
-  expect(validator([visualResponse])).toBe(false);
-});
-
-test("Invalid missing right node", () => {
-  let visualResponse = Object.assign({}, dpadVisualResponse);
-  delete visualResponse.right;
-  expect(validator([visualResponse])).toBe(false);
-});
-
-test("Invalid missing bottom node", () => {
-  let visualResponse = Object.assign({}, dpadVisualResponse);
-  delete visualResponse.bottom;
-  expect(validator([visualResponse])).toBe(false);
-});
-
-test("Invalid missing top node", () => {
-  let visualResponse = Object.assign({}, dpadVisualResponse);
-  delete visualResponse.top;
-  expect(validator([visualResponse])).toBe(false);
-});
-
-test("invalid additional properties", () => {
-  let visualResponse = Object.assign({}, axesVisualResponse);
-  visualResponse.someNonsense = {};
+test("3DOF invalid additional properties", () => {
+  let visualResponse = {
+    "target": "TargetNode",
+    "onPress": TestHelpers.copyJsonObject(visualResponse3DOF)
+  };
+  visualResponse.onPress.someNonsense = {};
   expect(validator([visualResponse])).toBe(false);
 });

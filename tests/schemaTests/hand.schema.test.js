@@ -1,5 +1,5 @@
-const testHelpers = require("../testHelpers.js");
-const validator = testHelpers.getValidator("hand.schema.json", ["mapping.index.schema.json"]);
+const TestHelpers = require("../testHelpers.js");
+const validator = TestHelpers.getValidator("hand.schema.json", ["mapping.index.schema.json"]);
 const validHand = Object.freeze({
   "asset": "asset uri",
   "root": "root node",
@@ -8,7 +8,7 @@ const validHand = Object.freeze({
 
 test("Valid hand", () => {
   let valid = false;
-  let hand = Object.assign({}, validHand);
+  let hand = TestHelpers.copyJsonObject(validHand);
   
   valid = validator(hand);
   if (!valid) {
@@ -35,21 +35,21 @@ test("Valid hand", () => {
 });
 
 test("Invalid asset", () => {
-  let hand = Object.assign({}, validHand);
+  let hand = TestHelpers.copyJsonObject(validHand);
   
   delete hand.asset;
   expect(validator(hand)).toBe(false);
 });
 
 test("Invalid root", () => {
-  let hand = Object.assign({}, validHand);
+  let hand = TestHelpers.copyJsonObject(validHand);
   
   delete hand.root;
   expect(validator(hand)).toBe(false);
 });
 
 test("Invalid components", () => {
-  let hand = Object.assign({}, validHand);
+  let hand = TestHelpers.copyJsonObject(validHand);
   
   delete hand.components;
   expect(validator(hand)).toBe(false);
@@ -62,7 +62,7 @@ test("Invalid components", () => {
 });
 
 test("invalid additional properties", () => {
-  let hand = Object.assign({}, validHand);
+  let hand = TestHelpers.copyJsonObject(validHand);
   hand.someNonsense = {};
   expect(validator(hand)).toBe(false);
 });
