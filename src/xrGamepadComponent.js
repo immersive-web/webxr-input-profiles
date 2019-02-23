@@ -209,6 +209,10 @@ class XRGamepadComponent {
     // component's current state (press/touch).
     this.visualResponses.forEach((visualResponse) => {
       let visualResponseState = visualResponse[data.state];
+      if (!visualResponseState && (data.state == Constants.ComponentState.PRESSED)) {
+        visualResponseState = visualResponse[Constants.ComponentState.TOUCHED];
+      }
+
       if (visualResponseState) {
         let weightedVisualResponse = {};
         
