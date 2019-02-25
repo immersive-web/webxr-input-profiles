@@ -48,15 +48,13 @@ A single button (including analog triggers and touchable thumbrests) is represen
 
 ```json
 {
-    "gamepad" : {
-        "dataSources" : [
-            {
-                "id" : "gripButton",
-                "dataSourceType" : "buttonSource",
-                "buttonIndex" : 2
-            }
-        ]
-    }
+    "dataSources" : [
+        {
+            "id" : "gripButton",
+            "dataSourceType" : "buttonSource",
+            "buttonIndex" : 2
+        }
+    ]
 }
 ```
 
@@ -64,16 +62,14 @@ When representing an analog button such as a trigger, the `analogValues` propert
 
 ```json
 {
-    "gamepad" : {
-        "dataSources" : [
-            {
-                "id" : "triggerButton",
-                "dataSourceType" : "buttonSource",
-                "buttonIndex" : 0,
-                "analogValues" : true
-            }
-        ]
-    }
+    "dataSources" : [
+        {
+            "id" : "triggerButton",
+            "dataSourceType" : "buttonSource",
+            "buttonIndex" : 0,
+            "analogValues" : true
+        }
+    ]
 }
 ```
 
@@ -81,16 +77,14 @@ When representing a button that can report a touched state but not a pressed sta
 
 ```json
 {
-    "gamepad" : {
-        "dataSources" : [
-            {
-                "id" : "thumbrest",
-                "dataSourceType" : "buttonSource",
-                "buttonIndex" : 5,
-                "pressUnsupported" : true
-            }
-        ]
-    }
+    "dataSources" : [
+        {
+            "id" : "thumbrest",
+            "dataSourceType" : "buttonSource",
+            "buttonIndex" : 5,
+            "pressUnsupported" : true
+        }
+    ]
 }
 ```
 
@@ -104,18 +98,16 @@ A data source of this type is defined as one with the `dataSourceType` property 
 
 ```json
 {
-    "gamepad" : {
-        "dataSources" : [
-            {
-                "id" : "dpad",
-                "type": "dpadFromButtonsSource",
-                "leftButtonIndex" : 3,
-                "rightButtonIndex" : 4,
-                "bottomButtonIndex" : 5,
-                "topButtonIndex" : 6
-            }
-        ]
-    }
+    "dataSources" : [
+        {
+            "id" : "dpad",
+            "type": "dpadFromButtonsSource",
+            "leftButtonIndex" : 3,
+            "rightButtonIndex" : 4,
+            "bottomButtonIndex" : 5,
+            "topButtonIndex" : 6
+        }
+    ]
 }
 ```
 
@@ -126,16 +118,14 @@ A data source of this type is defined as one with the `dataSourceType` property 
 
 ```json
 {
-    "gamepad" : {
-        "dataSources" : [
-            {
-                "id" : "dpad",
-                "type": "dpadFromAxesSource",
-                "xAxisIndex" : 2,
-                "yAxisIndex" : 3
-            }
-        ]
-    }
+    "dataSources" : [
+        {
+            "id" : "dpad",
+            "type": "dpadFromAxesSource",
+            "xAxisIndex" : 2,
+            "yAxisIndex" : 3
+        }
+    ]
 }
 ```
 
@@ -146,16 +136,14 @@ Both thumbsticks and touchpads are represented by an entry in the `dataSources` 
 
 ```json
 {
-    "gamepad" : {
-        "dataSources" : [
-            {
-                "id" : "touchpad",
-                "type": "touchpadSource",
-                "xAxisIndex" : 0,
-                "yAxisIndex" : 1
-            }
-        ]
-    }
+    "dataSources" : [
+        {
+            "id" : "touchpad",
+            "type": "touchpadSource",
+            "xAxisIndex" : 0,
+            "yAxisIndex" : 1
+        }
+    ]
 }
 ```
 
@@ -163,148 +151,152 @@ Some thumbsticks and touchpads may be able to be depressed or they may also have
 
 ```json
 {
-    "gamepad" : {
-        "dataSources" : [
-            {
-                "id" : "thumbstick",
-                "type": "thumbstickSource",
-                "xAxisIndex" : 0,
-                "yAxisIndex" : 1,
-                "buttonIndex" : 1
-            }
-        ]
-    }
+    "dataSources" : [
+        {
+            "id" : "thumbstick",
+            "type": "thumbstickSource",
+            "xAxisIndex" : 0,
+            "yAxisIndex" : 1,
+            "buttonIndex" : 1
+        }
+    ]
 }
 ```
 
 If the thumbstick or touchpad is able to be depressed in an analog manner, the data source must also include an `analogButtonValues` property with a value of `true`.  If the thumbstick or touchpad is capable of reporting a deadzone "touched" status but cannot be pressed, the data source must also include a `pressUnsupported` property with a value of `true`.
 
 ## Visual Responses
-The visual representation of a motion controller in a VR must respond to reflect its physical state in the real-world.  For example, when a physical thumbstick is moved to the left, the virtual thumbstick should also move to the left.  In order to do this without requiring custom code for each `Gamepad.id`, the schema defines an array of `visualResponse` objects.
+The visual representation of a motion controller in a VR must respond to reflect its physical state in the real-world.  For example, when a physical thumbstick is moved to the left, the virtual thumbstick should also move to the left.  The `visualResponses` array contains descriptions of all visual changes that can occur when a controller part is considered "pressed" or touched".  Each element in this array must contain a `target` property which references a node in the asset to be modified.  It must also contain an `onTouch` property, and `onPress` property, or both.  
 
-Each `visualResponse` must contain a `target` property which references the node in an asset to be modified.  Each `visualResponse` must also contain a `userAction` property set to either `onTouch` or `onPress`.  A `userAction` set to `onTouch` indicates the visual response is describing the desired state of `target` when the associated `GamepadButton.touched` is `true` or the associated elements in the `Gamepad.axes` array are non-zero.  A `userAction` set to `onPress` indicates the visual response is describing the desired state of `target` when the associated `GamepadButton.pressed` is `true`. When `visualResponse` objects have the same `target`, node properties described by a `userAction` equal to `onPress` will take precedence over those with a `userAction` of `onTouch`.
+The `onPress` and `onTouch` properties must always contain a `degreesOfFreedom` property which describes the degrees of freedom the visual response will contain.  For example, an thumbstick with a button would have `3` degrees of freedom because it can rotate around two axes and translate along a third. The schema supports 1, 2, or 3 degrees of freedom and requires one of the following groups of additional properties based on the value of `degreesOfFreedom`.  The associated javascript library will report the weight to be applied to the values of each of these nodes based on the current state of the associated `dataSource`.
+1. `button`
+2. `left`, `right`, `bottom`, and `top`
+3. `left`, `right`, `bottom`, `top`, and `button`
 
-In addition to the `target` and `userAction` properties, a `visualResponse` must have one of the following groups of properties.  Each property represents a node in the asset at the extent of the value which is it matched to:
-* `buttonMin` and `buttonMax`
-* `left`, `right`, `bottom`, and `top`
-* `left`, `right`, `bottom`, `top`, `buttonMin`, and `buttonMax`
-
-For example, a button part would have a `buttonMin` representing the visual state of `target` when the button is not being interacted with and a `buttonMax` representing the visual state of `target` when the button is fully pressed.  Developers are then able to interpolate the correct visualization of `target` by weighting `buttonMin` and `buttonMax` based on `GamepadButton.value`.  The javascript library shipped as part of this package includes this calculation.
+When the `visualResponse` associated with a `dataSource` is in the "pressed" state and the `visualResponse` has an `onPress` property then the `onPress` property should be applied to the `target`.  When the `visualResponse` associated with a `dataSource` is in the "touched" state and the `visualResponse` has an `onTouch` property then the `onTouch` property should be applied to the `target`.  A fallback behavior should also be applied such that the `onTouch` property is applied if no `onPress` is present in the `visualResponse` and the `dataSource` is in the "pressed" state.
 
 ### Button Visual Responses
-Visual responses for button parts are expected to interpolate `target` properties based on the associated `GamepadButton.value` attribute. For example:
+A `buttonSource` is considered "pressed" when the associated `GamepadButton.pressed` value is true and considered "touched" when the associated `GamepadButton.touched` value is true. Visual responses for button parts are expected to interpolate `target` properties based on the associated `GamepadButton.value` attribute. For example:
 
 ```json
 {
-    "gamepad" : {
-        "visualResponses" : [
-            {
-                "userAction": "onTouch",
-                "target" : "trigger-root",
-                "buttonMin" : "trigger-transform-buttonMin",
-                "buttonMax" : "trigger-transform-buttonMax"
+    "visualResponses" : [
+        {
+            "target" : "trigger-root",
+            "onTouch": {
+                "degreesOfFreedom": 1,
+                "button" : "trigger-transform-button"
             }
-        ]
-    }
+        }
+    ]
 }
 ```
 
 ### Dpad Visual Responses
-Physical dpad parts rock around a central pivot, requiring their visual responses to interpolate between `left` and `right` as well as `bottom` and `top`.  The expected interpolation is different when associated based on a `dpadFromButtonSource` as opposed to a `dpadFromAxes`.  When associated with the former, `right` is weighted by the `GamepadButton.value` associated with the `rightButtonIndex`, `bottom` is weighted by the `GamepadButton.value` associated with the `bottomButtonIndex`, and so on.  When associated with the latter type of data source, the algorithm is a bit more complicated.  Only positive values in `Gamepad.axes` array at the `xAxisIndex` position are used for interpolation with the `right` node whereas only the absolute value of negative values are used for interpolation with the `left` node.  The same behavior applies to `top` and `bottom` regarding the data at the `yAxisIndex` in the `Gamepad.axes` array. In this manner, both types of data sources can be associated with a single type of visual response.  For example:
+Physical dpad parts rock around a central pivot, requiring their visual responses to interpolate between `left` and `right` as well as `bottom` and `top`.  The expected interpolation is different when associated based on a `dpadFromButtonSource` as opposed to a `dpadFromAxesSource`.  When associated with the former, `right` is weighted by the `GamepadButton.value` associated with the `rightButtonIndex`, `bottom` is weighted by the `GamepadButton.value` associated with the `bottomButtonIndex`, and so on.  When associated with the latter type of data source, the algorithm is a bit more complicated.  Only positive values in `Gamepad.axes` array at the `xAxisIndex` position are used for interpolation with the `right` node whereas only the absolute value of negative values are used for interpolation with the `left` node.  The same behavior applies to `top` and `bottom` regarding the data at the `yAxisIndex` in the `Gamepad.axes` array. In this manner, both types of data sources can be associated with a single type of visual response.
+
+The primary difference between `dpadFromButtonsSource` and `dpadFromAxesSource` is how the "pressed" or "touched" states are determined.  The former is considered "touched" or "pressed" if any of the associated `GamepadButton.touched` or `GamedpadButton.pressed` values are true respectively.  The latter is considered "touched" or "pressed" if the absolute value of either axis is over a touched value threshold or a pressed value threshold respectively.  These two values are defined within the associated javascript library.
+
+For example:
 
 ```json
 {
-    "gamepad" : {
-        "visualResponses" : [
-            {
-                "userAction": "onTouch",
-                "target" : "dpad-root",
+    "visualResponses" : [
+        {
+            "target" : "dpad-root",
+            "onTouch" : {
+                "degreesOfFreedom": 2,
                 "left" : "dpad-transform-leftmost",
                 "right" : "dpad-transform-rightmost",
                 "bottom" : "dpad-transform-bottommost",
                 "top" : "dpad-transform-topmost"
             }
-        ]
-    }
+        }
+    ]
 }
 ```
 
 ### Thumbstick Visual Responses
-Thumbsticks share physical characteristics with dpad, though they typically have a wider range of motion and may also be clickable.  For interpolating the `target` properties, only positive values in `Gamepad.axes` array at the `xAxisIndex` position are used with the `right` node, whereas only the absolute value of negative values are used with the `left` node.  The same behavior applies to `top` and `bottom` regarding the data at the `yAxisIndex` in the `Gamepad.axes` array. If clickable, `target` properties are also interpolated with `buttonMin` and `buttonMax` based on `GamepadButton.value`.  For example:
+Thumbsticks share physical characteristics with dpad, though they typically have a wider range of motion and may also be clickable.  For interpolating the `target` properties, only positive values in `Gamepad.axes` array at the `xAxisIndex` position are used with the `right` node, whereas only the absolute value of negative values are used with the `left` node.  The same behavior applies to `top` and `bottom` regarding the data at the `yAxisIndex` in the `Gamepad.axes` array. If clickable, `target` properties are also interpolated with `buttonMin` and `buttonMax` based on `GamepadButton.value`.
+
+If the `thumbstickSource` has a `buttonIndex`, the associated `GamepadButton.touched` and `GamepadButton.pressed` will cause the `dataSource` to be considered "touched" or "pressed" respectively.  In addition, similar to the `dpadFromAxesSource`, a `thumbstickSource` may also be considered "touched" or "pressed" if the absolute value of either axis is over a touched value threshold or a pressed value threshold respectively. These two values are defined within the associated javascript library.
+
+For example:
 
 ```json
 {
-    "gamepad" : {
-        "visualResponses" : [
-            {
-                "userAction": "onTouch",
-                "target" : "thumbstick-root",
+    "visualResponses" : [
+        {
+            "target" : "thumbstick-root",
+            "onTouch" : {
+                "degreesOfFreedom": 3,
+                "button" : "thumbstick-transform-button",
                 "left" : "thumbstick-transform-leftmost",
                 "right" : "thumbstick-transform-rightmost",
                 "bottom" : "thumbstick-transform-bottommost",
                 "top" : "thumbstick-transform-topmost",
-                "buttonMin" : "thumbstick-transform-buttonMin",
-                "buttonMax" : "thumbstick-transform-buttonMax"
             }
-        ]
-    }
+        }
+    ]
 }
 ```
 
 ### Touchpad Visual Responses
-Thumbsticks share physical characteristics with dpad, though they may also be clickable.  Whereas all other data source types may use a `userAction` of `onTouch` for all visualizations, touchpad data sources will most likely only use an `onTouch` visualization to represent the touch-dot of the user's finger on the part.  Any motion of the touchpad itself due to being clickable, will likely be represented in a visualization with the `userAction` set to `onPress`.
+Touchpads share physical characteristics with dpad, though they may also be clickable.  Whereas all other data source types may use an `onTouch` property for all visualizations, `touchpadSources` will most likely only use an `onTouch` visualization to represent the touch-dot of the user's finger on the part.  Any motion of the touchpad itself due to being clickable, will likely be represented the `onPress` property.
 
 In either case, the algorithm for interpolating the `target` properties is roughly the same.  Only positive values in `Gamepad.axes` array at the `xAxisIndex` position are used with the `right` node, whereas only the absolute value of negative values are used with the `left` node.  The same behavior applies to `top` and `bottom` regarding the data at the `yAxisIndex` in the `Gamepad.axes` array. If clickable, response visualizations with a `userAction` set to `onPress` may also interpolate `buttonMin` and `buttonMax` based on `GamepadButton.value`.  For example:
 
+If the `touchpadSource` has a `buttonIndex`, the associated `GamepadButton.touched` and `GamepadButton.pressed` will cause the `dataSource` to be considered "touched" or "pressed" respectively.  In addition, similar to the `dpadFromAxesSource`, a `touchpadSource` may also be considered "touched" or "pressed" if the absolute value of either axis is over a touched value threshold or a pressed value threshold respectively. These two values are defined within the associated javascript library.
+
+For example:
+
 ```json
 {
-    "gamepad" : {
-        "visualResponses" : [
-            {
-                "userAction": "onTouch",
-                "target" : "touchpadDot-root",
+    "visualResponses" : [
+        {
+            "target" : "touchpadDot-root",
+            "onTouch" : {
+                "degreesOfFreedom": 2,
                 "left" : "touchpadDot-transform-leftmost",
                 "right" : "touchpadDot-transform-rightmost",
                 "bottom" : "touchpadDot-transform-bottommost",
                 "top" : "touchpadDot-transform-topmost"
-            },
-            {
-                "userAction": "onPress",
-                "target" : "touchpad-root",
+            }
+        },
+        {
+            "target" : "touchpad-root",
+            "onPress" : {
+                "button" : "touchpad-transform-button",
                 "left" : "touchpad-transform-leftmost",
                 "right" : "touchpad-transform-rightmost",
                 "bottom" : "touchpad-transform-bottommost",
-                "top" : "touchpad-transform-topmost",
-                "buttonMin" : "touchpad-transform-buttonMin",
-                "buttonMax" : "touchpad-transform-buttonMax"
+                "top" : "touchpad-transform-topmost"
             }
-        ]
-    }
+        }
+    ]
 }
 ```
 
 ## Components
-Components connect a dataSource with the information necessary to correctly visualize it. A component must contain a `dataSource` property which points to an index in the file's `dataSources` array. It must also contain a `root` property which references the topmost node in an asset hierarchy that is associated with the physical part. A component mut also contain a `labelTransform` property which references a node in the asset hierarchy at which a legend label could be placed.  It is expected that this node is located a safe distance from the body of the motion controller and oriented in a position appropriate for a label to be read.
+Components connect a dataSource with the information necessary to correctly visualize it. A component must contain a `dataSource` property which points to an index in the file's `dataSources` array. It must also contain a `root` property which references the topmost node in an asset hierarchy that is associated with the physical part. A component must also contain a `labelTransform` property which references a node in the asset hierarchy at which a legend label could be placed.  It is expected that this node is located a safe distance from the body of the motion controller and oriented in a position appropriate for a label to be read.
 
 For example, here is component mapping for a single button.
 ```json
 {
-    "gamepad" : {
-        "components" : [
-            {
-                "dataSource" : 4,
-                "root" : "trigger-root",
-                "labelTransform" : "trigger-label-transform"
-            }
-        ],
-        "dataSources" : [
-            {
-                "id" : "triggerButton",
-                "dataSourceType" : "buttonSource",
-                "buttonIndex" : 2
-            }
-        ]
-    }
+    "components" : [
+        {
+            "dataSource" : 4,
+            "root" : "trigger-root",
+            "labelTransform" : "trigger-label-transform"
+        }
+    ],
+    "dataSources" : [
+        {
+            "id" : "triggerButton",
+            "dataSourceType" : "buttonSource",
+            "buttonIndex" : 2
+        }
+    ]
 }
 ```
 
@@ -312,31 +304,29 @@ In addition, most components will also include the `visualResponses` array prope
 
 ```json
 {
-    "gamepad" : {
-        "components" : [
-            {
-                "dataSource" : 4,
-                "root" : "trigger-root",
-                "labelTransform" : "trigger-label-transform",
-                "visualResponses" : [0]
-            }
-        ],
-        "dataSources" : [
-            {
-                "id" : "triggerButton",
-                "dataSourceType" : "buttonSource",
-                "buttonIndex" : 2
-            }
-        ],
-        "visualResponses" : [
-            {
-                "userAction": "onTouch",
-                "target" : "trigger-root",
-                "buttonMin" : "trigger-transform-buttonMin",
-                "buttonMax" : "trigger-transform-buttonMax"
-            }
-        ]
-    }
+    "components" : [
+        {
+            "dataSource" : 4,
+            "root" : "trigger-root",
+            "labelTransform" : "trigger-label-transform",
+            "visualResponses" : [0]
+        }
+    ],
+    "dataSources" : [
+        {
+            "id" : "triggerButton",
+            "dataSourceType" : "buttonSource",
+            "buttonIndex" : 2
+        }
+    ],
+    "visualResponses" : [
+        {
+            "userAction": "onTouch",
+            "target" : "trigger-root",
+            "buttonMin" : "trigger-transform-buttonMin",
+            "buttonMax" : "trigger-transform-buttonMax"
+        }
+    ]
 }
 ```
 
@@ -353,14 +343,11 @@ For example:
 
 ```json
 {
-    "gamepad" : {
-        "id" : "motion-controller-id",
-        "handedness" : {
-            "none" : {
-                "asset" : "some-url",
-                "root" : "none-handedness-controller",
-                "components" : [0]
-            }
+    "handedness" : {
+        "none" : {
+            "asset" : "some-url",
+            "root" : "neutral-handedness-controller",
+            "components" : [0]
         }
     }
 }
@@ -370,18 +357,25 @@ The `none`, `left`, and `right` objects may also contain two additional properti
 
 ```json
 {
-    "gamepad" : {
-        "id" : "motion-controller-id",
-        "handedness" : {
-            "none" : {
-                "asset" : "some-url",
-                "root" : "none-handedness-controller",
-                "components" : [0],
-                "primaryButtonComponent" : 0,
-                "primaryAxisComponent" : 1
-            }
+    "handedness" : {
+        "none" : {
+            "asset" : "some-url",
+            "root" : "none-handedness-controller",
+            "components" : [0],
+            "primaryButtonComponent" : 0,
+            "primaryAxisComponent" : 1
         }
     }
+}
+```
+
+## Top-level Properties
+The schema defines two key top-level properties: `version` and `id`.  The `version` property is a semantic version made up of a major, minor, and patch version number.  The major and minor version parts must always be up to date with the library being used to parse the mapping file.  The patch portion of the version may be out of sync.  The `id` property must match the `Gamepad.id` of the `Gamepad` object the mapping is being applied to.  The naming conventions for the `WebXR Device API` are concretely defined; the naming conventions for `WebVR` are somewhat more haphazard.
+
+```json
+{
+    "version" : "0.1.0",
+    "id" : "motion-controller-id"
 }
 ```
 
