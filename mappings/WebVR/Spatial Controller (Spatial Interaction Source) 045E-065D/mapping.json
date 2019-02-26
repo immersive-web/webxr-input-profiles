@@ -1,0 +1,142 @@
+{
+    "version" : "0.1",
+    "id" : "Spatial Controller (Spatial Interaction Source) 045E-065D",
+    "webVR": true,
+    "handedness" : {
+        "left" : {
+            "asset" : "some-url",
+            "root" : "left-controller-node",
+            "webVR_targetRayOrigin": "left-controller-pointing-origin",
+            "components" : [ 0, 1, 2, 3, 4],
+            "primaryButtonComponent" : 0,
+            "primaryAxesComponent" : 1
+        },
+        "right" : {
+            "asset" : "some-url",
+            "root" : "right-controller-node",
+            "webVR_targetRayOrigin": "right-controller-pointing-origin",
+            "components" : [ 0, 1, 2, 3, 4],
+            "primaryButtonComponent" : 0,
+            "primaryAxesComponent" : 1
+        }
+    },
+    "components" : [
+        {
+            "dataSource" : 0,
+            "root" : "trigger-node",
+            "labelTransform" : "trigger-label",
+            "visualResponses": [0]
+        },
+        {
+            "dataSource" : 1,
+            "root" : "thumbstick-node",
+            "labelTransform" : "thumbstick-label",
+            "visualResponses": [1]
+        },
+        {
+            "dataSource" : 2,
+            "root" : "grip-node",
+            "labelTransform" : "grip-label",
+            "visualResponses": [2]
+        },
+        {
+            "dataSource" : 3,
+            "root" : "grip-node",
+            "labelTransform" : "grip-label",
+            "visualResponses": [3, 4]
+        },
+        {
+            "dataSource" : 4,
+            "root" : "menu-node",
+            "labelTransform" : "menu-label",
+            "visualResponses": [5]
+        }
+    ],
+    "dataSources" : [
+        {
+            "id" : "trigger",
+            "dataSourceType": "buttonSource",
+            "buttonIndex": 0,
+            "analogValues": true
+        },
+        {
+            "id" : "thumbstick",
+            "dataSourceType": "thumbstickSource",
+            "xAxisIndex" : 0,
+            "yAxisIndex" : 1,
+            "buttonIndex" : 1
+        },
+        {
+            "id" : "grip",
+            "dataSourceType": "buttonSource",
+            "buttonIndex" : 2
+        },
+        {
+            "id" : "touchpad",
+            "dataSourceType": "touchpadSource",
+            "xAxisIndex" : 2,
+            "yAxisIndex" : 3,
+            "buttonIndex" : 3
+        },
+        {
+            "id" : "menu",
+            "dataSourceType": "buttonSource",
+            "buttonIndex" : 4
+        }
+    ],
+    "visualResponses" : [
+        {
+            "target" : "trigger-transform-node",
+            "onTouch" : {
+                "degreesOfFreedom": 1,
+                "button": "trigger-transform-button-node"
+            }
+        },
+        {
+            "target" : "thumbstick-transform-node",
+            "onTouch": {
+                "degreesOfFreedom": 3,
+                "button": "thumbstick-transform-button-node",
+                "left" : "thumbstick-transform-left-node",
+                "right" : "thumbstick-transform-right-node",
+                "top" : "thumbstick-transform-top-node",
+                "bottom" : "thumbstick-transform-bottom-node"
+            }
+        },
+        {
+            "target" : "grip-transform-node",
+            "onPress": {
+                "degreesOfFreedom": 1,
+                "button": "grip-max-transform-node"
+            }
+        },
+        {
+            "target" : "touchpad-transform-node",
+            "onPress": {
+                "degreesOfFreedom": 3,
+                "button": "touchpad-transform-button-node",
+                "left" : "touchpad-transform-left-node",
+                "right" : "touchpad-transform-right-node",
+                "top" : "touchpad-transform-top-node",
+                "bottom" : "touchpad-transform-bottom-node"
+            }
+        },
+        {
+            "target" : "touchpad-touchpoint-node",
+            "onTouch": {
+                "degreesOfFreedom": 2,
+                "left" : "touchpad-touchpoint-left-node",
+                "right" : "touchpad-touchpoint-right-node",
+                "top" : "touchpad-touchpoint-top-node",
+                "bottom" : "touchpad-touchpoint-bottom-node"
+            }
+        },
+        {
+            "target" : "menu-transform-node",
+            "onPress" : {
+                "degreesOfFreedom": 1,
+                "button": "menu-transform-button-node"
+            }
+        }
+    ]
+}

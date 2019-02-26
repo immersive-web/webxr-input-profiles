@@ -1,11 +1,13 @@
 {
     "version": "0.1",
     "id": "mock3",
+    "webVR": true,
     "handedness": {
       "none": {
         "asset": "asset.glb",
         "root": "ROOT_NODE",
-        "components": [0, 1, 2, 3, 4]
+        "webVR_targetRayOrigin": "POINTING_ORIGIN_NODE",
+        "components": [0, 1, 2, 3, 4, 5]
       }
     },
     "components": [
@@ -37,6 +39,12 @@
         "dataSource": 4,
         "root": "DPAD_FROM_BUTTONS_ROOT_NODE",
         "labelTransform": "DPAD_FROM_BUTTONS_LABEL_NODE",
+        "visualResponses": [2, 3]
+      },
+      {
+        "dataSource": 5,
+        "root": "INVERTED_TOUCHPAD_ROOT_NODE",
+        "labelTransform": "INVERTED_TOUCHPAD_LABEL_NODE",
         "visualResponses": [2, 3]
       }
     ],
@@ -72,6 +80,13 @@
         "rightButtonIndex": 3,
         "bottomButtonIndex": 4,
         "topButtonIndex": 5
+      },
+      {
+        "id": "invertedTouchpad",
+        "dataSourceType": "touchpadSource",
+        "xAxisIndex": 6,
+        "yAxisIndex": 7,
+        "webVR_yAxisInverted": true
       }
     ],
     "visualResponses": [

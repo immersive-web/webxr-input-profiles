@@ -1,6 +1,7 @@
 const TestHelpers = require("../testHelpers.js");
 const validator = TestHelpers.getValidator();
-const validMapping = Object.freeze(TestHelpers.getMappingById("mock1", true));
+const Constants = require("../../src/constants.js");
+const validMapping = Object.freeze(TestHelpers.getMappingById("mock1", Constants.MappingType.MOCK));
 
 test("Valid mapping", () => {
   let valid = false;

@@ -5,7 +5,7 @@ const Constants = require("../src/constants.js");
 
 const gamepadId = "mock3";
 const handedness = Constants.Handedness.NONE;
-const mapping = Object.freeze(TestHelpers.getMappingById(gamepadId, handedness));
+const mapping = Object.freeze(TestHelpers.getMappingById(gamepadId, Constants.MappingType.MOCK));
 const mockGamepad = new MockGamepad(mapping, handedness);
 const asButtons = true;
 
@@ -167,6 +167,31 @@ const testDescriptions = {
   "right touched and bottom pressed": {
     dataSourceIds: ["dpadFromButtons"],
     mockGamepadValues: { right: 0.4, bottom: 1 }
+  },
+
+  "xAxis negative on inverted yAxis": {
+    dataSourceIds: ["invertedTouchpad"],
+    mockGamepadValues: { xAxis: -0.4 },
+    expectedData: { xAxis: -0.4 },
+    expectedDataAsButtons: { left: 0.4 }
+  },
+  "xAxis positive on inverted yAxis": {
+    dataSourceIds: ["invertedTouchpad"],
+    mockGamepadValues: { xAxis: 0.4 },
+    expectedData: { xAxis: 0.4 },
+    expectedDataAsButtons: { right: 0.4 } 
+  },
+  "yAxis negative on inverted yAxis": {
+    dataSourceIds: ["invertedTouchpad"],
+    mockGamepadValues: { yAxis: -0.4 },
+    expectedData: { yAxis: 0.4 },
+    expectedDataAsButtons: { bottom: 0.4 }
+  },
+  "yAxis positive on inverted yAxis": {
+    dataSourceIds: ["invertedTouchpad"],
+    mockGamepadValues: { yAxis: 0.4 },
+    expectedData: { yAxis: -0.4 },
+    expectedDataAsButtons: { top: 0.4 } 
   }
 };
 
@@ -223,7 +248,8 @@ const testsTable = [
   filterTests(1),
   filterTests(2),
   filterTests(3),
-  filterTests(4)
+  filterTests(4),
+  filterTests(5)
 ];
 
 beforeAll(() => {

@@ -1,4 +1,4 @@
-# Gamepad Mapping
+# XR Gamepad Mappings
 
 ## Motivation
 > **TODO** Explain what WebXR is and how its different from WebVR
@@ -14,7 +14,7 @@ When a motion controller is present on XR hardware, developers often wish to do 
 The state of an XR motion controller's buttons, thumbsticks, dpads, and touchpads is made available to developers via a `Gamepad` object, as defined by the [Gamepad API](https://www.w3.org/TR/gamepad/). This data is divided up and populated in the `Gamepad.buttons` array and the `Gamepad.axes` array. While this system was adequate for the relatively homogenous console gaming controllers, it breaks down for XR motion controllers as they have not yet converged on a common form factor. In addition, the [Gamepad API](https://www.w3.org/TR/gamepad/) does not provide any information about the visualization of a `Gamepad` object which is a requirement to displaying a virtual copy of motion controller on opaque XR headsets.
 
 ## Overview
-This repository defines a JSON schema to bridge the gap between the needs listed above and the abstract data reported by `Gamepad` objects. For each known motion controller, there is a folder in this repository at `./mappings/<Gamepad.id>/`.  In this folder is a `mapping.json` file which enumerates how to interpret the `Gamepad` data, paths to included 3D asset files representing the `Gamepad`, and the metadata necessary bind them together. Assets are available under MIT license in .glTF or .glB  format with a schema extension to be defined so additional formats may also be made available in the future.
+This repository defines a JSON schema to bridge the gap between the needs listed above and the abstract data reported by `Gamepad` objects. For each known motion controller, there is a folder in this repository at either `./mappings/WebXR/<Gamepad.id>/` or `./mappings/WebVR/<Gamepad.id>/` depending on the type of `Gamepad`.  In this folder is a `mapping.json` file which enumerates how to interpret the `Gamepad` data, paths to included 3D asset files representing the `Gamepad`, and the metadata necessary bind them together. Assets are available under MIT license in .glTF or .glB  format with a schema extension to be defined so additional formats may also be made available in the future.
 
 ## Design Goals
 This repository has been designed to meet the following goals:
@@ -33,7 +33,7 @@ This repository has been designed to meet the following goals:
 
 > **TODO** Create an issue template for bugs
 
-# Concepts
+# Schema
 ![Diagram of top-level schema parts](./figures/Concepts.png)
 
 ## Data Sources
@@ -376,6 +376,58 @@ In addition to `handedness`, `components`, `dataSources`, and `visualResponses` 
 {
     "version" : "0.1",
     "id" : "motion-controller-id"
+}
+```
+
+## WebVR
+While the main focus of this repo is for future WebXR support, the general design is also applicable to WebVR with a few small additions.  Mapping files for WebVR gamepads must be located at `./mappings/WebVR/<Gamepad.id>/` and the `mapping.json` file must include the top-level property `webVR` set to true.
+
+```json
+{
+    "webVR": true
+}
+```
+
+### TargetRay origin
+The WebXR API communicates the origin of a motion controller's targeting ray through the `XRInputSource.targetRaySpace`, but the WebVR API does not have any mechanism to communicate the same concept.  To account for this, WebVR motion controllers assets must contain an additional    node to indicate the location of the targeting ray's origin relative to the motion controller's root. This node must be referenced in the `handedness` descriptions by including the `webVR_targetRayOrigin` property.
+
+```json
+{
+    "webVR": true,
+    "handedness": {
+        "none": {
+            "asset" : "some-url",
+            "root" : "none-handedness-controller",
+            "webVR_targetRayOrigin": "target-ray-origin-node",
+            "components" : [0],
+            "primaryButtonComponent" : 0,
+            "primaryAxisComponent" : 1
+        }
+    }
+}
+```
+
+### Axis Inversion
+Certain WebVR `Gamepad` objects have some components with an inverted `yAxis` causing positive `yAxis` values map to the `top` and negative ones map to `bottom`.  Mapping files can indicate this, or an inverted `xAxis`, on a `dataSource` by setting the `webVR_yAxisInverted` or `webVR_xAxisInverted` to true.
+
+```json
+{
+    "webVR": true,
+    "dataSources" : [
+        {
+            "id": "invertedThumbstick",
+            "buttonIndex": 0,
+            "xAxisIndex": 0,
+            "yAxisIndex": 1,
+            "webVR_yAxisInverted": true
+        },
+        {
+            "id": "invertedThumbstick2",
+            "xAxisIndex": 2,
+            "yAxisIndex": 3,
+            "webVR_xAxisInverted": true
+        }
+    ]
 }
 ```
 

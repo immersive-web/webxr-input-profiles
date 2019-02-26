@@ -1,23 +1,25 @@
 const { join } = require('path');
-const mappingsFolder = join(__dirname, "../mappings/");
-const mockMappingsFolder = join(__dirname, "./mockMappings/");
 const Constants = require("../src/constants.js");
+const MappingFolders = {};
+MappingFolders[Constants.MappingType.WEBXR] = join(__dirname, "../mappings/WebXR/");
+MappingFolders[Constants.MappingType.WEBVR] = join(__dirname, "../mappings/WebVR/");
+MappingFolders[Constants.MappingType.MOCK] = join(__dirname, "./mockMappings/");
 
 const TestHelpers = {
   /**
    * @description Gets the list of mapping files in the known folder locations
-   * @param {boolean} useMocks Indicates the folder with mock mappings should
-   * be used instead of the real mappings folder
+   * @param {string} [mappingType="WebXR"] Indicates the folder from which
+   * mapping should be enumerated
    * @returns {Array} The list of Gamepad id's which have known mappings
    */
-  getMappingsList : function (useMocks) {
+  getMappingsList : function (mappingType = Constants.MappingType.WEBXR) {
     const { lstatSync, readdirSync } = require('fs')
   
     const getSubDirectoryList = function(folder) {
       return readdirSync(folder).filter(item => lstatSync(join(folder, item)).isDirectory());
     };
 
-    let folder = useMocks ? mockMappingsFolder : mappingsFolder;
+    let folder = MappingFolders[mappingType];
     const items = getSubDirectoryList(folder);
     return items;
   },
@@ -25,13 +27,13 @@ const TestHelpers = {
   /**
    * @description Gets the mapping description for the supplied gamepad id
    * @param {String} gamepadId The id of the Gamepad to find the mapping for
-   * @param {boolean} useMocks Indicates the folder with mock mappings should
-   * be searched instead of the real mappings folder
+   * @param {string} [mappingType="WebXR"] Indicates the folder from which
+   * mapping should be enumerated
    * @returns {Object} The mapping described in the mapping.json file
    */
-  getMappingById : function (gamepadId, useMocks) {
-    let folder = useMocks ? mockMappingsFolder : mappingsFolder;
-    let mappingPath = join(folder, gamepadId, "mapping.json")
+  getMappingById : function (gamepadId, mappingType = Constants.MappingType.WEBXR) {
+    let folder = MappingFolders[mappingType];
+    let mappingPath = join(folder, gamepadId, "mapping.json");
     let mapping = require(mappingPath);
     return mapping;
   },

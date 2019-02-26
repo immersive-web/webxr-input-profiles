@@ -1,0 +1,52 @@
+{
+    "version" : "0.1",
+    "id" : "google-daydream",
+    "handedness" : {
+        "none" : {
+            "asset" : "some-url",
+            "root" : "none-controller-node",
+            "components" : [0],
+            "primaryButtonComponent" : 0,
+            "primaryAxesComponent" : 0
+        }
+    },
+    "components" : [
+        {
+            "dataSource" : 0,
+            "root" : "thumbpad-node",
+            "labelTransform" : "thumbpad-label-transform",
+            "visualResponses" : [0, 1]
+        }
+    ],
+    "dataSources" : [
+        {
+            "id" : "thumbpad",
+            "dataSourceType": "touchpadSource",
+            "xAxisIndex" : 0,
+            "yAxisIndex" : 1,
+            "buttonIndex" : 0
+        }
+    ],
+    "visualResponses" : [
+        {
+            "target" : "thumbpad-transform-node",
+            "onTouch": {
+                "degreesOfFreedom": 2,
+                "left" : "thumbpad-transform-left-node",
+                "right" : "thumbpad-transform-right-node",
+                "top" : "thumbpad-transform-top-node",
+                "bottom" : "thumbpad-transform-bottom-node"
+            }
+        },
+        {
+            "target" : "thumbpad-touchpoint-node",
+            "onTouch" : {
+                "degreesOfFreedom": 2,
+                "left" : "thumbpad-touchpoint-left-node",
+                "right" : "thumbpad-touchpoint-right-node",
+                "top" : "thumbpad-touchpoint-top-node",
+                "bottom" : "thumbpad-touchpoint-bottom-node"
+            }
+        }
+    ]
+}

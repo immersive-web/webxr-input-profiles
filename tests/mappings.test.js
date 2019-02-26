@@ -2,10 +2,19 @@ const TestHelpers = require("./testHelpers.js");
 const validator = TestHelpers.getValidator();
 const Constants = require("../src/constants.js");
 
-const mappingList = TestHelpers.getMappingsList();
+const createTestTable = function(mappingType) {
+  const mappingList = TestHelpers.getMappingsList(mappingType);
+  return Array.from(mappingList, (gamepadId) => [gamepadId, mappingType]);
+}
 
-describe.each(mappingList)("validateMapping.%s", (gamepadId) => {
-  const mapping = TestHelpers.getMappingById(gamepadId);
+const testTable = [
+  ...createTestTable(Constants.MappingType.WEBXR),
+  ...createTestTable(Constants.MappingType.WEBVR),
+  ...createTestTable(Constants.MappingType.MOCK)
+];
+
+describe.each(testTable)("validateMapping.%s", (gamepadId, mappingType) => {
+  const mapping = TestHelpers.getMappingById(gamepadId, mappingType);
 
   test("Mapping exists and passes schema validation", () => {
     expect(mapping).not.toBeNull();
@@ -43,9 +52,11 @@ describe.each(mappingList)("validateMapping.%s", (gamepadId) => {
   test("Component references are valid", () => {
     mapping.components.forEach((component) => {
       expect(component.dataSource).toBeLessThan(mapping.dataSources.length);
-      component.visualResponses.forEach((visualResponse) => {
-        expect(visualResponse).toBeLessThan(mapping.visualResponses.length);
-      });
+      if (component.visualResponses) {
+        component.visualResponses.forEach((visualResponse) => {
+          expect(visualResponse).toBeLessThan(mapping.visualResponses.length);
+        });
+      }
     });
   });
 
@@ -76,43 +87,44 @@ describe.each(mappingList)("validateMapping.%s", (gamepadId) => {
     // valid for the dataSourceType
     Object.values(mapping.components).forEach((component) => {
       let dataSource = mapping.dataSources[component.dataSource];
+      if (component.visualResponses) {
+        component.visualResponses.forEach((visualResponseIndex) => {
+          let visualResponse = mapping.visualResponses[visualResponseIndex];
 
-      component.visualResponses.forEach((visualResponseIndex) => {
-        let visualResponse = mapping.visualResponses[visualResponseIndex];
-
-        // Helper function to confirm visualResponse degreesOfFreedom
-        // is valid for the dataSourceType
-        const validateDegreesOfFreedom = (degreesOfFreedom) => {
-          switch(dataSource.dataSourceType) {
-            case Constants.DataSourceType.BUTTON:
-              expect(degreesOfFreedom).toEqual(1);
-              break;
-            case Constants.DataSourceType.DPAD_FROM_AXES:
-            case Constants.DataSourceType.DPAD_FROM_BUTTONS:
-              expect(degreesOfFreedom).toEqual(2);
-              break;
-            case Constants.DataSourceType.THUMBSTICK:
-            case Constants.DataSourceType.TOUCHPAD:
-              if (dataSource.buttonIndex != undefined) {
-                expect(degreesOfFreedom).toBeGreaterThanOrEqual(1);
-                expect(degreesOfFreedom).toBeLessThanOrEqual(3);
-              } else {
+          // Helper function to confirm visualResponse degreesOfFreedom
+          // is valid for the dataSourceType
+          const validateDegreesOfFreedom = (degreesOfFreedom) => {
+            switch(dataSource.dataSourceType) {
+              case Constants.DataSourceType.BUTTON:
+                expect(degreesOfFreedom).toEqual(1);
+                break;
+              case Constants.DataSourceType.DPAD_FROM_AXES:
+              case Constants.DataSourceType.DPAD_FROM_BUTTONS:
                 expect(degreesOfFreedom).toEqual(2);
-              }
-              break;
-            default:
-              throw new Error(`Unknown ${dataSource.dataSourceType}`);
+                break;
+              case Constants.DataSourceType.THUMBSTICK:
+              case Constants.DataSourceType.TOUCHPAD:
+                if (dataSource.buttonIndex != undefined) {
+                  expect(degreesOfFreedom).toBeGreaterThanOrEqual(1);
+                  expect(degreesOfFreedom).toBeLessThanOrEqual(3);
+                } else {
+                  expect(degreesOfFreedom).toEqual(2);
+                }
+                break;
+              default:
+                throw new Error(`Unknown ${dataSource.dataSourceType}`);
+            }
+          };
+
+          if (visualResponse.onPress) {
+            validateDegreesOfFreedom(visualResponse.onPress.degreesOfFreedom);
           }
-        };
 
-        if (visualResponse.onPress) {
-          validateDegreesOfFreedom(visualResponse.onPress.degreesOfFreedom);
-        }
-
-        if (visualResponse.onTouch) {
-          validateDegreesOfFreedom(visualResponse.onTouch.degreesOfFreedom);
-        }
-      });
+          if (visualResponse.onTouch) {
+            validateDegreesOfFreedom(visualResponse.onTouch.degreesOfFreedom);
+          }
+        });
+      }
     });
   });
 
@@ -140,16 +152,43 @@ describe.each(mappingList)("validateMapping.%s", (gamepadId) => {
   });
 
   test("No unused visualResponses", () => {
-    let usedVisualResponseIndicies = Array(mapping.visualResponses.length);
+    if (mapping.visualResponses) {
+      let usedVisualResponseIndicies = Array(mapping.visualResponses.length);
 
-    mapping.components.forEach((component) => {
-      component.visualResponses.forEach((visualResponseIndex) => {
-        usedVisualResponseIndicies[visualResponseIndex] = true;
+      mapping.components.forEach((component) => {
+        component.visualResponses.forEach((visualResponseIndex) => {
+          usedVisualResponseIndicies[visualResponseIndex] = true;
+        });
       });
+
+      let unusedVisualResponses = mapping.visualResponses.filter((visualResponse, index) => !usedVisualResponseIndicies[index]);
+      expect(unusedVisualResponses).toHaveLength(0);
+    }
+  });
+
+  test("WebVR properties", () => {
+    if (mappingType === Constants.MappingType.WEBVR) {
+      expect(mapping.webVR).toEqual(true);
+    } else if (mappingType === Constants.MappingType.WEBXR) {
+      expect(mapping.webVR).toBeUndefined();
+    }
+
+    let isWebVR = mapping.webVR;
+
+    Object.values(mapping.handedness).forEach((hand) => {
+      if (isWebVR) {
+        expect(hand.webVR_targetRayOrigin).toBeDefined();
+      } else {
+        expect(hand.webVR_targetRayOrigin).toBeUndefined();
+      }
     });
 
-    let unusedVisualResponses = mapping.visualResponses.filter((visualResponse, index) => !usedVisualResponseIndicies[index]);
-    expect(unusedVisualResponses).toHaveLength(0);
+    Object.values(mapping.dataSources).forEach((dataSource) => {
+      if (!isWebVR) {
+        expect(dataSource.webVR_xAxisInverted).toBeUndefined();
+        expect(dataSource.webVR_yAxisInverted).toBeUndefined();
+      }
+    });
   });
 
 });
