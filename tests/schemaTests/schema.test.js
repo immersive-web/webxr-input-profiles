@@ -37,9 +37,9 @@ test("Invalid missing id", () => {
   expect(validator(mapping)).toBe(false);
 });
 
-test("Invalid missing hands", () => {
+test("Invalid missing handedness", () => {
   let mapping = TestHelpers.copyJsonObject(validMapping);
-  delete mapping.hands;
+  delete mapping.handedness;
   expect(validator(mapping)).toBe(false);
 });
 

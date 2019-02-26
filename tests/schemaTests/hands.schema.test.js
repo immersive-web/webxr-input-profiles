@@ -1,71 +1,71 @@
 const TestHelpers = require("../testHelpers.js");
-const validator = TestHelpers.getValidator("hands.schema.json", ["hand.schema.json", "mapping.index.schema.json"]);
+const validator = TestHelpers.getValidator("handedness.schema.json", ["hand.schema.json", "mapping.index.schema.json"]);
 const validHand = Object.freeze({
   "asset": "asset uri",
   "root": "root node",
   "components": [0]
 });
 
-test("valid hands", () => {
+test("valid handedness", () => {
   let valid = false;
-  let hands = {
-    neutral: validHand
+  let handedness = {
+    none: validHand
   };
   
-  valid = validator(hands);
+  valid = validator(handedness);
   if (!valid) {
     expect(validator.errors).toBeNull();
   }
 
-  hands.left = validHand;
-  hands.right = validHand;  
-  valid = validator(hands);
+  handedness.left = validHand;
+  handedness.right = validHand;  
+  valid = validator(handedness);
   if (!valid) {
     expect(validator.errors).toBeNull();
   }
 
-  delete hands.neutral;
-  valid = validator(hands);
+  delete handedness.none;
+  valid = validator(handedness);
   if (!valid) {
     expect(validator.errors).toBeNull();
   }
 });
 
 test("Invalid hand pairings", () => {
-  let hands = {
-    neutral: validHand,
+  let handedness = {
+    none: validHand,
     right: validHand
   };
-  expect(validator(hands)).toBe(false);
+  expect(validator(handedness)).toBe(false);
 
-  hands = {
-    neutral: validHand,
+  handedness = {
+    none: validHand,
     left: validHand
   };  
-  expect(validator(hands)).toBe(false);
+  expect(validator(handedness)).toBe(false);
 });
 
 test("Invalid single hand", () => {
-  let hands = {
+  let handedness = {
     right: validHand
   };
-  expect(validator(hands)).toBe(false);
+  expect(validator(handedness)).toBe(false);
 
-  hands = {
+  handedness = {
     left: validHand
   };  
-  expect(validator(hands)).toBe(false);
+  expect(validator(handedness)).toBe(false);
 });
 
-test("no valid hand in hands", () => {
-  let hands = {};
-  expect(validator(hands)).toBe(false);
+test("no valid hand in handedness", () => {
+  let handedness = {};
+  expect(validator(handedness)).toBe(false);
 });
 
 test("invalid additional properties", () => {
-  let hands = {
-    neutral: validHand,
+  let handedness = {
+    none: validHand,
     someNonsense: {}
   };
-  expect(validator(hands)).toBe(false);
+  expect(validator(handedness)).toBe(false);
 });

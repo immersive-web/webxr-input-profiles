@@ -1,8 +1,8 @@
 {
     "version": "0.1.0",
     "id": "mock1",
-    "hands": {
-      "neutral": {
+    "handedness": {
+      "none": {
         "asset": "asset name",
         "root": "root name",
         "components": [0]

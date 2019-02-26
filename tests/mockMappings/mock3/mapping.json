@@ -1,8 +1,8 @@
 {
     "version": "0.1.0",
     "id": "mock3",
-    "hands": {
-      "neutral": {
+    "handedness": {
+      "none": {
         "asset": "asset.glb",
         "root": "ROOT_NODE",
         "components": [0, 1, 2, 3, 4]

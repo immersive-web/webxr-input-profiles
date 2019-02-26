@@ -1,7 +1,7 @@
 {
     "version" : "0.1.0",
     "id" : "Oculus-Go",
-    "hands" : {
+    "handedness" : {
         "left" : {
             "asset" : "some-url",
             "root" : "controller-node",

@@ -1,10 +1,10 @@
 {
     "version" : "0.1.0",
     "id" : "Gear-VR",
-    "hands" : {
-        "neutral" : {
+    "handedness" : {
+        "none" : {
             "asset" : "some-url",
-            "root" : "neutral-controller-node",
+            "root" : "none-controller-node",
             "components" : [0, 1],
             "primaryButtonComponent" : 0,
             "primaryAxesComponent" : 0

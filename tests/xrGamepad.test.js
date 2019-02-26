@@ -7,14 +7,14 @@ let testTable = [];
 const mappingList = TestHelpers.getMappingsList();
 mappingList.forEach((gamepadId) => {
   let mapping = TestHelpers.getMappingById(gamepadId);
-  Object.keys(mapping.hands).forEach((handedness) => {
+  Object.keys(mapping.handedness).forEach((handedness) => {
     testTable.push([gamepadId, handedness, mapping]);
   });
 });
 
 const constructorOptions = {
   gamepadId: "mock3",
-  handedness: Constants.Handedness.NEUTRAL
+  handedness: Constants.Handedness.NONE
 };
 constructorOptions.mapping = TestHelpers.getMappingById(constructorOptions.gamepadId, constructorOptions.handedness);
 constructorOptions.mockGamepad = new MockGamepad(constructorOptions.mapping, constructorOptions.handedness);

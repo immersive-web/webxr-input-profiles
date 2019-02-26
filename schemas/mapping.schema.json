@@ -4,7 +4,7 @@
     "type": "object",
     "description": "The root object for a gamepad mapping.",
     "additionalProperties": false,
-    "required": [ "version", "id", "hands", "components", "dataSources"],
+    "required": [ "version", "id", "handedness", "components", "dataSources"],
     "properties": {
         "version" : {
             "description": "The schema version",
@@ -14,7 +14,7 @@
             "description": "The Gamepad.id the mapping applies to",
             "type" : "string"
         },
-        "hands": { "$ref": "hands.schema.json"},
+        "handedness": { "$ref": "handedness.schema.json"},
         "components": { "$ref": "components.schema.json"},
         "dataSources": { "$ref": "dataSources.schema.json"},
         "visualResponses": { "$ref": "visualResponses.schema.json"}

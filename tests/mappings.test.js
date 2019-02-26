@@ -24,7 +24,7 @@ describe.each(mappingList)("validateMapping.%s", (gamepadId) => {
   });
 
   test("Each hand has unique dataSources", () => {
-    Object.values(mapping.hands).forEach((hand) => {
+    Object.values(mapping.handedness).forEach((hand) => {
       let dataSourceIndices = {};
       hand.components.forEach((componentIndex) => {
         let component = mapping.components[componentIndex];
@@ -44,7 +44,7 @@ describe.each(mappingList)("validateMapping.%s", (gamepadId) => {
   });
 
   test("Hand references are valid", () => {
-    Object.values(mapping.hands).forEach((hand) => {
+    Object.values(mapping.handedness).forEach((hand) => {
       hand.components.forEach((component) => {
         expect(component).toBeLessThan(mapping.components.length);
       });
@@ -123,7 +123,7 @@ describe.each(mappingList)("validateMapping.%s", (gamepadId) => {
   test("No unused components", () => {
     let usedComponentIndices = Array(mapping.components.length);
 
-    Object.values(mapping.hands).forEach((hand) => {
+    Object.values(mapping.handedness).forEach((hand) => {
       hand.components.forEach((componentIndex) => {
         usedComponentIndices[componentIndex] = true;
       });
