@@ -27,8 +27,8 @@ const TestHelpers = {
   /**
    * @description Gets the mapping description for the supplied gamepad id
    * @param {String} gamepadId The id of the Gamepad to find the mapping for
-   * @param {boolean} useMocks Indicates the folder with mock mappings should
-   * be searched instead of the real mappings folder
+   * @param {string} [mappingType="WebXR"] Indicates the folder from which
+   * mapping should be enumerated
    * @returns {Object} The mapping described in the mapping.json file
    */
   getMappingById : function (gamepadId, mappingType = Constants.MappingType.WEBXR) {
