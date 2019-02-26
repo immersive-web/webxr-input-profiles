@@ -15,6 +15,12 @@ describe.each(mappingList)("validateMapping.%s", (gamepadId) => {
     }
   });
 
+  test("Matched schema and package version", () => {
+    const {version} = require("../package.json");
+    const schemaVersion = version.replace(/\.[0-9]+$/, "");
+    expect(mapping.version).toEqual(schemaVersion);
+  });
+
   test("Mapping has unique data source ids", () => {
     let dataSourceIds = {};
     mapping.dataSources.forEach((dataSource) => {
