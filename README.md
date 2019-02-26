@@ -513,13 +513,25 @@ In WebXR and WebVR a target ray may be drawn for motion controllers, however the
 In WebXR, the `XRInputSource.targetRaySpace` should be passed into `XRFrame.getPose()` to determined the pointing origin.
 
 ```js
-const targetRayOrigin = xrFrame.getPose(xrInputSource.targetRaySpace, xrReferenceSpace);
+function getTargetRayOrigin(xrFrame, xrInputSource) {
+  return xrFrame.getPose(xrInputSource.targetRaySpace, xrReferenceSpace);
+}
 ```
 
 ### WebVR Target Ray Origin
-In WebVR there is no implicit mechanism for retrieving a target ray origin.  Instead, it must be retrieved from the the mapping via the `XRGamepad`
+In WebVR there is no implicit mechanism for retrieving a target ray origin.  Instead, it must be retrieved from the the mapping via the `XRGamepad` and multiplied by the `Gamepad` object's pose in matrix form.
 ```js
-const targetRayOrigin = xrGamepad.targetRayOrigin;
+function getTargetRayOrigin(xrGamepad){
+  let targetRayOrigin;
+
+  const gamepadPose = xrGamepad.gamepad.gamepadPose;
+  if (gamepadPose && gamepadPose.hasOrientation && gamepadPose.hasPosition) {
+    const gamepadPoseMatrix = new MyMatrixMathLibrary.RigidTransform(gamepadPose.position, gamepadPose.orientation);
+    targetRayOrigin = MyMatrixMathLibrary.Multiply(gamepadPoseMatrix, xrGamepad.targetRayOrigin);
+  }
+
+  return targetRayOrigin;
+}
 ```
 
 # Appendices
