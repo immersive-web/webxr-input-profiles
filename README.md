@@ -346,7 +346,7 @@ For example:
     "handedness" : {
         "none" : {
             "asset" : "some-url",
-            "root" : "neutral-handedness-controller",
+            "root" : "none-handedness-controller",
             "components" : [0]
         }
     }
@@ -369,8 +369,8 @@ The `none`, `left`, and `right` objects may also contain two additional properti
 }
 ```
 
-## Top-level Properties
-The schema defines two key top-level properties: `version` and `id`.  The `version` property is a semantic version made up of a major, minor, and patch version number.  The major and minor version parts must always be up to date with the library being used to parse the mapping file.  The patch portion of the version may be out of sync.  The `id` property must match the `Gamepad.id` of the `Gamepad` object the mapping is being applied to.  The naming conventions for the `WebXR Device API` are concretely defined; the naming conventions for `WebVR` are somewhat more haphazard.
+## Additional Top-level Properties
+In addition to `handedness`, `components`, `dataSources`, and `visualResponses` the schema defines two more top-level properties: `version` and `id`.  The `version` property is a semantic version made up of major and minor version parts.  The major and minor version parts must always be up to date with the library being used to parse the mapping file.  The `id` property must match the `Gamepad.id` of the `Gamepad` object the mapping is being applied to.  The naming conventions for the `WebXR Device API` are concretely defined; the naming conventions for `WebVR` are somewhat more haphazard.
 
 ```json
 {
