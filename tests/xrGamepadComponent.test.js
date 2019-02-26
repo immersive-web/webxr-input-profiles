@@ -1,11 +1,12 @@
 const TestHelpers = require("./testHelpers.js");
 const MockGamepad = require("./mockGamepad/mockGamepad.js");
+const XRGamepad = require("../src/xrGamepad.js");
 const XRGamepadComponent = require("../src/xrGamepadComponent.js");
 const Constants = require("../src/constants.js");
 
 const gamepadId = "mock3";
 const handedness = Constants.Handedness.NONE;
-const mapping = Object.freeze(TestHelpers.getMappingById(gamepadId, Constants.MappingType.MOCK));
+const mapping = Object.freeze(XRGamepad.getMapping(gamepadId, Constants.MappingType.MOCK));
 const mockGamepad = new MockGamepad(mapping, handedness);
 const asButtons = true;
 

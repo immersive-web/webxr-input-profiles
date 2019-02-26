@@ -5,7 +5,7 @@ const XRGamepad = require("../src/xrGamepad.js");
 
 const validGamepadId = "mock3";
 const validHandedness = Constants.Handedness.NONE;
-const validMapping = Object.freeze(TestHelpers.getMappingById(validGamepadId, Constants.MappingType.MOCK));
+const validMapping = Object.freeze(XRGamepad.getMapping(validGamepadId, Constants.MappingType.MOCK));
 const validGamepad = new MockGamepad(validMapping, validHandedness);
 
 test("Constructor - invalid gamepad", () => {
@@ -55,27 +55,15 @@ test("Constructor - mismatched ids", () => {
   }).toThrow();
 });
 
-const createTestTable = function(mappingType) {
-  const testTable = [];
-
-  const mappingList = TestHelpers.getMappingsList(mappingType);
-  mappingList.forEach((gamepadId) => {
-    let mapping = TestHelpers.getMappingById(gamepadId, mappingType);
-    Object.keys(mapping.handedness).forEach((handednessKey) => {
-      testTable.push([gamepadId, handednessKey, mapping]);
-    });
+const testsTable = [];
+TestHelpers.getMappingsList().forEach((entry) => {
+  Object.keys(entry.mapping.handedness).forEach((handedness) => {
+    const testName = `${entry.testName}.${handedness}`;
+    testsTable.push([ testName, { handedness: handedness, mapping: entry.mapping }]);
   });
+});
 
-  return testTable;
-}
-
-const testTable = [
-  ...createTestTable(Constants.MappingType.WEBXR),
-  ...createTestTable(Constants.MappingType.WEBVR),
-  ...createTestTable(Constants.MappingType.MOCK)
-];
-
-describe.each(testTable)("xrGamepad.%s.%s", (gamepadId, handedness, mapping) => {
+describe.each(testsTable)("xrGamepad.%s", (testName, {handedness, mapping}) => {
 
   test("Create an XRGamepad", () => {
     let mockGamepad = new MockGamepad(mapping, handedness);

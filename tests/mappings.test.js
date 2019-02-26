@@ -2,19 +2,9 @@ const TestHelpers = require("./testHelpers.js");
 const validator = TestHelpers.getValidator();
 const Constants = require("../src/constants.js");
 
-const createTestTable = function(mappingType) {
-  const mappingList = TestHelpers.getMappingsList(mappingType);
-  return Array.from(mappingList, (gamepadId) => [gamepadId, mappingType]);
-}
+const testTable = Array.from(TestHelpers.getMappingsList(), (entry) => [ entry.testName, entry]);
 
-const testTable = [
-  ...createTestTable(Constants.MappingType.WEBXR),
-  ...createTestTable(Constants.MappingType.WEBVR),
-  ...createTestTable(Constants.MappingType.MOCK)
-];
-
-describe.each(testTable)("validateMapping.%s", (gamepadId, mappingType) => {
-  const mapping = TestHelpers.getMappingById(gamepadId, mappingType);
+describe.each(testTable)("validateMapping.%s", (testName, {mappingType, mapping}) => {
 
   test("Mapping exists and passes schema validation", () => {
     expect(mapping).not.toBeNull();
