@@ -72,6 +72,10 @@ class XRGamepad {
     return this.hand.root;
   }
 
+  get targetRayOrigin() {
+    return this.hand.targetRayOrigin;
+  }
+
   /**
    * @description Gets the mapping description for the supplied gamepad id
    * @param {String} gamepadId The id of the Gamepad to find the mapping for

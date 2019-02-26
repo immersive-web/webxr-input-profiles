@@ -431,6 +431,109 @@ Certain WebVR `Gamepad` objects have some components with an inverted `yAxis` ca
 }
 ```
 
+# Source Library
+This repo provides a javascript library for interpreting the `mapping.json` files and binding them to a live `Gamepad` object.  Developers can uses this library to interact with the conceptual components of the gamepad, rather than each individual button or axis.  
+
+## Connection and Disconnection
+In order to use this library, developers create a new `XRGamepad` by passing it the associated mapping file, the live `Gamepad` object, and an indication of which `handedness` should be applied.  The initialization path for a WebXR gamepad is slightly different than for a WebVR gamepad for several reasons.  First, newly connected gamepads are reported in WebXR through the `XRSession.inputsourceschange` event where as in WebVR they are reported through the `navigator.gamepadconnected` event.  Second, the handedness is passed separately due to the fact that in WebXR handedness is a property of the `XRInputSource`, whereas in WebVR handedness is a property of the `Gamepad`.
+
+### WebXR Connection and Disconnection
+This sample code shows creating an `XRGamepad` based on the `XRInputSource.gamepad` property for all newly connected `XRInputSource` objects.  When an `XRInputSource` is disconnected the `XRGamepad` is released.
+
+```js
+let xrGamepads = {};
+xrSession.addEventListener('inputsourceschange', onInputSourcesChange);
+
+function onInputSourcesChange(event) {
+  event.added.forEach((inputSource) => {
+    if (inputSource.gamepad) {
+      let mapping = XRGamepad.getMapping(gamepad.id, XRMappingConstants.MappingType.WebXR);
+      let xrGamepad = new XRGamepad(gamepad, mapping, inputSource.handedness);
+      xrGamepads[inputSource] = xrGamepad;
+    }
+  }
+
+  event.removed.forEach((inputSource) => {
+    if (xrGamepads[inputSource]) {
+      delete xrGamepads[inputSource];
+    }
+  });
+}
+```
+
+### WebVR Connection and Disconnection
+This sample code shows creating an `XRGamepad` for all newly connected `Gamepad` objects associated with WebVR.  When an associated `Gamepad` is disconnected the `XRGamepad` is released.
+
+```js
+let xrGamepads = {};
+navigator.addEventListener('gamepadconnected', onGamepadConnected);
+navigator.addEventListener('gamepaddisconnected', onGamepadDisconnected);
+
+function onGamepadConnected(event) {
+  let gamepad = event.gamepad;
+  if (gamepad.deviceId) {
+    let mapping = XRGamepad.getMapping(gamepad.id, XRMappingConstants.MappingType.WebVR);
+    let xrGamepad = new XRGamepad(gamepad, mapping, gamepad.handedness);
+    xrGamepads[gamepad] = xrGamepad;
+  }
+}
+
+function onGamepadDisconnected(event) {
+  if (xrGamepads[event.gamepad]) {
+      delete xrGamepads[event.gamepad];
+    }
+  }
+}
+```
+
+## Engine Loop
+On each frame, the gamepad data must be requeried and the engine must respond accordingly to the new data.  This will be the same for both WebXR and WebVR
+
+```js
+function updateGamepads() {
+  Object.key(xrGamepads).forEach((key) => {
+    let xrGamepad = xrGamepads[key];
+    xrGamepads.components.forEach((xrComponent) => {
+      const xrComponentData = xrComponent.getData();
+      MyEngine.respondToInput(key, xrComponentData);
+
+      const weightedVisualizations = xrComponent.getWeightedVisualizations();
+      MyEngine.updateInputVisuals(key, weightedVisualizations);
+    });
+  });
+}
+```
+
+> TODO Add an explanation for how to updated the visuals based on the weighted visualizations
+
+## Target Ray Origin
+In WebXR and WebVR a target ray may be drawn for motion controllers, however the origin of this ray is retrieved differently for each.
+
+### WebXR Target Ray Origin
+In WebXR, the `XRInputSource.targetRaySpace` should be passed into `XRFrame.getPose()` to determined the pointing origin.
+
+```js
+function getTargetRayOrigin(xrFrame, xrInputSource) {
+  return xrFrame.getPose(xrInputSource.targetRaySpace, xrReferenceSpace);
+}
+```
+
+### WebVR Target Ray Origin
+In WebVR there is no implicit mechanism for retrieving a target ray origin.  Instead, it must be retrieved from the the mapping via the `XRGamepad` and multiplied by the `Gamepad` object's pose in matrix form.
+```js
+function getTargetRayOrigin(xrGamepad){
+  let targetRayOrigin;
+
+  const gamepadPose = xrGamepad.gamepad.gamepadPose;
+  if (gamepadPose && gamepadPose.hasOrientation && gamepadPose.hasPosition) {
+    const gamepadPoseMatrix = new MyMatrixMathLibrary.RigidTransform(gamepadPose.position, gamepadPose.orientation);
+    targetRayOrigin = MyMatrixMathLibrary.Multiply(gamepadPoseMatrix, xrGamepad.targetRayOrigin);
+  }
+
+  return targetRayOrigin;
+}
+```
+
 # Appendices
 
 ## Licence
