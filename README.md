@@ -374,7 +374,7 @@ In addition to `handedness`, `components`, `dataSources`, and `visualResponses` 
 
 ```json
 {
-    "version" : "0.1.0",
+    "version" : "0.1",
     "id" : "motion-controller-id"
 }
 ```
