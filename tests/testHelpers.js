@@ -1,9 +1,6 @@
 const { join } = require('path');
 const Constants = require("../src/constants.js");
-const MappingFolders = {};
-MappingFolders[Constants.MappingType.WEBXR] = join(__dirname, "../mappings/WebXR/");
-MappingFolders[Constants.MappingType.WEBVR] = join(__dirname, "../mappings/WebVR/");
-MappingFolders[Constants.MappingType.MOCK] = join(__dirname, "./mockMappings/");
+const XRGamepad = require("../src/XRGamepad.js");
 
 const TestHelpers = {
   /**
@@ -12,30 +9,27 @@ const TestHelpers = {
    * mapping should be enumerated
    * @returns {Array} The list of Gamepad id's which have known mappings
    */
-  getMappingsList : function (mappingType = Constants.MappingType.WEBXR) {
+  getMappingsList : function () {
     const { lstatSync, readdirSync } = require('fs')
   
-    const getSubDirectoryList = function(folder) {
-      return readdirSync(folder).filter(item => lstatSync(join(folder, item)).isDirectory());
+    const getMappingTypeList = function(mappingType) {
+      const mappingFolder = Constants.MappingFolders[mappingType];
+      const folderItems = readdirSync(mappingFolder).filter(item => lstatSync(join(mappingFolder, item)).isDirectory());
+      return Array.from(folderItems, (gamepadId) => 
+        ({
+          testName: `${mappingType}.${gamepadId}`,
+          mappingType: mappingType, 
+          gamepadId: gamepadId, 
+          mapping: XRGamepad.getMapping(gamepadId, mappingType)
+        })
+      );
     };
 
-    let folder = MappingFolders[mappingType];
-    const items = getSubDirectoryList(folder);
-    return items;
-  },
-
-  /**
-   * @description Gets the mapping description for the supplied gamepad id
-   * @param {String} gamepadId The id of the Gamepad to find the mapping for
-   * @param {string} [mappingType="WebXR"] Indicates the folder from which
-   * mapping should be enumerated
-   * @returns {Object} The mapping described in the mapping.json file
-   */
-  getMappingById : function (gamepadId, mappingType = Constants.MappingType.WEBXR) {
-    let folder = MappingFolders[mappingType];
-    let mappingPath = join(folder, gamepadId, "mapping.json");
-    let mapping = require(mappingPath);
-    return mapping;
+    return [
+      ...getMappingTypeList(Constants.MappingType.WEBXR),
+      ...getMappingTypeList(Constants.MappingType.WEBVR),
+      ...getMappingTypeList(Constants.MappingType.MOCK),
+    ];
   },
 
   /**

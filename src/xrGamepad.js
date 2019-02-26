@@ -71,6 +71,21 @@ class XRGamepad {
   get root() {
     return this.hand.root;
   }
+
+  /**
+   * @description Gets the mapping description for the supplied gamepad id
+   * @param {String} gamepadId The id of the Gamepad to find the mapping for
+   * @param {string} [mappingType="WebXR"] Indicates the folder from which
+   * mapping should be enumerated
+   * @returns {Object} The mapping described in the mapping.json file
+   */
+  static getMapping(gamepadId, mappingType = Constants.MappingType.WEBXR) {
+    const { join } = require('path');
+    const folder = Constants.MappingFolders[mappingType];
+    const mappingPath = join(folder, gamepadId, "mapping.json");
+    const mapping = require(mappingPath);
+    return mapping;
+  }
 };
 
 module.exports = XRGamepad;
