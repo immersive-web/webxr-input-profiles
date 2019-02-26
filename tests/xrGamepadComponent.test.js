@@ -7,6 +7,7 @@ const gamepadId = "mock3";
 const handedness = Constants.Handedness.NONE;
 const mapping = Object.freeze(TestHelpers.getMappingById(gamepadId, handedness));
 const mockGamepad = new MockGamepad(mapping, handedness);
+const asButtons = true;
 
 const testDescriptions = {
   "default": {
@@ -24,64 +25,64 @@ const testDescriptions = {
   "xAxis negative": {
     dataSourceIds: ["touchpad", "thumbstick", "dpadFromAxes"],
     mockGamepadValues: { xAxis: -0.4 },
-    dataAsButtons: { left: 0.4 }
+    expectedDataAsButtons: { left: 0.4 }
   },
   "xAxis positive": {
     dataSourceIds: ["touchpad", "thumbstick", "dpadFromAxes"],
     mockGamepadValues: { xAxis: 0.4 },
-    dataAsButtons: { right: 0.4 } 
+    expectedDataAsButtons: { right: 0.4 } 
   },
   "yAxis negative": {
     dataSourceIds: ["touchpad", "thumbstick", "dpadFromAxes"],
     mockGamepadValues: { yAxis: -0.4 },
-    dataAsButtons: { top: 0.4 }
+    expectedDataAsButtons: { top: 0.4 }
   },
   "yAxis positive": {
     dataSourceIds: ["touchpad", "thumbstick", "dpadFromAxes"],
     mockGamepadValues: { yAxis: 0.4 },
-    dataAsButtons: { bottom: 0.4 } 
+    expectedDataAsButtons: { bottom: 0.4 } 
   },
 
   "xAxis negative and yAxis positive": {
     dataSourceIds: ["touchpad", "thumbstick", "dpadFromAxes"],
     mockGamepadValues: { xAxis: -0.3, yAxis: 0.4 },
-    dataAsButtons: { left: 0.3, bottom: 0.4 }
+    expectedDataAsButtons: { left: 0.3, bottom: 0.4 }
   },
   "xAxis positive and yAxis positive": {
     dataSourceIds: ["touchpad", "thumbstick", "dpadFromAxes"],
     mockGamepadValues: { xAxis: 0.3, yAxis: 0.4 },
-    dataAsButtons: { right: 0.3, bottom: 0.4 }
+    expectedDataAsButtons: { right: 0.3, bottom: 0.4 }
   },
   "xAxis negative and yAxis negative": {
     dataSourceIds: ["touchpad", "thumbstick", "dpadFromAxes"],
     mockGamepadValues: { xAxis: -0.3, yAxis: -0.4 },
-    dataAsButtons: { left: 0.3, top: 0.4 }
+    expectedDataAsButtons: { left: 0.3, top: 0.4 }
   },
   "xAxis positive and yAxis negative": {
     dataSourceIds: ["touchpad", "thumbstick", "dpadFromAxes"],
     mockGamepadValues: { xAxis: 0.3, yAxis: -0.4 },
-    dataAsButtons: { right: 0.3, top: 0.4 }
+    expectedDataAsButtons: { right: 0.3, top: 0.4 }
   },
   
   "xAxis negative and button touched": {
     dataSourceIds: ["thumbstick"],
     mockGamepadValues: { xAxis: -0.4, button: 0.7 },
-    dataAsButtons: { left: 0.4, button: 0.7 }
+    expectedDataAsButtons: { left: 0.4, button: 0.7 }
   },
   "xAxis positive and button pressed": {
     dataSourceIds: ["thumbstick"],
     mockGamepadValues: { xAxis: 0.4, button: 1 },
-    dataAsButtons: { right: 0.4, button: 1 }
+    expectedDataAsButtons: { right: 0.4, button: 1 }
   },
   "xAxis negative and yAxis positive and button touched": {
     dataSourceIds: ["thumbstick"],
     mockGamepadValues: { xAxis: -0.3, yAxis: 0.4, button: 0.7 },
-    dataAsButtons: { left: 0.3, bottom: 0.4, button: 0.7 }
+    expectedDataAsButtons: { left: 0.3, bottom: 0.4, button: 0.7 }
   },
   "xAxis positive and yAxis negative and button pressed": {
     dataSourceIds: ["thumbstick"],
     mockGamepadValues: { xAxis: 0.3, yAxis: -0.4, button: 1 },
-    dataAsButtons: { right: 0.3, top: 0.4, button: 1 }
+    expectedDataAsButtons: { right: 0.3, top: 0.4, button: 1 }
   },
   
   "left touched": {
@@ -169,20 +170,60 @@ const testDescriptions = {
   }
 };
 
-const filterTests = function(dataSourceId) {
-  return Object.entries(testDescriptions).filter((entry) => {
-    if (entry[1].dataSourceIds.includes(dataSourceId)) {
-      return true;
+/**
+ * Builds a table of tests for the provided componentIndex by filtering relevant
+ * tests out of the full testDescriptions table
+ * @param {number} componentIndex - The index of the component to be tested
+ * @returns {Object} Describes the complete set of tests for the provided 
+ * componentIndex
+ */
+const filterTests = function(componentIndex) {
+  let component = mapping.components[componentIndex];
+  let dataSource = mapping.dataSources[component.dataSource];
+
+  // Look through tests to find ones applicable to the provided componentIndex
+  let filteredTests = [];
+  Object.keys(testDescriptions).forEach((key) => {
+    let testDescription = testDescriptions[key];
+
+    // If the test matches, build a test data description
+    if (testDescription.dataSourceIds.includes(dataSource.id)) {
+      // Fill in the mockGamepadValues
+      testData = {
+        mockGamepadValues: TestHelpers.makeData(dataSource, testDescription.mockGamepadValues)
+      };
+
+      // Fill in the expectedData when not requested as buttons
+      if (testDescription.expectedData) {
+        testData.expectedData = TestHelpers.makeData(dataSource, testDescription.expectedData);
+      } else {
+        testData.expectedData = testData.mockGamepadValues;
+      }
+
+      // Fill in the expected data when requested as buttons
+      if (testDescription.expectedDataAsButtons) {
+        testData.expectedDataAsButtons = TestHelpers.makeData(dataSource, testDescription.expectedDataAsButtons, asButtons);
+      } else if (testDescription.expectedData) {
+        testData.expectedDataAsButtons = TestHelpers.makeData(dataSource, testDescription.expectedData, asButtons);
+      } else {
+        testData.expectedDataAsButtons = TestHelpers.makeData(dataSource, testDescription.mockGamepadValues, asButtons);
+      }
+
+      // Add the test to the component's test list
+      filteredTests.push([key, testData]);
     }
   });
+
+  return [dataSource.id, componentIndex, filteredTests];
 };
 
+// The comprehensive list of tests for all components
 const testsTable = [
-  ["button",          0, filterTests("button") ],
-  ["touchpad",        1, filterTests("touchpad") ],
-  ["thumbstick",      2, filterTests("thumbstick") ],
-  ["dpadFromAxes",    3, filterTests("dpadFromAxes") ],
-  ["dpadFromButtons", 4, filterTests("dpadFromButtons") ]
+  filterTests(0),
+  filterTests(1),
+  filterTests(2),
+  filterTests(3),
+  filterTests(4)
 ];
 
 beforeAll(() => {
@@ -221,6 +262,7 @@ test("Constructor - invalid componentIndex", () => {
   }).toThrow();
 });
 
+
 describe.each(testsTable)("xrGamepadComponent.%s", (dataSourceId, componentIndex, dataTestsTable) => {
 
   test("Create XRGamepadComponent", () => {
@@ -235,38 +277,31 @@ describe.each(testsTable)("xrGamepadComponent.%s", (dataSourceId, componentIndex
     expect(componentState).toEqual(Constants.ComponentState.DEFAULT);
   });
 
-  test.each(dataTestsTable)(`GetData w/ %s`, (testName, {mockData}) => {
+  test.each(dataTestsTable)(`GetData w/ %s`, (testName, {mockGamepadValues, expectedData}) => {
     // Create the object to test
     let xrGamepadComponent = new XRGamepadComponent(mockGamepad, mapping, componentIndex);
 
-    // Build the expected data object
-    let expectedData = TestHelpers.makeData(xrGamepadComponent.dataSource, mockData);
-    mockGamepad.mockComponents[dataSourceId].setValues(mockData);
+    // Set the mock gamepad to the values being tested
+    mockGamepad.mockComponents[dataSourceId].setValues(mockGamepadValues);
 
     // Validate getData() returns the expected values
     let actualData = xrGamepadComponent.getData();
     expect(actualData).toMatchObject(expectedData);
   });
 
-  test.each(dataTestsTable)(`GetData asButtons w/ %s`, (testName, {mockData, mockDataAsButtons=mockData}) => {
-    const asButtons = true;
-    
+  test.each(dataTestsTable)(`GetData asButtons w/ %s`, (testName, {mockGamepadValues, expectedDataAsButtons}) => {
     // Create the object to test
     let xrGamepadComponent = new XRGamepadComponent(mockGamepad, mapping, componentIndex);
 
     // Set the mock gamepad to the values being tested
-    let data = TestHelpers.makeData(xrGamepadComponent.dataSource, mockData);
-    mockGamepad.mockComponents[dataSourceId].setValues(data);
-
-    // Build the expected data object
-    expectedData = TestHelpers.makeData(xrGamepadComponent.dataSource, mockDataAsButtons, asButtons);
+    mockGamepad.mockComponents[dataSourceId].setValues(mockGamepadValues);
 
     // Validate getData() returns the expected values
-    actualData = xrGamepadComponent.getData(asButtons);
-    expect(actualData).toMatchObject(expectedData);
+    let actualData = xrGamepadComponent.getData(asButtons);
+    expect(actualData).toMatchObject(expectedDataAsButtons);
   });
 
-  test.each(dataTestsTable)("No visualResponse states w/ %s", (testName, {mockData}) => {
+  test.each(dataTestsTable)("No visualResponse states w/ %s", (testName, {mockGamepadValues}) => {
     // Remove all visualizations
     let modifiedMapping = TestHelpers.copyJsonObject(mapping);
     delete modifiedMapping.components[componentIndex].visualResponses;
@@ -275,15 +310,14 @@ describe.each(testsTable)("xrGamepadComponent.%s", (dataSourceId, componentIndex
     let xrGamepadComponent = new XRGamepadComponent(mockGamepad, modifiedMapping, componentIndex);
 
     // Set the mock gamepad to the values being tested
-    let data = TestHelpers.makeData(xrGamepadComponent.dataSource, mockData);
-    mockGamepad.mockComponents[dataSourceId].setValues(data);
+    mockGamepad.mockComponents[dataSourceId].setValues(mockGamepadValues);
     
     // Get the weighted visualizations and ensure they do not exist
     let actualVisualizations = xrGamepadComponent.getWeightedVisualizations();
     expect(Object.keys(actualVisualizations)).toHaveLength(0);
   });
 
-  test.each(dataTestsTable)("Only onTouch visualResponse state w/ %s", (testName, {mockData, mockDataAsButtons=mockData}) => {
+  test.each(dataTestsTable)("Only onTouch visualResponse state w/ %s", (testName, {mockGamepadValues, expectedDataAsButtons}) => {
     // Remove onPress visualizations
     let modifiedMapping = TestHelpers.copyJsonObject(mapping);
     modifiedMapping.components[componentIndex].visualResponses.forEach((visualResponseIndex) => {
@@ -291,26 +325,24 @@ describe.each(testsTable)("xrGamepadComponent.%s", (dataSourceId, componentIndex
       delete visualResponse.onPress;
     });
 
+    // Update the expected data state to reflect the lack of onPress visualization
+    let modifiedExpectedData = TestHelpers.copyJsonObject(expectedDataAsButtons)
+    if (modifiedExpectedData.state == Constants.ComponentState.PRESSED) {
+      modifiedExpectedData.state = Constants.ComponentState.TOUCHED;
+    }
+
     // Create the object to test
-    let xrGamepadComponent = new XRGamepadComponent(mockGamepad, mapping, componentIndex);
+    let xrGamepadComponent = new XRGamepadComponent(mockGamepad, modifiedMapping, componentIndex);
 
     // Set the mock gamepad to the values being tested
-    let data = TestHelpers.makeData(xrGamepadComponent.dataSource, mockData);
-    mockGamepad.mockComponents[dataSourceId].setValues(data);
-    
-    // Build the expected data object
-    const asButtons = true;
-    let expectedData = TestHelpers.makeData(xrGamepadComponent.dataSource, mockDataAsButtons, asButtons);
-    if (expectedData.state == Constants.ComponentState.PRESSED) {
-      expectedData.state = Constants.ComponentState.TOUCHED;
-    }
+    mockGamepad.mockComponents[dataSourceId].setValues(mockGamepadValues);
 
     // Get the visualizations and validate them
     let actualVisualizations = xrGamepadComponent.getWeightedVisualizations();
-    validateWeightedResponse(mapping, expectedData, actualVisualizations);
+    validateWeightedResponse(mapping, modifiedExpectedData, actualVisualizations);
   });
 
-  test.each(dataTestsTable)("Only onPress visualResponse state w/ %s", (testName, {mockData, mockDataAsButtons=mockData}) => {
+  test.each(dataTestsTable)("Only onPress visualResponse state w/ %s", (testName, {mockGamepadValues, expectedDataAsButtons}) => {
     // Remove onPress visualizations
     let modifiedMapping = TestHelpers.copyJsonObject(mapping);
     modifiedMapping.components[componentIndex].visualResponses.forEach((visualResponseIndex) => {
@@ -318,40 +350,33 @@ describe.each(testsTable)("xrGamepadComponent.%s", (dataSourceId, componentIndex
       delete visualResponse.onTouch;
     });
 
+    // Update the expected data state to reflect the lack of onPress visualization
+    let modifiedExpectedData = TestHelpers.copyJsonObject(expectedDataAsButtons)
+    if (modifiedExpectedData.state == Constants.ComponentState.TOUCHED) {
+      modifiedExpectedData.state = Constants.ComponentState.DEFAULT;
+    }
+
     // Create the object to test
     let xrGamepadComponent = new XRGamepadComponent(mockGamepad, modifiedMapping, componentIndex);
 
     // Set the mock gamepad to the values being tested
-    let data = TestHelpers.makeData(xrGamepadComponent.dataSource, mockData);
-    mockGamepad.mockComponents[dataSourceId].setValues(data);
+    mockGamepad.mockComponents[dataSourceId].setValues(mockGamepadValues);
     
-    // Build the expected data object
-    const asButtons = true;
-    let expectedData = TestHelpers.makeData(xrGamepadComponent.dataSource, mockDataAsButtons, asButtons);
-    if (expectedData.state == Constants.ComponentState.TOUCHED) {
-      expectedData.state = Constants.ComponentState.DEFAULT;
-    }
-
     // Get the visualizations and validate them
     let actualVisualizations = xrGamepadComponent.getWeightedVisualizations();
-    validateWeightedResponse(mapping, expectedData, actualVisualizations);
+    validateWeightedResponse(mapping, modifiedExpectedData, actualVisualizations);
   });
 
-  test.each(dataTestsTable)("Both visualResponse states w/ %s", (testName, {mockData, mockDataAsButtons=mockData}) => {
+  test.each(dataTestsTable)("Both visualResponse states w/ %s", (testName, {mockGamepadValues, expectedDataAsButtons}) => {
     // Create the object to test
     let xrGamepadComponent = new XRGamepadComponent(mockGamepad, mapping, componentIndex);
 
     // Set the mock gamepad to the values being tested
-    let data = TestHelpers.makeData(xrGamepadComponent.dataSource, mockData);
-    mockGamepad.mockComponents[dataSourceId].setValues(data);
-
-    // Build the expected data object
-    const asButtons = true;
-    let expectedData = TestHelpers.makeData(xrGamepadComponent.dataSource, mockDataAsButtons, asButtons);
+    mockGamepad.mockComponents[dataSourceId].setValues(mockGamepadValues);
 
     // Get the visualizations and validate them
     let actualVisualizations = xrGamepadComponent.getWeightedVisualizations();
-    validateWeightedResponse(mapping, expectedData, actualVisualizations);
+    validateWeightedResponse(mapping, expectedDataAsButtons, actualVisualizations);
   });
 
   function validateWeightedResponse(mapping, expectedData, actualVisualizations) {
@@ -364,6 +389,7 @@ describe.each(testsTable)("xrGamepadComponent.%s", (dataSourceId, componentIndex
       if (!expectedVisualResponse) {
         expect(actualVisualResponse).toBeUndefined();
       } else {
+        expect(actualVisualResponse).toBeDefined();
         expect(Object.keys(actualVisualResponse)).toHaveLength(Object.keys(expectedVisualResponse).length - 1);
         Object.keys(expectedVisualResponse).forEach((node) => {
           if (node != "degreesOfFreedom") {
