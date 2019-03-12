@@ -102,19 +102,19 @@ class XRGamepadComponent {
     // Checks if any of the associated GamepadButtons is touched or pressed
     Object.values(this.buttons).forEach((index) => {
       let button = this.gamepad.buttons[index];
-      isPressed = isPressed | button.pressed;
-      isTouched = isTouched | button.touched;
+      isPressed = isPressed || button.pressed;
+      isTouched = isTouched || button.touched;
     });
     
     // Checks if axes are present and they have moved beyond defined thresholds
     // for touched and pressed
     Object.values(this.axes).forEach( ({index}) => {
-      isTouched = isTouched | (Math.abs(this.gamepad.axes[index]) > Constants.TouchThreshold);
+      isTouched = isTouched || (Math.abs(this.gamepad.axes[index]) > Constants.TouchThreshold);
       
       // Only treat the component as PRESSED based on axes values if a physical 
       // button is not present
       if (!this.buttons.button) {
-        isPressed = isPressed | (Math.abs(this.gamepad.axes[index]) > Constants.PressThreshold);
+        isPressed = isPressed || (Math.abs(this.gamepad.axes[index]) > Constants.PressThreshold);
       }
     });
 
