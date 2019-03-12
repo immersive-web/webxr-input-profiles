@@ -1,5 +1,5 @@
 const TestHelpers = require("./testHelpers.js");
-const MockGamepad = require("./mockGamepad/mockGamepad.js");
+import { MockGamepad } from "../src/mockGamepad/mockGamepad.js";
 
 const testsTable = [];
 TestHelpers.getMappingsList().forEach((entry) => {

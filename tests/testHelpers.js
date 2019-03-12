@@ -1,8 +1,25 @@
-const { join } = require('path');
-const Constants = require("../src/constants.js");
-const XRGamepad = require("../src/XRGamepad.js");
+import { Constants } from "../src/constants.js";
+const Ajv = require('ajv');
+const { join } = require("path");
+const { lstatSync, readdirSync } = require('fs');
+const mappingsFolder = "../mappings";
+
+/**
+ * @description Gets the mapping description for the supplied gamepad id
+ * @param {String} gamepadId The id of the Gamepad to find the mapping for
+ * @param {string} mappingType Indicates the folder from which
+ * mapping should be enumerated
+ * @returns {Object} The mapping described in the mapping.json file
+ */
+function getMapping(gamepadId, mappingType) {
+  const mappingUri = join(mappingsFolder, mappingType, gamepadId, "mapping.json");
+  const mapping = require(mappingUri);
+  return mapping;
+}
 
 const TestHelpers = {
+  getMapping,
+  
   /**
    * @description Gets the list of mapping files in the known folder locations
    * @param {string} [mappingType="WebXR"] Indicates the folder from which
@@ -10,17 +27,15 @@ const TestHelpers = {
    * @returns {Array} The list of Gamepad id's which have known mappings
    */
   getMappingsList : function () {
-    const { lstatSync, readdirSync } = require('fs')
-  
     const getMappingTypeList = function(mappingType) {
-      const mappingFolder = Constants.MappingFolders[mappingType];
-      const folderItems = readdirSync(mappingFolder).filter(item => lstatSync(join(mappingFolder, item)).isDirectory());
+      const mappingSubfolder = join(__dirname, mappingsFolder, mappingType);
+      const folderItems = readdirSync(mappingSubfolder).filter(item => lstatSync(join(mappingSubfolder, item)).isDirectory());
       return Array.from(folderItems, (gamepadId) => 
         ({
           testName: `${mappingType}.${gamepadId}`,
           mappingType: mappingType, 
           gamepadId: gamepadId, 
-          mapping: XRGamepad.getMapping(gamepadId, mappingType)
+          mapping: getMapping(gamepadId, mappingType)
         })
       );
     };
@@ -43,9 +58,7 @@ const TestHelpers = {
    * @returns {Object} An AJV validator that can be used to validate mappings
    */
   getValidator: function (schemaFilename, dependencies) {
-    const { join } = require('path');
     const schemasFolder = join(__dirname, "../schemas/");
-    const Ajv = require('ajv');
     const ajv = new Ajv();
 
     let mainSchema;
@@ -71,7 +84,7 @@ const TestHelpers = {
       });
     } 
 
-    validator =  ajv.compile(mainSchema);
+    const validator =  ajv.compile(mainSchema);
     return validator;
   },
 

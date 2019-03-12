@@ -1,6 +1,6 @@
-const MockGamepadComponent = require("./mockGamepadComponent.js");
-const MockGamepadButton = require("./mockGamepadButton.js");
-const Constants = require("../../src/constants.js");
+import { MockGamepadComponent } from "./mockGamepadComponent.js";
+import { MockGamepadButton } from "./mockGamepadButton.js";
+import { Constants } from "../constants.js";
 
 /**
  * @description A mock implementation of the Gamepad object as defined 
@@ -10,7 +10,7 @@ const Constants = require("../../src/constants.js");
 class MockGamepad {
 
   /**
-   * @param {Object} mapping - The mapping file text in dictionary form
+   * @param {Object} mapping - The mapping file JSON text as an object
    * @param {String} handedness - An enum value as defined by Handedness in 
    * constants.js
    */
@@ -90,4 +90,4 @@ class MockGamepad {
   }
 };
 
-module.exports = MockGamepad;
+export { MockGamepad };

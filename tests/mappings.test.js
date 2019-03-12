@@ -1,6 +1,6 @@
 const TestHelpers = require("./testHelpers.js");
+import { Constants } from "../src/constants.js";
 const validator = TestHelpers.getValidator();
-const Constants = require("../src/constants.js");
 
 const testTable = Array.from(TestHelpers.getMappingsList(), (entry) => [ entry.testName, entry]);
 

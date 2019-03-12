@@ -1,4 +1,4 @@
-const Constants = require("./constants.js");
+import { Constants } from "./constants.js";
 
 /**
   * @description This class connects a component, as described in a mapping.json
@@ -9,7 +9,7 @@ class XRGamepadComponent {
 
   /**
    * @param {Object} gamepad - The Gamepad object provided by the user agent
-   * @param {Object} mapping - The mapping file text in dictionary form
+   * @param {Object} mapping - The mapping file JSON text as an object
    * @param {number} componentIndex - The index of the component in the mapping 
    * file's components array
    */
@@ -242,4 +242,4 @@ class XRGamepadComponent {
   }
 };
 
-module.exports = XRGamepadComponent;
+export { XRGamepadComponent };
