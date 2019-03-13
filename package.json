@@ -2,6 +2,13 @@
   "name": "xr-gamepad-mappings",
   "version": "0.1.0",
   "description": "",
+  "main": "src/xrGamepad.js",
+  "files": [
+    "mappings/",
+    "schemas/",
+    "src/",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "jest"
   },
