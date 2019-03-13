@@ -1,6 +1,6 @@
 const { join } = require('path');
 const Constants = require("../src/constants.js");
-const XRGamepad = require("../src/XRGamepad.js");
+const XRGamepad = require("../src/xrGamepad.js");
 
 const TestHelpers = {
   /**
