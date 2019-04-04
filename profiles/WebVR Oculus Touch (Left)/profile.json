@@ -1,0 +1,170 @@
+{
+    "version" : "0.1",
+    "id" : "WebVR Oculus Touch (Left)",
+    "webVR": true,
+    "handedness" : {
+        "left" : {
+            "asset" : "some-url",
+            "root" : "left-controller-node",
+            "webVR_targetRayOrigin": "left-controller-pointing-origin",
+            "components" : [0, 1, 2, 3, 4, 7],
+            "selectionComponent" : 1
+        },
+        "right" : {
+            "asset" : "some-url",
+            "root" : "right-controller-node",
+            "webVR_targetRayOrigin": "right-controller-pointing-origin",
+            "components" : [0, 1, 2, 5, 6, 7],
+            "selectionComponent" : 1
+        }
+    },
+    "components" : [
+        {
+            "dataSource" : 0,
+            "root" : "thumbstick-node",
+            "labelTransform" : "thumbstick-label",
+            "visualResponses": [0, 1, 2]
+        },
+        {
+            "dataSource" : 1,
+            "root" : "trigger-node",
+            "labelTransform" : "trigger-label",
+            "visualResponses": [3]
+        },
+        {
+            "dataSource" : 2,
+            "root" : "grip-node",
+            "labelTransform" : "grip-label",
+            "visualResponses": [4]
+        },
+        {
+            "dataSource" : 3,
+            "root" : "x-node",
+            "labelTransform" : "x-label",
+            "visualResponses": [7]
+        },
+        {
+            "dataSource" : 4,
+            "root" : "y-node",
+            "labelTransform" : "y-label",
+            "visualResponses": [8]
+        },
+        {
+            "dataSource" : 5,
+            "root" : "a-node",
+            "labelTransform" : "a-label",
+            "visualResponses": [5]
+        },
+        {
+            "dataSource" : 6,
+            "root" : "b-node",
+            "labelTransform" : "b-label",
+            "visualResponses": [6]
+        },
+        {
+            "dataSource" : 7,
+            "root" : "thumbrest-node",
+            "labelTransform" : "thumbrest-label",
+            "visualResponses": [9]
+        }
+    ],
+    "dataSources" : [
+        {
+            "id" : "thumbstick",
+            "dataSourceType": "thumbstickSource",
+            "xAxisIndex" : 0,
+            "yAxisIndex" : 1,
+            "buttonIndex" : 0
+        },
+        {
+            "id" : "trigger",
+            "dataSourceType": "buttonSource",
+            "buttonIndex" : 1,
+            "analogValues" : true
+        },
+        {
+            "id" : "grip",
+            "dataSourceType": "buttonSource",
+            "buttonIndex" : 2
+        },
+        {
+            "id" : "x",
+            "dataSourceType": "buttonSource",
+            "buttonIndex" : 3
+        },
+        {
+            "id" : "y",
+            "dataSourceType": "buttonSource",
+            "buttonIndex" : 4
+        },
+        {
+            "id" : "a",
+            "dataSourceType": "buttonSource",
+            "buttonIndex" : 3
+        },
+        {
+            "id" : "b",
+            "dataSourceType": "buttonSource",
+            "buttonIndex" : 4
+        },
+        {
+            "id" : "thumbrest",
+            "dataSourceType": "buttonSource",
+            "buttonIndex" : 5,
+            "pressUnsupported": true
+        }
+    ],
+    "visualResponses" : [
+        {
+            "rootNodeName": "THUMBSTICK_PRESS",
+            "source" : "state",
+            "states" : ["pressed"]
+        },
+        {
+            "rootNodeName": "THUMBSTICK_X",
+            "source" : "xAxis",
+            "states" : ["default", "touched", "pressed"]
+        },
+        {
+            "rootNodeName": "THUMBSTICK_Y",
+            "source" : "yAxis",
+            "states" : ["default", "touched", "pressed"]
+        },
+        {
+            "rootNodeName" : "TRIGGER",
+            "source" : "buttonValue",
+            "states" : ["default", "touched", "pressed"]
+        },
+        {
+            "rootNodeName" : "GRIP",
+            "source" : "state",
+            "states" : ["pressed"]
+        },
+        {
+            "rootNodeName" : "A",
+            "source" : "state",
+            "states" : ["pressed"]
+        },
+        {
+            "rootNodeName" : "B",
+            "source" : "state",
+            "states" : ["pressed"]
+        },
+        {
+            "rootNodeName" : "X",
+            "source" : "state",
+            "states" : ["pressed"]
+        },
+        {
+            "rootNodeName" : "Y",
+            "source" : "state",
+            "states" : ["pressed"]
+        },
+        {
+            "rootNodeName" : "THUMBREST",
+            "source" : "state",
+            "states" : ["touched", "pressed"],
+            "property" : "visibility"
+        }
+    ]
+}

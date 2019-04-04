@@ -1,0 +1,92 @@
+{
+    "version" : "0.1",
+    "id" : "oculus-go",
+    "handedness" : {
+        "left" : {
+            "asset" : "some-url",
+            "root" : "controller-node",
+            "components" : [0, 1, 2],
+            "selectionComponent" : 0
+        },
+        "right" : {
+            "asset" : "some-url",
+            "root" : "controller-node",
+            "components" : [0, 1, 2],
+            "selectionComponent" : 0
+        }
+    },
+    "components" : [
+        {
+            "dataSource" : 0,
+            "root" : "touchpad-root",
+            "labelTransform" : "touchpad-label-transform",
+            "touchpadDot" : "touchpad-dot",
+            "visualResponses": [0, 1, 2, 3]
+        },
+        {
+            "dataSource" : 1,
+            "root" : "trigger-root",
+            "labelTransform" : "trigger-label-transform",
+            "visualResponses": [4]
+        },
+        {
+            "dataSource" : 2,
+            "root" : "facebutton-root",
+            "labelTransform" : "facebutton-label-transform",
+            "visualResponses": [5]
+        }
+    ],
+    "dataSources" : [
+        {
+            "id" : "touchpad",
+            "dataSourceType": "touchpadSource",
+            "xAxisIndex" : 0,
+            "yAxisIndex" : 1,
+            "buttonIndex" : 0
+        },
+        {
+            "id" : "trigger",
+            "dataSourceType": "buttonSource",
+            "buttonIndex" : 1,
+            "analogValues" : true
+        },
+        {
+            "id" : "faceButton",
+            "dataSourceType": "buttonSource",
+            "buttonIndex" : 2
+        }
+    ],
+    "visualResponses" : [
+        {
+            "rootNodeName": "TOUCHPAD_PRESS",
+            "source" : "state",
+            "states" : ["pressed"]
+        },
+        {
+            "rootNodeName": "TOUCH",
+            "source" : "state",
+            "states" : ["touched", "pressed"],
+            "property": "visibility"
+        },
+        {
+            "rootNodeName": "TOUCHPAD_TOUCH_X",
+            "source" : "xAxis",
+            "states" : ["default", "touched", "pressed"]
+        },
+        {
+            "rootNodeName": "TOUCHPAD_TOUCH_Y",
+            "source" : "yAxis",
+            "states" : ["default", "touched", "pressed"]
+        },
+        {
+            "rootNodeName" : "TRIGGER",
+            "source" : "buttonValue",
+            "states" : ["default", "touched", "pressed"]
+        },
+        {
+            "rootNodeName" : "FACE_BUTTON",
+            "source" : "state",
+            "states" : ["pressed"]
+        }
+    ]
+}

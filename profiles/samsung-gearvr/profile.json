@@ -1,0 +1,69 @@
+{
+    "version" : "0.1",
+    "id" : "samsung-gearvr",
+    "handedness" : {
+        "none" : {
+            "asset" : "some-url",
+            "root" : "none-controller-node",
+            "components" : [0, 1],
+            "selectionComponent" : 0
+        }
+    },
+    "components" : [
+        {
+            "dataSource" : 0,
+            "root" : "touchpad-node",
+            "labelTransform" : "touchpad-label-transform",
+            "touchpadDot" : "touchpad-dot",
+            "visualResponses": [0, 1, 2, 3]
+        },
+        {
+            "dataSource" : 1,
+            "root" : "faceButton-node",
+            "labelTransform" : "faceButton-label-transform",
+            "visualResponses": [4]
+        }
+    ],
+    "dataSources" : [
+        {
+            "id" : "touchpad",
+            "dataSourceType": "touchpadSource",
+            "xAxisIndex" : 0,
+            "yAxisIndex" : 1,
+            "buttonIndex" : 0
+        },
+        {
+            "id" : "faceButton",
+            "dataSourceType": "buttonSource",
+            "buttonIndex" : 1
+        }
+    ],
+    "visualResponses" : [
+        {
+            "rootNodeName": "TOUCHPAD_PRESS",
+            "source" : "state",
+            "states" : ["pressed"]
+        },
+        {
+            "rootNodeName": "TOUCH",
+            "source" : "state",
+            "states" : ["touched", "pressed"],
+            "property": "visibility"
+        },
+        {
+            "rootNodeName": "TOUCHPAD_TOUCH_X",
+            "source" : "xAxis",
+            "states" : ["default", "touched", "pressed"]
+        },
+        {
+            "rootNodeName": "TOUCHPAD_TOUCH_Y",
+            "source" : "yAxis",
+            "states" : ["default", "touched", "pressed"]
+        },
+        {
+            "rootNodeName" : "FACE_BUTTON",
+            "source" : "state",
+            "states" : ["pressed"]
+        }
+    ]
+}

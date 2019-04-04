@@ -1,33 +1,25 @@
 const Constants = {
-  MappingType: Object.freeze({
-    WEBXR: "WebXR",
-    WEBVR: "WebVR",
-    MOCK: "mock"
-  }),
-
   Handedness: Object.freeze({
-    NONE: "none",
-    LEFT: "left",
-    RIGHT: "right"
+    NONE: 'none',
+    LEFT: 'left',
+    RIGHT: 'right'
   }),
 
   ComponentState: Object.freeze({
-    DEFAULT: "default",
-    TOUCHED: "onTouch",
-    PRESSED: "onPress"
-    }),
-  
-  DataSourceType: Object.freeze({
-    BUTTON: "buttonSource",
-    DPAD_FROM_AXES: "dpadFromAxesSource",
-    DPAD_FROM_BUTTONS: "dpadFromButtonsSource",
-    THUMBSTICK: "thumbstickSource",
-    TOUCHPAD: "touchpadSource"
+    DEFAULT: 'default',
+    TOUCHED: 'touched',
+    PRESSED: 'pressed'
   }),
 
-  TouchThreshold: 0.2,
-  
-  PressThreshold: 0.95
+  DataSourceType: Object.freeze({
+    BUTTON: 'buttonSource',
+    THUMBSTICK: 'thumbstickSource',
+    TOUCHPAD: 'touchpadSource'
+  }),
+
+  ButtonTouchThreshold: 0.05,
+
+  AxisTouchThreshold: 0.1
 };
 
-export {Constants};
+export default Constants;

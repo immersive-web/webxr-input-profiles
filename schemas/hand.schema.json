@@ -1,9 +1,9 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://immersive-web/gamepad-mapping/0.1.0/hand.schema.json",
+    "$id": "https://immersive-web/gamepad-profiles/0.1.0/hand.schema.json",
     "type": "object",
     "additionalProperties": false,
-    "required":["asset", "root", "components"],
+    "required":["asset", "root", "components", "selectionComponent"],
     "properties": {
         "asset" : {
             "description": "The URI of the asset associated with the hand",
@@ -24,16 +24,12 @@
             "additionalItems": false,
             "uniqueItems": true,
             "items": {
-                "allOf": [ { "$ref": "mapping.index.schema.json#/definitions/mappingIndex"} ]
+                "allOf": [ { "$ref": "profile.index.schema.json#/definitions/profileIndex"} ]
             }
         },
-        "primaryButtonComponent": {
-            "allOf": [ { "$ref": "mapping.index.schema.json#/definitions/mappingIndex"} ],
-            "description": "The primary button suggested by the hardware manufacturer"
-        },
-        "primaryAxesComponent": {
-            "allOf": [ { "$ref": "mapping.index.schema.json#/definitions/mappingIndex"} ],
-            "description": "The primary thumbstick or touchpad suggested by the hardware manufacturer"
+        "selectionComponent": {
+            "allOf": [ { "$ref": "profile.index.schema.json#/definitions/profileIndex"} ],
+            "description": "The button which triggers the select events"
         }
     }
 }
