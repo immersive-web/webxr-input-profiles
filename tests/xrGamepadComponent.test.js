@@ -1,12 +1,11 @@
 const TestHelpers = require("./testHelpers.js");
-const MockGamepad = require("./mockGamepad/mockGamepad.js");
-const XRGamepad = require("../src/xrGamepad.js");
-const XRGamepadComponent = require("../src/xrGamepadComponent.js");
-const Constants = require("../src/constants.js");
+import { Constants } from "../src/constants.js";
+import { XRGamepadComponent } from "../src/xrGamepadComponent.js";
+import { MockGamepad } from "../src/mockGamepad/mockGamepad.js";
 
 const gamepadId = "mock3";
 const handedness = Constants.Handedness.NONE;
-const mapping = Object.freeze(XRGamepad.getMapping(gamepadId, Constants.MappingType.MOCK));
+const mapping = Object.freeze(TestHelpers.getMapping(gamepadId, Constants.MappingType.MOCK));
 const mockGamepad = new MockGamepad(mapping, handedness);
 const asButtons = true;
 
@@ -215,7 +214,7 @@ const filterTests = function(componentIndex) {
     // If the test matches, build a test data description
     if (testDescription.dataSourceIds.includes(dataSource.id)) {
       // Fill in the mockGamepadValues
-      testData = {
+      const testData = {
         mockGamepadValues: TestHelpers.makeData(dataSource, testDescription.mockGamepadValues)
       };
 

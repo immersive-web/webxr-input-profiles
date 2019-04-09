@@ -1,5 +1,5 @@
-const Constants = require("./constants.js");
-const XRGamepadComponent = require("./xrGamepadComponent.js");
+import { Constants } from "./constants.js";
+import { XRGamepadComponent } from "./xrGamepadComponent.js";
 
 /**
   * @description This class connects an XR gamepad, as described in a 
@@ -12,7 +12,7 @@ class XRGamepad {
   /**
    * @param {Object} gamepad - The Gamepad object provided by the user agent as 
    * defined by https://www.w3.org/TR/gamepad/
-   * @param {Object} mapping - The mapping file text in dictionary form
+   * @param {Object} mapping - The mapping file JSON text as an object
    * @param {String} handedness - An enum value as defined by Handedness in 
    * constants.js
    */
@@ -75,21 +75,6 @@ class XRGamepad {
   get targetRayOrigin() {
     return this.hand.targetRayOrigin;
   }
-
-  /**
-   * @description Gets the mapping description for the supplied gamepad id
-   * @param {String} gamepadId The id of the Gamepad to find the mapping for
-   * @param {string} [mappingType="WebXR"] Indicates the folder from which
-   * mapping should be enumerated
-   * @returns {Object} The mapping described in the mapping.json file
-   */
-  static getMapping(gamepadId, mappingType = Constants.MappingType.WEBXR) {
-    const { join } = require('path');
-    const folder = Constants.MappingFolders[mappingType];
-    const mappingPath = join(folder, gamepadId, "mapping.json");
-    const mapping = require(mappingPath);
-    return mapping;
-  }
 };
 
-module.exports = XRGamepad;
+export { XRGamepad };

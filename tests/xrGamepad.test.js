@@ -1,11 +1,11 @@
 const TestHelpers = require("./testHelpers.js");
-const MockGamepad = require("./mockGamepad/mockGamepad.js");
-const Constants = require("../src/constants.js");
-const XRGamepad = require("../src/xrGamepad.js");
+import { Constants } from "../src/constants.js";
+import { XRGamepad } from "../src/xrGamepad.js";
+import { MockGamepad } from "../src/mockGamepad/mockGamepad.js";
 
 const validGamepadId = "mock3";
 const validHandedness = Constants.Handedness.NONE;
-const validMapping = Object.freeze(XRGamepad.getMapping(validGamepadId, Constants.MappingType.MOCK));
+const validMapping = Object.freeze(TestHelpers.getMapping(validGamepadId, Constants.MappingType.MOCK));
 const validGamepad = new MockGamepad(validMapping, validHandedness);
 
 test("Constructor - invalid gamepad", () => {

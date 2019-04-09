@@ -447,7 +447,7 @@ xrSession.addEventListener('inputsourceschange', onInputSourcesChange);
 function onInputSourcesChange(event) {
   event.added.forEach((inputSource) => {
     if (inputSource.gamepad) {
-      let mapping = XRGamepad.getMapping(gamepad.id, XRMappingConstants.MappingType.WebXR);
+      let mapping = Mapping.getMapping(gamepad.id, XRMappingConstants.MappingType.WebXR);
       let xrGamepad = new XRGamepad(gamepad, mapping, inputSource.handedness);
       xrGamepads[inputSource] = xrGamepad;
     }
@@ -472,7 +472,7 @@ navigator.addEventListener('gamepaddisconnected', onGamepadDisconnected);
 function onGamepadConnected(event) {
   let gamepad = event.gamepad;
   if (gamepad.deviceId) {
-    let mapping = XRGamepad.getMapping(gamepad.id, XRMappingConstants.MappingType.WebVR);
+    let mapping = Mapping.getMapping(gamepad.id, XRMappingConstants.MappingType.WebVR);
     let xrGamepad = new XRGamepad(gamepad, mapping, gamepad.handedness);
     xrGamepads[gamepad] = xrGamepad;
   }

@@ -1,15 +1,15 @@
-const Constants = require("../../src/constants.js");
+import { Constants } from "../constants.js";
 
 /**
  * @description Represents the component grouping of buttons and axes in a MockGamepad
  * @author Nell Waliczek / https://github.com/NellWaliczek
  */
-class MockComponent {
+class MockGamepadComponent {
   /**
    * @param {MockGamepad} mockGamepad - The MockGamepad this MockComponent will
    * be part of
-   * @param {Object} mapping - The mapping object used to initialize the 
-   * MockGamepad and containing the component description
+   * @param {Object} mapping - The mapping file JSON text as an object used to 
+   * initialize the MockGamepad and containing the component description
    * @param {number} componentIndex - The index of the component in the mapping 
    * object that this MockComponent will represent
    */
@@ -124,4 +124,4 @@ class MockComponent {
   }
 };
 
-module.exports = MockComponent;
+export { MockGamepadComponent };

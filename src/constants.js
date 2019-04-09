@@ -1,19 +1,9 @@
-const { join } = require('path');
-
-const MappingType = Object.freeze({
-  WEBXR: "WebXR",
-  WEBVR: "WebVR",
-  MOCK: "mock"
-});
-
 const Constants = {
-  MappingType: MappingType,
-
-  MappingFolders: Object.freeze({
-    [MappingType.WEBXR]: join(__dirname, "../mappings/WebXR/"),
-    [MappingType.WEBVR]: join(__dirname, "../mappings/WebVR/"),
-    [MappingType.MOCK]: join(__dirname, "../tests/mockMappings/")
-  }), 
+  MappingType: Object.freeze({
+    WEBXR: "WebXR",
+    WEBVR: "WebVR",
+    MOCK: "mock"
+  }),
 
   Handedness: Object.freeze({
     NONE: "none",
@@ -40,4 +30,4 @@ const Constants = {
   PressThreshold: 0.95
 };
 
-module.exports = Constants;
+export {Constants};

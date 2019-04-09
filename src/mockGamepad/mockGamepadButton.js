@@ -65,4 +65,4 @@ class MockGamepadButton {
   }
 };
 
-module.exports = MockGamepadButton;
+export { MockGamepadButton };

@@ -1,8 +1,7 @@
 const TestHelpers = require("../testHelpers.js");
 const validator = TestHelpers.getValidator();
-const { MappingType } = require("../../src/constants.js");
-const XRGamepad = require("../../src/xrGamepad.js");
-const validMapping = Object.freeze(XRGamepad.getMapping("mock1", MappingType.MOCK));
+import { Constants } from "../../src/constants.js";
+const validMapping = Object.freeze(TestHelpers.getMapping("mock1", Constants.MappingType.MOCK));
 
 test("Valid mapping", () => {
   let valid = false;

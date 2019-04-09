@@ -1,20 +1,69 @@
 {
   "name": "xr-gamepad-mappings",
   "version": "0.1.0",
-  "description": "",
-  "scripts": {
-    "test": "jest"
-  },
-  "author": "",
+  "description": "A tool for making W3C Gamepad objects easier to work with in XR on the web",
+  "private": true,
+  "main": "dist/xr-gamepad-mappings.module.js",
+  "files": [
+    "package.json",
+    "LICENSE",
+    "README.md",
+    "dist/xr-gamepad-mappings.module.js",
+    "dist/mock-gamepad.module.js",
+    "dist/mappings/",
+    "schemas/",
+    "src/"
+  ],
+  "author": "Nell Waliczek <NellWaliczek@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/immersive-web/xr-gamepad-mappings.git"
   },
-  "dependencies": {
-    "ajv": "^6.7.0"
+  "bugs": {
+    "url": "https://github.com/immersive-web/xr-gamepad-mappings/issues"
   },
+  "homepage": "https://github.com/immersive-web/xr-gamepad-mappings",
+  "keywords": [
+    "WebXR",
+    "WebVR",
+    "ImmersiveWeb",
+    "Immersive Web",
+    "AR",
+    "Virtual Reality",
+    "Augmented Reality",
+    "Mixed Reality",
+    "VR",
+    "XR",
+    "AR/VR",
+    "VR/AR",
+    "Gamepad",
+    "Gamepads",
+    "Motion controllers",
+    "MotionControllers"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
+    "test": "jest",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {},
   "devDependencies": {
-    "jest": "^24.0.0"
+    "@babel/plugin-transform-spread": "^7.2.2",
+    "@babel/preset-env": "^7.3.4",
+    "ajv": "^6.10.0",
+    "babel-jest": "^24.1.0",
+    "concurrently": "^4.1.0",
+    "http-server": "^0.11.1",
+    "jest": "^24.1.0",
+    "rollup": "^1.4.0",
+    "rollup-plugin-copy-glob": "^0.3.0",
+    "yui-lint": "^0.2.0"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    }
   }
 }
