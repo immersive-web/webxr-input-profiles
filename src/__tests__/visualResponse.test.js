@@ -1,26 +1,23 @@
 import Constants from '../constants';
-import VisualResponses from '../visualResponses';
+import VisualResponse from '../visualResponse';
 
 describe('Construction tests', () => {
   test('Fail to construct visual response when description is not provided', () => {
     expect(() => {
       // eslint-disable-next-line no-unused-vars
-      const visualResponses = new VisualResponses(undefined);
+      const visualResponses = new VisualResponse(undefined);
     }).toThrow();
 
     expect(() => {
       // eslint-disable-next-line no-unused-vars
-      const visualResponses = new VisualResponses(null);
+      const visualResponses = new VisualResponse(null);
+    }).toThrow();
+
+    expect(() => {
+      // eslint-disable-next-line no-unused-vars
+      const visualResponses = new VisualResponse({});
     }).toThrow();
   });
-
-  test('Create with empty descriptions array', () => {
-    const visualResponses = new VisualResponses([]);
-    expect(visualResponses).toBeDefined();
-    expect(visualResponses.responses).toEqual([]);
-    expect(visualResponses.weightedNodes).toEqual([]);
-  });
-
   test.each([
     ['buttonValue', 'PRESSED', 'UNPRESSED'],
     ['state', 'PRESSED', 'UNPRESSED'],
@@ -40,9 +37,9 @@ describe('Construction tests', () => {
       property: 'transform'
     });
 
-    const visualResponses = new VisualResponses([responseDescription]);
-    expect(visualResponses).toBeDefined();
-    expect(visualResponses.responses).toEqual([expectedResponse]);
+    const visualResponse = new VisualResponse(responseDescription);
+    expect(visualResponse).toBeDefined();
+    expect(visualResponse.description).toEqual(expectedResponse);
   });
 
   test('Create with explicit properties', () => {
@@ -56,10 +53,9 @@ describe('Construction tests', () => {
       property: 'visibility'
     };
 
-    const visualResponses = new VisualResponses([responseDescription]);
-    expect(visualResponses).toBeDefined();
-    expect(visualResponses.responses).toHaveLength(1);
-    expect(visualResponses.responses[0]).toMatchObject(responseDescription);
+    const visualResponse = new VisualResponse(responseDescription);
+    expect(visualResponse).toBeDefined();
+    expect(visualResponse.description).toMatchObject(responseDescription);
   });
 });
 
@@ -70,18 +66,20 @@ describe('Weighting tests', () => {
       buttonValue: 0.8
     };
 
-    const response = {
+    const responseDescription = {
       source: 'buttonValue',
       states: [Constants.ComponentState.DEFAULT],
       property: 'transform'
     };
 
-    const activeValue = VisualResponses.getValue(component, response);
-    expect(activeValue).toEqual(0.8);
+    const visualResponse = new VisualResponse(responseDescription);
+
+    visualResponse.updateFromComponent(component);
+    expect(visualResponse.value).toEqual(0.8);
 
     component.state = Constants.ComponentState.TOUCHED;
-    const inactiveValue = VisualResponses.getValue(component, response);
-    expect(inactiveValue).toEqual(0);
+    visualResponse.updateFromComponent(component);
+    expect(visualResponse.value).toEqual(0);
   });
 
   test('axis values in inactive state', () => {
@@ -91,23 +89,26 @@ describe('Weighting tests', () => {
       yAxis: 1
     };
 
-    const xAxisResponse = {
+    const xAxisResponseDescription = {
       source: 'xAxis',
       states: [Constants.ComponentState.DEFAULT],
       property: 'transform'
     };
 
-    const yAxisResponse = {
+    const yAxisResponseDescription = {
       source: 'yAxis',
       states: [Constants.ComponentState.DEFAULT],
       property: 'transform'
     };
 
-    const xValue = VisualResponses.getValue(component, xAxisResponse);
-    expect(xValue).toEqual(0.5);
+    const xAxisResponse = new VisualResponse(xAxisResponseDescription);
+    const yAxisResponse = new VisualResponse(yAxisResponseDescription);
 
-    const yValue = VisualResponses.getValue(component, yAxisResponse);
-    expect(yValue).toEqual(0.5);
+    xAxisResponse.updateFromComponent(component);
+    expect(xAxisResponse.value).toEqual(0.5);
+
+    yAxisResponse.updateFromComponent(component);
+    expect(yAxisResponse.value).toEqual(0.5);
   });
 
   /* eslint-disable indent */
@@ -134,23 +135,26 @@ describe('Weighting tests', () => {
       yAxis
     };
 
-    const xAxisResponse = {
+    const xAxisResponseDescription = {
       source: 'xAxis',
       states: [Constants.ComponentState.DEFAULT],
       property: 'transform'
     };
 
-    const yAxisResponse = {
+    const yAxisResponseDescription = {
       source: 'yAxis',
       states: [Constants.ComponentState.DEFAULT],
       property: 'transform'
     };
 
-    const xValue = VisualResponses.getValue(component, xAxisResponse);
-    expect(xValue).toBeCloseTo(expectedX, 4);
+    const xAxisResponse = new VisualResponse(xAxisResponseDescription);
+    const yAxisResponse = new VisualResponse(yAxisResponseDescription);
 
-    const yValue = VisualResponses.getValue(component, yAxisResponse);
-    expect(yValue).toBeCloseTo(expectedY, 4);
+    xAxisResponse.updateFromComponent(component);
+    yAxisResponse.updateFromComponent(component);
+
+    expect(xAxisResponse.value).toBeCloseTo(expectedX, 4);
+    expect(yAxisResponse.value).toBeCloseTo(expectedY, 4);
   });
   /* eslint-enable */
 
@@ -159,18 +163,19 @@ describe('Weighting tests', () => {
       state: Constants.ComponentState.DEFAULT
     };
 
-    const response = {
+    const responseDescription = {
       source: 'state',
       states: [Constants.ComponentState.DEFAULT],
       property: 'visibility'
     };
 
-    const activeValue = VisualResponses.getValue(component, response);
-    expect(activeValue).toEqual(true);
+    const response = new VisualResponse(responseDescription);
+
+    expect(response.value).toEqual(true);
 
     component.state = Constants.ComponentState.TOUCHED;
-    const inactiveValue = VisualResponses.getValue(component, response);
-    expect(inactiveValue).toEqual(false);
+    response.updateFromComponent(component);
+    expect(response.value).toEqual(false);
   });
 
   test('state for transform property', () => {
@@ -178,16 +183,17 @@ describe('Weighting tests', () => {
       state: Constants.ComponentState.DEFAULT
     };
 
-    const response = {
+    const responseDescription = {
       source: 'state',
       states: [Constants.ComponentState.DEFAULT]
     };
 
-    const activeValue = VisualResponses.getValue(component, response);
-    expect(activeValue).toEqual(1);
+    const response = new VisualResponse(responseDescription);
+
+    expect(response.value).toEqual(1);
 
     component.state = Constants.ComponentState.TOUCHED;
-    const inactiveValue = VisualResponses.getValue(component, response);
-    expect(inactiveValue).toEqual(0);
+    response.updateFromComponent(component);
+    expect(response.value).toEqual(0);
   });
 });

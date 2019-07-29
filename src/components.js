@@ -1,5 +1,5 @@
 import Constants from './constants';
-import VisualResponses from './visualResponses';
+import VisualResponse from './visualResponse';
 
 class Component {
   constructor(profile, componentDescription) {
@@ -14,7 +14,10 @@ class Component {
       });
     }
 
-    this.visualResponses = new VisualResponses(visualResponseDescriptions);
+    this.visualResponses = {};
+    visualResponseDescriptions.forEach((description) => {
+      this.visualResponses[description.rootNodeName] = new VisualResponse(description);
+    });
 
     this.state = Constants.ComponentState.DEFAULT;
 
@@ -23,6 +26,12 @@ class Component {
     }
 
     this.pressUnsupported = this.dataSource.pressUnsupported;
+  }
+
+  updateVisualResponses() {
+    Object.values(this.visualResponses).forEach((visualResponse) => {
+      visualResponse.updateFromComponent(this);
+    });
   }
 
   get id() {
@@ -66,7 +75,7 @@ class Button extends Component {
       this.state = Constants.ComponentState.DEFAULT;
     }
 
-    this.visualResponses.updateFromComponent(this);
+    this.updateVisualResponses();
   }
 
   get data() {
@@ -133,7 +142,7 @@ class Axes extends Component {
       this.state = Constants.ComponentState.TOUCHED;
     }
 
-    this.visualResponses.updateFromComponent(this);
+    this.updateVisualResponses();
   }
 
   get data() {
