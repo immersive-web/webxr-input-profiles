@@ -623,6 +623,9 @@ Certain WebVR `Gamepad` objects have some components with an inverted `yAxis` ca
 }
 ```
 
+# Asset requirements
+TODO
+
 # Appendices
 
 ## Licence
