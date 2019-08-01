@@ -7,13 +7,44 @@ import buildElements from './buildElements.js';
 
 const profiles = new Profiles('../../../dist/profiles');
 let mockXRInputSource;
+let supportedProfilesList;
 let profile;
 let motionController;
 
-function onLoad() {
-  const motionControllerElement = document.getElementById('motionController');
-  ModelViewer.initialize(motionControllerElement);
-  const gamepadId = 'microsoft-045e-065d';
+function populateProfileSelector() {
+  profiles.fetchSupportedProfilesList().then((profilesList) => {
+    supportedProfilesList = profilesList;
+
+    // Remove loading entry
+    const profileSelectorElement = document.getElementById('profileSelector');
+    profileSelectorElement.innerHTML = '';
+
+    if (supportedProfilesList.length == 0) {
+      // No supported profiles found
+      profileSelectorElement.innerHTML = `
+        <option value='No profiles found'>No profiles found</option>
+      `;
+    } else {
+      // Populate the selector with the profiles list
+      supportedProfilesList.forEach((supportedProfile) => {
+        profileSelectorElement.innerHTML += `
+        <option value=${supportedProfile}>${supportedProfile}</option>
+        `;
+      });
+
+      // Hook up event listener and load profile
+      profileSelectorElement.addEventListener('change', onSelectorChange);
+      fetchProfile(profileSelectorElement.value);
+    }
+  });
+}
+
+function onSelectorChange() {
+  const profileSelectorElement = document.getElementById('profileSelector');
+  fetchProfile(profileSelectorElement.value);
+}
+
+function fetchProfile() {
   profiles.fetchProfile(['fake profile id', gamepadId]).then((fetchedProfile) => {
     profile = fetchedProfile;
     const mockGamepad = new MockGamepad(profile);
@@ -25,5 +56,11 @@ function onLoad() {
       });
     });
   });
+}
+
+function onLoad() {
+  const motionControllerElement = document.getElementById('motionController');
+  ModelViewer.initialize(motionControllerElement);
+  populateDropdown(populateProfileSelector);
 }
 window.addEventListener('load', onLoad);
