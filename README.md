@@ -14,7 +14,7 @@ When a motion controller is present on XR hardware, developers often wish to do 
 The state of an XR motion controller's buttons, thumbsticks, dpads, and touchpads is made available to developers via a `Gamepad` object, as defined by the [Gamepad API](https://www.w3.org/TR/gamepad/). This data is divided up and populated in the `Gamepad.buttons` array and the `Gamepad.axes` array. While this system was adequate for the relatively homogenous console gaming controllers, it breaks down for XR motion controllers as they have not yet converged on a common form factor. In addition, the [Gamepad API](https://www.w3.org/TR/gamepad/) does not provide any information about the visualization of a `Gamepad` object which is a requirement to displaying a virtual copy of motion controller on opaque XR headsets.
 
 ## Overview
-This repository defines a JSON schema to bridge the gap between the needs listed above and the abstract data reported by `Gamepad` objects. For each known motion controller, there is a folder in this repository at either `./profiles/<profile.id>/`.  In this folder is a `profile.json` file which enumerates how to interpret the `Gamepad` data, paths to included 3D asset files representing the `Gamepad`, and the metadata necessary bind them together. Assets are available under MIT license in .glTF or .glB  format with a schema extension to be defined so additional formats may also be made available in the future.
+This repository defines a JSON schema to bridge the gap between the needs listed above and the abstract data reported by `Gamepad` objects. For each known motion controller, there is a folder in this repository at either `./profiles/<profile.id>/`.  In this folder is a `profile.json` file which enumerates how to interpret the `Gamepad` data, paths to included 3D asset files representing the `Gamepad`, and the metadata necessary bind them together. Assets are available under MIT license in .glTF, .glB, or .fbx formats.
 
 ## Design Goals
 This repository has been designed to meet the following goals:
@@ -85,11 +85,13 @@ navigator.addEventListener('gamepaddisconnected', onGamepadDisconnected);
 
 function onGamepadConnected(event) {
   const gamepad = event.gamepad;
-  const mockInputSource = new MockXRInputSource(gamepad);
+  if (gamepad.displayId) {
+    const mockInputSource = new MockXRInputSource(gamepad);
 
-  profiles.createMotionController(mockInputSource).then((motionController) => {
-    xrMotionControllers[gamepad] = motionController;
-  });
+    profiles.createMotionController(mockInputSource).then((motionController) => {
+        xrMotionControllers[gamepad] = motionController;
+    });
+  }
 }
 
 function onGamepadDisconnected(event) {
@@ -144,7 +146,7 @@ function processThumbstickInput(thumbstick) {
 ## Visual representation
 
 ### Loading the asset
-The visualization asset representing a motion controller can loaded once the `MotionController` has been created. The path to the asset can be found in the `MotionController.assetPath`.
+The visualization asset representing a motion controller can loaded once the `MotionController` has been created. The path to the asset can be found in the `MotionController.assetPath`. Assets are available under MIT license in .glTF, .glB, or .fbx formats.
 
 ```js
 profiles.createMotionController(inputSource).then((motionController) => {
@@ -281,7 +283,7 @@ For WebVR input sources, the `id` must be a string prefixed with 'WebVR ' follow
 ```json
 {
     "version" : "0.1",
-    "id" : "motion-controller-id",
+    "id" : "WebVR motion-controller-id",
     "webVR" : true
 }
 ```
@@ -356,7 +358,7 @@ For example:
 ```
 
 ## Data sources
-The [Gamepad API](https://www.w3.org/TR/gamepad/) communicates the state of buttons and axes via the `Gamepad.buttons` array and the `Gamepad.axes` array. Elements in the shcema's `dataSources` array describe which indices represent the buttons and axes associated with a component. Each `dataSource` must contain a unique `id` and a `dataSource` type set to `buttonSource`, `thumbstickSource` or `touchpadSource`.  
+The [Gamepad API](https://www.w3.org/TR/gamepad/) communicates the state of buttons and axes via the `Gamepad.buttons` array and the `Gamepad.axes` array. Elements in the schema's `dataSources` array describe which indices represent the buttons and axes associated with a component. Each `dataSource` must contain a unique `id` and a `dataSource` type set to `buttonSource`, `thumbstickSource` or `touchpadSource`.  
 
 ### Button data sources
 If the `dataSource` is a `buttonSource` it must also contain a `buttonIndex` representing an element in the `Gamepad.buttons` array.
@@ -600,7 +602,7 @@ The WebXR API communicates the origin of a motion controller's targeting ray thr
 ```
 
 ### Axis inversion
-Certain WebVR `Gamepad` objects have some components with an inverted `yAxis` causing positive at the top of its range of motion and negative ones at the bottom.  Profiles indicate this, or an inverted `xAxis`, on a `dataSource` by setting the `webVR_yAxisInverted` or `webVR_xAxisInverted` to true respectively.
+Certain WebVR `Gamepad` objects have some components with an inverted `yAxis` causing positive values at the top of its range of motion and negative ones at the bottom.  Profiles indicate this, or an inverted `xAxis`, on a `dataSource` by setting the `webVR_yAxisInverted` or `webVR_xAxisInverted` to true respectively.
 
 ```json
 {
