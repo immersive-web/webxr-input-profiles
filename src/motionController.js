@@ -2,14 +2,14 @@ import Constants from './constants';
 import { Button, Thumbstick, Touchpad } from './components';
 
 /**
-  * @description Builds a motion controller with enumerated thumbstick, touchpad, trigger,
-  * etc components
+  * @description Builds a motion controller with components and visual responses based on the
+  * supplied profile description. Data is polled from the xrInputSource's gamepad.
   * @author Nell Waliczek / https://github.com/NellWaliczek
 */
 class MotionController {
   /**
-   * @param {Object} xrInputSource - The XRInputSource
-   * @param {Object} profile - The profile to apply
+   * @param {Object} xrInputSource - The XRInputSource to build the MotionController around
+   * @param {Object} profile - The best matched profile description for the supplied xrInputSource
    */
   constructor(xrInputSource, profile) {
     if (!xrInputSource) {
@@ -23,6 +23,7 @@ class MotionController {
     this.profile = profile;
     this.xrInputSource = xrInputSource;
 
+    // Build child components as described in the profile description
     this.components = {};
     this.hand = this.profile.handedness[xrInputSource.handedness];
     this.hand.components.forEach((componentIndex) => {
@@ -46,6 +47,7 @@ class MotionController {
       }
     });
 
+    // Initialize components based on current gamepad state
     this.updateFromGamepad();
   }
 
@@ -65,6 +67,9 @@ class MotionController {
     return this.xrInputSource.targetRaySpace;
   }
 
+  /**
+   * @description Returns a subset of component data for simplified debugging
+   */
   get data() {
     const data = [];
     Object.values(this.components).forEach((component) => {
@@ -73,6 +78,9 @@ class MotionController {
     return data;
   }
 
+  /**
+   * @description Poll for updated data based on current gamepad state
+   */
   updateFromGamepad() {
     Object.values(this.components).forEach((component) => {
       component.updateFromGamepad(this.xrInputSource.gamepad);

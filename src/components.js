@@ -1,33 +1,39 @@
 import Constants from './constants';
 import VisualResponse from './visualResponse';
 
+/**
+ * @description The base class of all component types
+ */
 class Component {
-  constructor(profile, componentDescription) {
+  /**
+   * @param {Object} profileDescription - Description of the profile that the component belongs to
+   * @param {Object} componentDescription - Description of the component to be created
+   */
+  constructor(profileDescription, componentDescription) {
     this.componentDescription = componentDescription;
-    this.dataSource = profile.dataSources[this.componentDescription.dataSource];
-
-    const visualResponseDescriptions = [];
-    if (this.componentDescription.visualResponses) {
-      this.componentDescription.visualResponses.forEach((visualResponseIndex) => {
-        const visualResponseDescription = profile.visualResponses[visualResponseIndex];
-        visualResponseDescriptions.push(visualResponseDescription);
-      });
-    }
-
-    this.visualResponses = {};
-    visualResponseDescriptions.forEach((description) => {
-      this.visualResponses[description.rootNodeName] = new VisualResponse(description);
-    });
-
-    this.state = Constants.ComponentState.DEFAULT;
-
+    this.dataSource = profileDescription.dataSources[this.componentDescription.dataSource];
+    this.pressUnsupported = this.dataSource.pressUnsupported;
     if (this.dataSource.analogValues || this.dataSource.analogButtonValues) {
       this.analogButtonValues = true;
     }
 
-    this.pressUnsupported = this.dataSource.pressUnsupported;
+    // Build all the visual responses for this component
+    this.visualResponses = {};
+    if (this.componentDescription.visualResponses) {
+      this.componentDescription.visualResponses.forEach((visualResponseIndex) => {
+        const visualResponseDescription = profileDescription.visualResponses[visualResponseIndex];
+        const visualResponse = new VisualResponse(visualResponseDescription);
+        this.visualResponses[visualResponseDescription.rootNodeName] = visualResponse;
+      });
+    }
+
+    // Set default state
+    this.state = Constants.ComponentState.DEFAULT;
   }
 
+  /**
+   * Update the visual response weights based on the current component data
+   */
   updateVisualResponses() {
     Object.values(this.visualResponses).forEach((visualResponse) => {
       visualResponse.updateFromComponent(this);
@@ -47,18 +53,30 @@ class Component {
   }
 }
 
+/**
+ * @description Represents a button component
+ */
 class Button extends Component {
-  constructor(profile, componentDescription) {
-    const { dataSourceType } = profile.dataSources[componentDescription.dataSource];
+  /**
+   * @param {Object} profileDescription - Description of the profile that the component belongs to
+   * @param {Object} componentDescription - Description of the component to be created
+   */
+  constructor(profileDescription, componentDescription) {
+    const { dataSourceType } = profileDescription.dataSources[componentDescription.dataSource];
     if (dataSourceType !== Constants.DataSourceType.BUTTON) {
       throw new Error('Button requires a matching dataSource.type');
     }
 
-    super(profile, componentDescription);
+    super(profileDescription, componentDescription);
 
+    // Set default state
     this.buttonValue = 0;
   }
 
+  /**
+   * @description Poll for updated data based on current gamepad state
+   * @param {Object} gamepad - The gamepad object from which the component data should be polled
+   */
   updateFromGamepad(gamepad) {
     const gamepadButton = gamepad.buttons[this.dataSource.buttonIndex];
 
@@ -78,6 +96,9 @@ class Button extends Component {
     this.updateVisualResponses();
   }
 
+  /**
+   * @description Returns a subset of component data for simplified debugging
+   */
   get data() {
     const { id, buttonValue, state } = this;
     const data = { id, buttonValue, state };
@@ -85,9 +106,16 @@ class Button extends Component {
   }
 }
 
+/**
+ * @description Base class for Thumbsticks and Touchpads
+ */
 class Axes extends Component {
-  constructor(profile, componentDescription) {
-    super(profile, componentDescription);
+  /**
+   * @param {Object} profileDescription - Description of the profile that the component belongs to
+   * @param {Object} componentDescription - Description of the component to be created
+   */
+  constructor(profileDescription, componentDescription) {
+    super(profileDescription, componentDescription);
 
     this.xAxis = 0;
     this.yAxis = 0;
@@ -106,6 +134,10 @@ class Axes extends Component {
     }
   }
 
+  /**
+   * @description Poll for updated data based on current gamepad state
+   * @param {Object} gamepad - The gamepad object from which the component data should be polled
+   */
   updateFromGamepad(gamepad) {
     // Get and normalize x axis value
     this.xAxis = gamepad.axes[this.dataSource.xAxisIndex];
@@ -145,6 +177,9 @@ class Axes extends Component {
     this.updateVisualResponses();
   }
 
+  /**
+   * @description Returns a subset of component data for simplified debugging
+   */
   get data() {
     const {
       id, xAxis, yAxis, state
@@ -159,17 +194,31 @@ class Axes extends Component {
   }
 }
 
+/**
+ * @description Represents a Thumbstick component
+ */
 class Thumbstick extends Axes {
-  constructor(profile, componentDescription) {
-    const { dataSourceType } = profile.dataSources[componentDescription.dataSource];
+  /**
+   * @param {Object} profileDescription - Description of the profile that the component belongs to
+   * @param {Object} componentDescription - Description of the component to be created
+   */
+  constructor(profileDescription, componentDescription) {
+    const { dataSourceType } = profileDescription.dataSources[componentDescription.dataSource];
     if (dataSourceType !== Constants.DataSourceType.THUMBSTICK) {
       throw new Error('Thumbstick requires a matching dataSource.type');
     }
-    super(profile, componentDescription);
+    super(profileDescription, componentDescription);
   }
 }
 
+/**
+ * @description Represents a Touchpad component
+ */
 class Touchpad extends Axes {
+  /**
+   * @param {Object} profileDescription - Description of the profile that the component belongs to
+   * @param {Object} componentDescription - Description of the component to be created
+   */
   constructor(profile, componentDescription) {
     const { dataSourceType } = profile.dataSources[componentDescription.dataSource];
     if (dataSourceType !== Constants.DataSourceType.TOUCHPAD) {

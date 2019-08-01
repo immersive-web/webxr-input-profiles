@@ -9,6 +9,9 @@ const profilesFolderPath = join(__dirname, '../profiles');
 const TestHelpers = {
   profilesFolderPath,
 
+  /**
+   * @description Builds and retrieves the list of supported profiles
+   */
   getSupportedProfilesList() {
     const folderContents = fs.readdirSync(profilesFolderPath);
     const profilesList = [];
@@ -21,6 +24,12 @@ const TestHelpers = {
     return profilesList;
   },
 
+  /**
+   * @description Loads a profile description
+   * @param {string} profileName - The name of the profile to load
+   * @param {boolean} includeBaseUri - Adds the baseUri property to the profile description.
+   * False by default to make object comparisons in tests easier in the common case.
+   */
   getProfile(profileName, includeBaseUri) {
     const folderPath = join(profilesFolderPath, profileName);
     const profile = fs.readJSONSync(join(folderPath, 'profile.json'));
@@ -47,6 +56,7 @@ const TestHelpers = {
     let mainSchema;
 
     if (schemaFilename) {
+      // Set the target schema to the one supplied and load all specified dependencies
       if (dependencies) {
         dependencies.forEach((dependency) => {
           ajv.addMetaSchema(fs.readJSONSync(join(schemasFolder, dependency)));
@@ -54,6 +64,7 @@ const TestHelpers = {
       }
       mainSchema = fs.readJSONSync(join(schemasFolder, schemaFilename));
     } else {
+      // Set the target schema to the top-level schema and load all other schemas as dependencies
       const mainSchemaId = 'https://immersive-web/gamepad-profiles/0.1.0/profile.schema.json';
       const items = fs.readdirSync(schemasFolder);
       items.forEach((filename) => {
