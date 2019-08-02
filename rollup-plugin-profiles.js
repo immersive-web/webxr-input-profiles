@@ -2,11 +2,11 @@ const fs = require('fs-extra');
 const path = require('path');
 const chokidar = require('chokidar');
 
-function isDirectory(path) {
-  return fs.lstatSync(path).isDirectory();
+function isDirectory(targetPath) {
+  return fs.lstatSync(targetPath).isDirectory();
 }
 
-export default function generateProfilesList({ profilePaths, dest} = {}) {
+export default function generateProfilesList({ profilePaths, dest } = {}) {
   if (!dest || (fs.pathExistsSync(dest) && isDirectory(dest))) {
     throw new Error(`Invalid dest supplied: ${dest}`);
   }
@@ -42,7 +42,7 @@ export default function generateProfilesList({ profilePaths, dest} = {}) {
           chokidar.watch(profilePath)
             .on('add', filePath => addFileToList(filePath))
             .on('unlink', filePath => removeFileFromList(filePath))
-            .on('error', error => console.error(error))
+            .on('error', error => console.error(error)); // eslint-disable-line no-console
         });
       }
     }

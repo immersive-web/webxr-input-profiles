@@ -17,14 +17,14 @@ export default [
       eslint(),
       copy(
         [
-          { files: 'profiles/**', dest: `${DIST_FOLDER}/profiles`}
+          { files: 'profiles/**', dest: `${DIST_FOLDER}/profiles` }
         ],
         { verbose: true, watch: true }
       ),
       buildProfilesList({
         profilePaths: ['profiles/**'],
         dest: `${DIST_FOLDER}/profiles/profilesList.json`,
-        verbose: true, 
+        verbose: true,
         watch: true
       })
     ]

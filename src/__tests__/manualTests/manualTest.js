@@ -28,7 +28,7 @@ function setUrl(profileId, handedness) {
     urlSearchParams.delete('handedness');
   }
 
-  history.replaceState(null, null, location.pathname + '?' + urlSearchParams.toString());
+  window.history.replaceState(null, null, `${window.location.pathname}?${urlSearchParams.toString()}`);
 }
 
 function changeActiveHandedness() {
@@ -68,7 +68,7 @@ function changeActiveProfile(requestedProfileId, requestedHandedness) {
   `;
 
   // Apply profileId override if supplied
-  const profileId = (requestedProfileId) ? requestedProfileId : profileSelectorElement.value;
+  const profileId = (requestedProfileId) || profileSelectorElement.value;
 
   // Set the query string
   setUrl(profileId);
@@ -132,8 +132,8 @@ function populateProfileSelector() {
       });
 
       // Get the initial query string parameters and override the default selection if available
-      let requestedProfileId = urlSearchParams.get('profileId');
-      let requestedHandedness = urlSearchParams.get('handedness');
+      const requestedProfileId = urlSearchParams.get('profileId');
+      const requestedHandedness = urlSearchParams.get('handedness');
       if (requestedProfileId) {
         profileSelectorElement.value = requestedProfileId;
       }
