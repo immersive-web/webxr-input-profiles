@@ -6,9 +6,13 @@ const xAxisIndex = 0;
 const yAxisIndex = 1;
 const buttonIndex = 0;
 
+const handednessDescription = {
+  none: { components: [0] }
+};
 const componentDescription = { dataSource: 0 };
 
 const noButtonProfile = {
+  handedness: handednessDescription,
   components: [componentDescription],
   dataSources: [{
     dataSourceType: Constants.DataSourceType.TOUCHPAD,
@@ -18,6 +22,7 @@ const noButtonProfile = {
 };
 
 const buttonProfile = {
+  handedness: handednessDescription,
   components: [componentDescription],
   dataSources: [{
     dataSourceType: Constants.DataSourceType.THUMBSTICK,
@@ -29,7 +34,7 @@ const buttonProfile = {
 
 test('xAxis value below touch threshold', () => {
   const axisComponent = new Axes(noButtonProfile, componentDescription);
-  const mockGamepad = new MockGamepad(noButtonProfile);
+  const mockGamepad = new MockGamepad(noButtonProfile, Constants.Handedness.NONE);
   mockGamepad.axes[xAxisIndex] = 0.01;
   axisComponent.updateFromGamepad(mockGamepad);
   expect(axisComponent.xAxis).toEqual(0.01);
@@ -38,7 +43,7 @@ test('xAxis value below touch threshold', () => {
 
 test('xAxis value above touch threshold', () => {
   const axisComponent = new Axes(noButtonProfile, componentDescription);
-  const mockGamepad = new MockGamepad(noButtonProfile);
+  const mockGamepad = new MockGamepad(noButtonProfile, Constants.Handedness.NONE);
   mockGamepad.axes[xAxisIndex] = 0.5;
   axisComponent.updateFromGamepad(mockGamepad);
   expect(axisComponent.xAxis).toEqual(0.5);
@@ -47,7 +52,7 @@ test('xAxis value above touch threshold', () => {
 
 test('yAxis value below touch threshold', () => {
   const axisComponent = new Axes(noButtonProfile, componentDescription);
-  const mockGamepad = new MockGamepad(noButtonProfile);
+  const mockGamepad = new MockGamepad(noButtonProfile, Constants.Handedness.NONE);
   mockGamepad.axes[yAxisIndex] = 0.01;
   axisComponent.updateFromGamepad(mockGamepad);
   expect(axisComponent.yAxis).toEqual(0.01);
@@ -56,7 +61,7 @@ test('yAxis value below touch threshold', () => {
 
 test('yAxis value above touch threshold', () => {
   const axisComponent = new Axes(noButtonProfile, componentDescription);
-  const mockGamepad = new MockGamepad(noButtonProfile);
+  const mockGamepad = new MockGamepad(noButtonProfile, Constants.Handedness.NONE);
   mockGamepad.axes[yAxisIndex] = -0.5;
   axisComponent.updateFromGamepad(mockGamepad);
   expect(axisComponent.yAxis).toEqual(-0.5);
@@ -65,7 +70,7 @@ test('yAxis value above touch threshold', () => {
 
 test('xAxis to be rounded down', () => {
   const axisComponent = new Axes(noButtonProfile, componentDescription);
-  const mockGamepad = new MockGamepad(noButtonProfile);
+  const mockGamepad = new MockGamepad(noButtonProfile, Constants.Handedness.NONE);
   mockGamepad.axes[xAxisIndex] = 5;
   axisComponent.updateFromGamepad(mockGamepad);
   expect(axisComponent.xAxis).toEqual(1);
@@ -74,7 +79,7 @@ test('xAxis to be rounded down', () => {
 
 test('yAxis to be rounded down', () => {
   const axisComponent = new Axes(noButtonProfile, componentDescription);
-  const mockGamepad = new MockGamepad(noButtonProfile);
+  const mockGamepad = new MockGamepad(noButtonProfile, Constants.Handedness.NONE);
   mockGamepad.axes[yAxisIndex] = 5;
   axisComponent.updateFromGamepad(mockGamepad);
   expect(axisComponent.yAxis).toEqual(1);
@@ -83,7 +88,7 @@ test('yAxis to be rounded down', () => {
 
 test('xAxis to be rounded up', () => {
   const axisComponent = new Axes(noButtonProfile, componentDescription);
-  const mockGamepad = new MockGamepad(noButtonProfile);
+  const mockGamepad = new MockGamepad(noButtonProfile, Constants.Handedness.NONE);
   mockGamepad.axes[xAxisIndex] = -5;
   axisComponent.updateFromGamepad(mockGamepad);
   expect(axisComponent.xAxis).toEqual(-1);
@@ -92,7 +97,7 @@ test('xAxis to be rounded up', () => {
 
 test('yAxis to be rounded up', () => {
   const axisComponent = new Axes(noButtonProfile, componentDescription);
-  const mockGamepad = new MockGamepad(noButtonProfile);
+  const mockGamepad = new MockGamepad(noButtonProfile, Constants.Handedness.NONE);
   mockGamepad.axes[yAxisIndex] = -5;
   axisComponent.updateFromGamepad(mockGamepad);
   expect(axisComponent.yAxis).toEqual(-1);
@@ -101,7 +106,7 @@ test('yAxis to be rounded up', () => {
 
 test('button below touch threshold and rounded up', () => {
   const axisComponent = new Axes(buttonProfile, componentDescription);
-  const mockGamepad = new MockGamepad(buttonProfile);
+  const mockGamepad = new MockGamepad(buttonProfile, Constants.Handedness.NONE);
   mockGamepad.buttons[buttonIndex].value = -5;
   axisComponent.updateFromGamepad(mockGamepad);
   expect(axisComponent.yAxis).toEqual(0);
@@ -110,7 +115,7 @@ test('button below touch threshold and rounded up', () => {
 
 test('button above touch threshold', () => {
   const axisComponent = new Axes(buttonProfile, componentDescription);
-  const mockGamepad = new MockGamepad(buttonProfile);
+  const mockGamepad = new MockGamepad(buttonProfile, Constants.Handedness.NONE);
   mockGamepad.buttons[buttonIndex].value = 0.5;
   axisComponent.updateFromGamepad(mockGamepad);
   expect(axisComponent.buttonValue).toEqual(0.5);
@@ -119,7 +124,7 @@ test('button above touch threshold', () => {
 
 test('button rounded down', () => {
   const axisComponent = new Axes(buttonProfile, componentDescription);
-  const mockGamepad = new MockGamepad(buttonProfile);
+  const mockGamepad = new MockGamepad(buttonProfile, Constants.Handedness.NONE);
   mockGamepad.buttons[buttonIndex].value = 5;
   axisComponent.updateFromGamepad(mockGamepad);
   expect(axisComponent.buttonValue).toEqual(1);
@@ -128,7 +133,7 @@ test('button rounded down', () => {
 
 test('button pressed', () => {
   const axisComponent = new Axes(buttonProfile, componentDescription);
-  const mockGamepad = new MockGamepad(buttonProfile);
+  const mockGamepad = new MockGamepad(buttonProfile, Constants.Handedness.NONE);
 
   mockGamepad.buttons[buttonIndex].pressed = true;
   axisComponent.updateFromGamepad(mockGamepad);
@@ -141,7 +146,7 @@ test('button pressed', () => {
 
 test('button touched', () => {
   const axisComponent = new Axes(buttonProfile, componentDescription);
-  const mockGamepad = new MockGamepad(buttonProfile);
+  const mockGamepad = new MockGamepad(buttonProfile, Constants.Handedness.NONE);
   mockGamepad.buttons[buttonIndex].touched = true;
   axisComponent.updateFromGamepad(mockGamepad);
   expect(axisComponent.state).toBe(Constants.ComponentState.TOUCHED);
@@ -149,7 +154,7 @@ test('button touched', () => {
 
 test('button pressed and axis over touch threshold', () => {
   const axisComponent = new Axes(buttonProfile, componentDescription);
-  const mockGamepad = new MockGamepad(buttonProfile);
+  const mockGamepad = new MockGamepad(buttonProfile, Constants.Handedness.NONE);
   mockGamepad.buttons[buttonIndex].pressed = true;
   mockGamepad.axes[xAxisIndex] = 0.5;
   axisComponent.updateFromGamepad(mockGamepad);
@@ -162,7 +167,7 @@ test('x axis inverted', () => {
   invertedProfile.dataSources[0].webVR_xAxisInverted = true;
 
   const axisComponent = new Axes(invertedProfile, componentDescription);
-  const mockGamepad = new MockGamepad(invertedProfile);
+  const mockGamepad = new MockGamepad(invertedProfile, Constants.Handedness.NONE);
 
   mockGamepad.axes[xAxisIndex] = 0.5;
   axisComponent.updateFromGamepad(mockGamepad);
@@ -178,7 +183,7 @@ test('y axis inverted', () => {
   invertedProfile.dataSources[0].webVR_yAxisInverted = true;
 
   const axisComponent = new Axes(invertedProfile, componentDescription);
-  const mockGamepad = new MockGamepad(invertedProfile);
+  const mockGamepad = new MockGamepad(invertedProfile, Constants.Handedness.NONE);
 
   mockGamepad.axes[yAxisIndex] = 0.5;
   axisComponent.updateFromGamepad(mockGamepad);

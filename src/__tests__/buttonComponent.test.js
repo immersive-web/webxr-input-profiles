@@ -3,8 +3,12 @@ import { Button } from '../components';
 import MockGamepad from '../mocks/mockGamepad';
 
 const buttonIndex = 0;
+const handednessDescription = {
+  none: { components: [0] }
+};
 const componentDescription = { dataSource: 0 };
 const profile = {
+  handedness: handednessDescription,
   components: [componentDescription],
   dataSources: [{
     dataSourceType: Constants.DataSourceType.BUTTON,
@@ -14,7 +18,7 @@ const profile = {
 
 test('Value below touch threshold', () => {
   const button = new Button(profile, componentDescription);
-  const mockGamepad = new MockGamepad(profile);
+  const mockGamepad = new MockGamepad(profile, Constants.Handedness.NONE);
   mockGamepad.buttons[buttonIndex].value = 0.01;
   button.updateFromGamepad(mockGamepad);
   expect(button.buttonValue).toEqual(mockGamepad.buttons[buttonIndex].value);
@@ -23,7 +27,7 @@ test('Value below touch threshold', () => {
 
 test('Value above touch threshold', () => {
   const button = new Button(profile, componentDescription);
-  const mockGamepad = new MockGamepad(profile);
+  const mockGamepad = new MockGamepad(profile, Constants.Handedness.NONE);
   mockGamepad.buttons[buttonIndex].value = 0.4;
   button.updateFromGamepad(mockGamepad);
   expect(button.buttonValue).toEqual(mockGamepad.buttons[buttonIndex].value);
@@ -32,7 +36,7 @@ test('Value above touch threshold', () => {
 
 test('Value to be rounded down', () => {
   const button = new Button(profile, componentDescription);
-  const mockGamepad = new MockGamepad(profile);
+  const mockGamepad = new MockGamepad(profile, Constants.Handedness.NONE);
   mockGamepad.buttons[buttonIndex].value = 2;
   button.updateFromGamepad(mockGamepad);
   expect(button.buttonValue).toEqual(1);
@@ -41,7 +45,7 @@ test('Value to be rounded down', () => {
 
 test('Touched', () => {
   const button = new Button(profile, componentDescription);
-  const mockGamepad = new MockGamepad(profile);
+  const mockGamepad = new MockGamepad(profile, Constants.Handedness.NONE);
   mockGamepad.buttons[buttonIndex].touched = true;
   button.updateFromGamepad(mockGamepad);
   expect(button.buttonValue).toEqual(0);
@@ -50,7 +54,7 @@ test('Touched', () => {
 
 test('Pressed', () => {
   const button = new Button(profile, componentDescription);
-  const mockGamepad = new MockGamepad(profile);
+  const mockGamepad = new MockGamepad(profile, Constants.Handedness.NONE);
 
   mockGamepad.buttons[buttonIndex].pressed = true;
   button.updateFromGamepad(mockGamepad);
@@ -60,7 +64,7 @@ test('Pressed', () => {
 
 test('Touched and pressed', () => {
   const button = new Button(profile, componentDescription);
-  const mockGamepad = new MockGamepad(profile);
+  const mockGamepad = new MockGamepad(profile, Constants.Handedness.NONE);
 
   mockGamepad.buttons[buttonIndex].touched = true;
   mockGamepad.buttons[buttonIndex].pressed = true;
@@ -71,7 +75,7 @@ test('Touched and pressed', () => {
 
 test('Set value to 1 and touched', () => {
   const button = new Button(profile, componentDescription);
-  const mockGamepad = new MockGamepad(profile);
+  const mockGamepad = new MockGamepad(profile, Constants.Handedness.NONE);
 
   mockGamepad.buttons[buttonIndex].touched = true;
   mockGamepad.buttons[buttonIndex].value = 1;
@@ -82,7 +86,7 @@ test('Set value to 1 and touched', () => {
 
 test('Set value to 10 and touched', () => {
   const button = new Button(profile, componentDescription);
-  const mockGamepad = new MockGamepad(profile);
+  const mockGamepad = new MockGamepad(profile, Constants.Handedness.NONE);
 
   mockGamepad.buttons[buttonIndex].touched = true;
   mockGamepad.buttons[buttonIndex].value = 10;
@@ -93,7 +97,7 @@ test('Set value to 10 and touched', () => {
 
 test('Set value below touch threshold and touched', () => {
   const button = new Button(profile, componentDescription);
-  const mockGamepad = new MockGamepad(profile);
+  const mockGamepad = new MockGamepad(profile, Constants.Handedness.NONE);
 
   mockGamepad.buttons[buttonIndex].touched = true;
   mockGamepad.buttons[buttonIndex].value = 0.005;
@@ -104,7 +108,7 @@ test('Set value below touch threshold and touched', () => {
 
 test('Set value below touch threshold and pressed', () => {
   const button = new Button(profile, componentDescription);
-  const mockGamepad = new MockGamepad(profile);
+  const mockGamepad = new MockGamepad(profile, Constants.Handedness.NONE);
 
   mockGamepad.buttons[buttonIndex].pressed = true;
   mockGamepad.buttons[buttonIndex].value = 0.005;

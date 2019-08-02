@@ -1,25 +1,85 @@
 /* eslint import/no-unresolved: off */
 
-import { Constants, Profiles } from '../../../dist/webxr-input-profiles.module.js';
+import { Profiles } from '../../../dist/webxr-input-profiles.module.js';
 import { MockGamepad, MockXRInputSource } from '../../../dist/webxr-input-mocks.module.js';
 import ModelViewer from './modelViewer.js';
-import buildElements from './buildElements.js';
+import ManualControls from './buildElements.js';
 
 const profiles = new Profiles('../../../dist/profiles');
-let mockXRInputSource;
 let supportedProfilesList;
-let profile;
-let motionController;
+let profileSelectorElement;
+let handednessSelectorElement;
+
+let activeProfile;
+
+function changeActiveHandedness() {
+  // Disable user interaction during change
+  profileSelectorElement.disabled = true;
+  handednessSelectorElement.disabled = true;
+
+  // Clear the old info
+  ModelViewer.clear();
+  ManualControls.clear();
+
+  // Create a mockgamepad that matches the profile and handedness
+  const handedness = handednessSelectorElement.value;
+  const mockGamepad = new MockGamepad(activeProfile, handedness);
+  const mockXRInputSource = new MockXRInputSource(mockGamepad, handedness);
+  profiles.createMotionController(mockXRInputSource).then((motionController) => {
+    ManualControls.build(motionController);
+    ModelViewer.loadModel(motionController);
+  }).finally(() => {
+    profileSelectorElement.disabled = false;
+    handednessSelectorElement.disabled = false;
+  });
+}
+
+function changeActiveProfile() {
+  // Disable user interaction during change
+  profileSelectorElement.disabled = true;
+  handednessSelectorElement.disabled = true;
+
+  // Clear the old info
+  activeProfile = undefined;
+  ModelViewer.clear();
+  ManualControls.clear();
+  handednessSelectorElement.innerHTML = `
+    <option value='loading'>Loading...</option>
+  `;
+
+  // Load the new profile
+  profiles.fetchProfile([profileSelectorElement.value]).then((profile) => {
+    activeProfile = profile;
+
+    // Populate handedness selector
+    handednessSelectorElement.innerHTML = '';
+    Object.keys(activeProfile.handedness).forEach((handedness) => {
+      handednessSelectorElement.innerHTML += `
+        <option value='${handedness}'>${handedness}</option>
+      `;
+    });
+
+    // Manually trigger the handedness to change
+    changeActiveHandedness();
+  }).catch((error) => {
+    profileSelectorElement.disabled = false;
+    handednessSelectorElement.disabled = true;
+    throw error;
+  });
+}
 
 function populateProfileSelector() {
+  // Disable user interaction during load
+  profileSelectorElement.disabled = true;
+  handednessSelectorElement.disabled = true;
+
   profiles.fetchSupportedProfilesList().then((profilesList) => {
     supportedProfilesList = profilesList;
 
     // Remove loading entry
-    const profileSelectorElement = document.getElementById('profileSelector');
     profileSelectorElement.innerHTML = '';
 
-    if (supportedProfilesList.length == 0) {
+    if (supportedProfilesList.length === 0) {
       // No supported profiles found
       profileSelectorElement.innerHTML = `
         <option value='No profiles found'>No profiles found</option>
@@ -28,39 +88,23 @@ function populateProfileSelector() {
       // Populate the selector with the profiles list
       supportedProfilesList.forEach((supportedProfile) => {
         profileSelectorElement.innerHTML += `
-        <option value=${supportedProfile}>${supportedProfile}</option>
+        <option value='${supportedProfile}'>${supportedProfile}</option>
         `;
       });
 
-      // Hook up event listener and load profile
-      profileSelectorElement.addEventListener('change', onSelectorChange);
-      fetchProfile(profileSelectorElement.value);
+      // Manually trigger active profile to change
+      changeActiveProfile();
     }
   });
 }
 
-function onSelectorChange() {
-  const profileSelectorElement = document.getElementById('profileSelector');
-  fetchProfile(profileSelectorElement.value);
-}
-
-function fetchProfile() {
-  profiles.fetchProfile(['fake profile id', gamepadId]).then((fetchedProfile) => {
-    profile = fetchedProfile;
-    const mockGamepad = new MockGamepad(profile);
-    mockXRInputSource = new MockXRInputSource(mockGamepad, Constants.Handedness.LEFT);
-    profiles.createMotionController(mockXRInputSource).then((createdMotionController) => {
-      motionController = createdMotionController;
-      ModelViewer.loadAsset(motionController).then(() => {
-        buildElements(motionController);
-      });
-    });
-  });
-}
-
 function onLoad() {
-  const motionControllerElement = document.getElementById('motionController');
-  ModelViewer.initialize(motionControllerElement);
-  populateDropdown(populateProfileSelector);
+  ModelViewer.initialize();
+
+  profileSelectorElement = document.getElementById('profileSelector');
+  handednessSelectorElement = document.getElementById('handednessSelector');
+  profileSelectorElement.addEventListener('change', changeActiveProfile);
+  handednessSelectorElement.addEventListener('change', changeActiveHandedness);
+  populateProfileSelector();
 }
 window.addEventListener('load', onLoad);
