@@ -1,9 +1,9 @@
 # XR Gamepad Mappings
 
 ## Motivation
-> **TODO** Explain what WebXR is and how its different from WebVR
+Explain what WebXR is and how its different from WebVR https://github.com/immersive-web/xr-gamepad-mappings/issues/49
 
-> **TODO** Define motion controllers
+Define motion controllers https://github.com/immersive-web/xr-gamepad-mappings/issues/50
 
 When a motion controller is present on XR hardware, developers often wish to do the following:
 1. Display the motion controller's virtual model at the correct location
@@ -14,37 +14,354 @@ When a motion controller is present on XR hardware, developers often wish to do 
 The state of an XR motion controller's buttons, thumbsticks, dpads, and touchpads is made available to developers via a `Gamepad` object, as defined by the [Gamepad API](https://www.w3.org/TR/gamepad/). This data is divided up and populated in the `Gamepad.buttons` array and the `Gamepad.axes` array. While this system was adequate for the relatively homogenous console gaming controllers, it breaks down for XR motion controllers as they have not yet converged on a common form factor. In addition, the [Gamepad API](https://www.w3.org/TR/gamepad/) does not provide any information about the visualization of a `Gamepad` object which is a requirement to displaying a virtual copy of motion controller on opaque XR headsets.
 
 ## Overview
-This repository defines a JSON schema to bridge the gap between the needs listed above and the abstract data reported by `Gamepad` objects. For each known motion controller, there is a folder in this repository at either `./mappings/WebXR/<Gamepad.id>/` or `./mappings/WebVR/<Gamepad.id>/` depending on the type of `Gamepad`.  In this folder is a `mapping.json` file which enumerates how to interpret the `Gamepad` data, paths to included 3D asset files representing the `Gamepad`, and the metadata necessary bind them together. Assets are available under MIT license in .glTF or .glB  format with a schema extension to be defined so additional formats may also be made available in the future.
+This repository defines a JSON schema to bridge the gap between the needs listed above and the abstract data reported by `Gamepad` objects. For each known motion controller, there is a folder in this repository at `./profiles/<profile.id>/`.  In this folder are assets and a `profile.json` file which enumerates how to interpret the `Gamepad` data and bind it to the assets. Assets are available under MIT license in .glTF, .glB, or .fbx formats.
 
 ## Design Goals
 This repository has been designed to meet the following goals:
 * *Distributable and modifiable.* The content in this repository is available under MIT licence.  Take this schema and modify it for your own purposes.
-* *Forward compatible.* The schema, validation tests, and tools are designed to make it straightforward to submit a pull request with new mapping files and assets as new XR hardware comes on the market.  Additionally, fallback assets and mappings are included to handle unknown motion controllers.
-* *No custom code necessary.* The schema enables enumerating all hardware metadata necessary to write a single code path for handling motion controller hardware.  Developers should not need to add code checks for specific `Gamepad.id` as aberrant user agent behavior is also documentable in the schema as bugs are discovered.
-* *WebXR optimized, WebVR compatible.* While WebVR is still available in several user agents, the future of XR on the web is in the standards-track API, WebXR. As such, when faced with tradeoffs, the design was optimized to simplify the schema for WebXR usage while still maintaining a path for WebVR usage.
+* *Forward compatible.* The schema, validation tests, and tools are designed to make it straightforward to submit a pull request with new profiles and assets as new XR hardware comes on the market.  Additionally, fallback assets and profiles are included to handle unknown motion controllers.
+* *WebXR optimized, WebVR compatible.* While WebVR is still available in several user agents, the future of XR on the web is in the standards-track API, WebXR. As such, when faced with tradeoffs, the design was optimized to simplify the schema and library for WebXR usage while still maintaining a path for WebVR usage.
 
 ## Adding New Hardware
-> **TODO** fill in the steps for adding a folder for a new XR device, testing the change, and submitting for PR
-
-> **TODO** Create an issue template for new hardware PRs
+Fill in the steps for adding a folder for a new XR device, testing the change, and submitting for PR https://github.com/immersive-web/xr-gamepad-mappings/issues/51
 
 ## Filing A Bug
-> **TODO** fill in the steps for filing a bug
+Fill in the steps for filing a bug https://github.com/immersive-web/xr-gamepad-mappings/issues/52
 
-> **TODO** Create an issue template for bugs
+# Developer usage
+This repo provides a javascript library for managing known motion controller profiles, loading the most ideal known profile for a supplied input source, and creating a MotionController object that binds them together.  Developers can use this library to interact with the conceptual components of an input source, rather than each individual button or axis.
 
-# Schema
+## Getting started
+To install this library and the associated profiles:
+```
+npm install webxr-input-profiles
+```
+
+To use this library, first initialize a `Profiles` object with the path to a folder containing the profiles. You'll probably want to copy the profiles from the module's `profiles/` folder as part of your application deployment.
+```js
+const profiles = new Profiles('URI of folder with profiles and assets');
+```
+On the first request to load a profile, the class retrieves the list of known profiles from the supplied URI and caches it for use on subsequent requests.
+
+## Creating a MotionController
+As input sources are added and removed, developers can monitor the related events and create a `MotionController` by invoking `Profiles.createMotionController()`.
+
+### WebXR connection and disconnection
+WebXR reports input sources being connected and disconnected via the `XRSession.inputsourceschange` event. Developers should register for this event and respond by requesting a `MotionController` be created. This will check the `XRInputSource.getProfiles()` list to find the best match.  If found, the library will load the 3D asset and fullfil the promise with a new `MotionController` object.
+
+```js
+import { Profiles } from './webxr-input-profiles.module.js';
+const profiles = new Profiles('the URI where profiles and assets are hosted');
+
+let xrMotionControllers = {};
+xrSession.addEventListener('inputsourceschange', onInputSourcesChange);
+
+function onInputSourcesChange(event) {
+  event.added.forEach((inputSource) => {
+    profiles.createMotionController(inputSource).then((motionController) => {
+      xrMotionControllers[inputSource] = motionController;
+    });
+  }
+
+  event.removed.forEach((inputSource) => {
+    if (xrMotionControllers[inputSource]) {
+      delete xrMotionControllers[inputSource];
+    }
+  });
+}
+```
+
+### WebVR connection and disconnection
+WebVR reports input sources being connected and disconnected by the `navigator.gamepadconnected` and `navigator.gamepaddisconnected` events respectively. In order to use this library, a `MockXRInputSource` must be created using the newly detected `Gamepad`.  The `Gamepad.id` will be treated as the single allowable profile returned by `MockXRInputSource.getProfiles()`.
+
+```js
+import { MockXRInputSource } from './webxr-input-mocks.module.js';
+import { Profiles } from './webxr-input-profiles.module.js';
+const profiles = new Profiles('the URI where profiles and assets are hosted');
+
+let xrMotionControllers = {};
+navigator.addEventListener('gamepadconnected', onGamepadConnected);
+navigator.addEventListener('gamepaddisconnected', onGamepadDisconnected);
+
+function onGamepadConnected(event) {
+  const gamepad = event.gamepad;
+  if (gamepad.displayId) {
+    const mockInputSource = new MockXRInputSource(gamepad);
+
+    profiles.createMotionController(mockInputSource).then((motionController) => {
+        xrMotionControllers[gamepad] = motionController;
+    });
+  }
+}
+
+function onGamepadDisconnected(event) {
+  if (xrMotionControllers[event.gamepad]) {
+      delete xrMotionControllers[event.gamepad];
+    }
+  }
+}
+```
+
+## Components
+
+### Button component
+A `Button` component is always in the `pressed` state if the associated `GamepadButton.pressed` is `true`.  Some buttons may not support the pressed state, such as the thumbrest on the original Oculus Touch controller. If the pressed state is allowed, the `Button` will also be set to it if the `GamepadButton.value` equals `1.0`.
+
+A `Button` component is in the `default` state if the associated `GamepadButton.touched` and the `GamepadButton.pressed` are both `false` and the `GamepadButton.value` is below `0.01`.
+
+Otherwise, the `Button` component is in the `touched` state.  This may be because the associated `GamepadButton.touched` is `true` and the `GamepadButton.pressed` is false.  It may also be because the `GamepadButton.value` is between `0.01` and `1.0` while the `GamepadButton.pressed` is `false`.
+
+The `Button.buttonValue` always comes directly from the `GamepadButton.value`. 
+
+```js
+import { Constants } from './webxr-input-profiles.module.js';
+function processTriggerInput(triggerButton) {
+  if (triggerButton.state === Constants.ComponentState.PRESSED) {
+    // Fire ray gun
+  } else if (triggerButton.state === Constants.ComponentState.TOUCHED) {
+    const chargeLevel = triggerButton.buttonValue;
+    // Show ray gun charging up
+  }
+}
+```
+
+### Thumbstick and touchpad components
+Though `Thumbstick` and `Touchpad` components are often used for different interactions (e.g. thumbsticks are often preferred for teleportation), they share common behavior and can collectively be referred to as `Axes` components. An `Axes` component will always have an `xAxis` value which is `-1.0` at the far left of its range of motion and `1.0` at the far right. An `Axes` component will also always have a `yAxis` value which is `-1.0` at the top of its range of motion and `1.0` at the bottom.  An `Axes` component may have a `buttonValue`, such as when a touchpad or thumbstick are clickable.
+
+If an `Axes` component is clickable, its state will mostly behave identically to a `Button` component. The only difference is when the component would otherwise be in the `default` state. In that case, an `xAxis` or `yAxis` value greater than `0.1` will cause the component to report the`touched` state.
+
+```js
+import { Constants } from './webxr-input-profiles.module.js';
+function processThumbstickInput(thumbstick) {
+  if (thumbstick.state === Constants.ComponentState.PRESSED) {
+    // Align the world orientation to the user's current orientation
+  } else if (thumbstick.state === Constants.ComponentState.TOUCHED
+             && thumbstick.yAxis !== 0) {
+    const scootDistance = thumbstick.yAxis * scootIncrement;
+    // Scoot the user forward
+  }
+}
+```
+
+## Visual representation
+
+### Loading the asset
+The visualization asset representing a motion controller can loaded once the `MotionController` has been created. The path to the asset can be found in the `MotionController.assetPath`. Assets are available under MIT license in .glTF, .glB, or .fbx formats.
+
+```js
+profiles.createMotionController(inputSource).then((motionController) => {
+  await MyEngine.loadAsset(motionController.assetPath, (asset) => {
+    MyEngine.scene.add(asset);
+  });
+});
+```
+
+### Touch dot
+Touchpads have an additional property that enables visualizing the point at which they are touched. To use this property, attach your visualization to the `Touchpad.touchDotNodeName` when the asset is loaded.
+
+```js
+function addTouchDots() {
+  Object.values(motionController.components).forEach((component) => {
+    const motionControllerRoot = MyEngine.scene.getChildByName(motionController.root);
+    if (component.dataSource.dataSourceType === 'touchpadSource') {
+      const componentRoot = motionControllerRoot.getChildByName(component.rootNodeName, true);
+      const touchDotRoot = componentRoot.getChildByName(component.touchDotNodeName, true);
+      
+      const sphereGeometry = new THREE.SphereGeometry(0.001);
+      const material = new THREE.MeshBasicMaterial({ color: 0x0000FF });
+      const sphere = new THREE.Mesh(sphereGeometry, material);
+      touchDotRoot.add(sphere);
+    }
+  });
+}
+```
+
+### Animating components
+On each frame, the motion controller data must be retrieved from the input source, and the rendering engine must respond accordingly to the new button/axis data. This the same for both WebXR and WebVR
+
+```js
+function onXRFrame(xrFrame) {
+  // Other frame-loop stuff ...
+  
+  Object.values(xrMotionControllers).forEach((motionController) => {
+    updateMotionControllerParts(motionController);
+  });
+
+  // Other frame-loop stuff ...
+}
+
+function updateMotionControllerParts(motionController) {
+  // Cause the MotionController to poll the Gamepad for data
+  motionController.updateFromGamepad();
+
+  // Update the 3D model to reflect the button, thumbstick, and touchpad state
+    const motionControllerRoot = MyEngine.scene.getChildByName(motionController.root);
+  Object.values(motionController.components).forEach((component) => {
+    const componentRoot = motionControllerRoot.getChildByName(component.rootNodeName);
+    component.visualResponses.weightedNodes.forEach((weightedNode) => {
+      // Find the topmost node in the visualization
+      let visualResponseRoot = motionControllerRoot.getChildByName(weightedNode.rootNodeName, true);
+      const targetNode = visualResponseRoot.getChildByName(weightedNode.targetNodeName);
+
+      // Calculate the new properties based on the weight supplied
+      if (weightedNode.property === 'visibility') {
+        targetNode.visible = weightedNode.value;
+      } else if (weightedNode.property === 'transform') {
+        const minNode = visualResponseRoot.getObjectByName(weightedNode.minNodeName);
+        const maxNode = visualResponseRoot.getObjectByName(weightedNode.maxNodeName);
+        targetNode.transform = MyEngine.interpolateTransform(
+          minNode, 
+          maxNode, 
+          weightedNode.value);
+      }
+    });
+  });
+}
+```
+
+## Update pose
+
+On each frame, the position and orientation of motion controllers must be queried.  These poses can be divided into a grip pose, representing the center of the motion controller, and a target ray, representing the ray from which the controller can be used to select items. Querying this data is done differently for WebXR and WebVR.
+
+### WebXR poses
+To get the grip pose, pass the `MotionController.gripSpace` into `XRFrame.getPose()`.
+
+```js
+function updateGripPose(xrFrame, motionController) {
+  const motionControllerRoot = MyEngine.findEntityByName(motionController.root);
+  const pose = xrFrame.getPose(motionController.gripSpace, xrReferenceSpace);
+  MyEngine.setTransform(motionControllerRoot, pose);
+  return ray;
+}
+```
+
+To get the target ray, pass the `MotionController.targetRaySpace` into `XRFrame.getPose()` and transform the result into a ray.
+
+```js
+function getTargetRay(xrFrame, motionController) {
+  const pose = xrFrame.getPose(motionController.targetRaySpace, xrReferenceSpace);
+  const ray = MyEngine.convertPoseToRay(pose);
+  return ray;
+}
+```
+
+### WebVR poses
+Figure out how to align this with the WebVR polyfill https://github.com/immersive-web/xr-gamepad-mappings/issues/53
+
+To update the motion controller's location...
+
+In WebVR there is no implicit mechanism for retrieving a target ray origin.  Instead, it must be retrieved from the the profile via the `XRGamepad` and multiplied by the `Gamepad` object's pose in matrix form.
+```js
+function getTargetRayOrigin(xrGamepad){
+  let targetRayOrigin;
+
+  const gamepadPose = xrGamepad.gamepad.gamepadPose;
+  if (gamepadPose && gamepadPose.hasOrientation && gamepadPose.hasPosition) {
+    const gamepadPoseMatrix = new MyMatrixMathLibrary.RigidTransform(gamepadPose.position, gamepadPose.orientation);
+    targetRayOrigin = MyMatrixMathLibrary.Multiply(gamepadPoseMatrix, xrGamepad.targetRayOrigin);
+  }
+
+  return targetRayOrigin;
+}
+```
+
+# Profile schema and JSON
 ![Diagram of top-level schema parts](./figures/Concepts.png)
 
-## Data Sources
-Motion controllers are made up of various parts such as thumbsticks, touchpads, triggers, buttons, or dpads.  The [Gamepad API](https://www.w3.org/TR/gamepad/) communicates the state of these parts via the `Gamepad.buttons` array and the `Gamepad.axes` array. However, a single physical part is divided into separate, unrelated attributes. 
+## Version and id
+Each schema file must contain a `version` and `id`.  The `version` property is a semantic version made up of major and minor version parts.  The major and minor version parts must always be up to date with the library being used to parse the profile file.  The `id` property must match the folder the JSON file and assets are contained in. For WebXR input sources, the `id` will be one of the profile names returned by `XRInputSource.getProfiles()`. 
 
-For example, a thumbstick's left-right motion is communicated as a double value in an entry in the `Gamepad.axes` array while the top-bottom motion is in a separate `Gamepad.axes` entry. Furthermore if the thumbstick can be clicked straight down, that pressed/touched/value information is communicated by a `GamepadButton` in the `Gamepad.buttons` array.  The `Gamepad` does not provide any indication that these three array entries are related in any way, despite all representing different aspects of the same physical part.
+```json
+{
+    "version" : "0.1",
+    "id" : "motion-controller-id"
+}
+```
 
-Each element in the `dataSources` array provides the missing information necessary to group the related parts of a `Gamepad` object back together.  All entries in the `dataSources` array must include an `id` property which is unique among all other entries in the array.  For clarity sake, a `dataSourceType` is also included to indicate which subschema is being used to describe the physical properties of a single part.
+For WebVR input sources, the `id` must be a string prefixed with 'WebVR ' followed by the `Gamepad.id` string. A `webVR` property set to `true` is also required.
 
-### Buttons
-A single button (including analog triggers and touchable thumbrests) is represented by an entry in the `dataSources` array with the `dataSourceType` property set to `buttonSource`.  It must also include a `buttonIndex` property with a value representing the index in the `Gamepad.buttons` array at which to find the button's data.  For example:
+```json
+{
+    "version" : "0.1",
+    "id" : "WebVR motion-controller-id",
+    "webVR" : true
+}
+```
+
+## Handedness
+The `handedness` object contains definitions for `left`, `right`, and/or `none` motion controlLer form factors. Each of these children contains all information necessary to interact with and render a single motion controller. The `handedness` object must be populated by properties in one of the following configurations:
+
+* *`left` and `right`.* This option should be used when the underlying XR platform is expected to always report a handedness.  This may be because the motion controllers are intrinsically unique such as the Oculus Touch.  It may also be due to a system-level configuration setting which causes an intrinsically unhanded controller to report itself as either left or right such as the Google Daydream Controller.
+* *`none`.* This option should be used for motion controllers which are incapable of reporting handedness.  It does not imply that only one motion controller will be tracked at a time.
+* *`none`, `left`, and `right`.* This option should be used for motion controllers that are capable of but not guaranteed to report handedness. For example, HTC Vive Controllers are not intrinsically handed, but the underlying XR system is able to interpret usage based on relative position over time.  As a result, these controllers are capable of reporting all three types of handedness.
+
+All three of these properties are the same type and must contain an `asset`, a `root`, and a `components` property.  The `asset` property points to a .glTF or .glB file representing the motion controller; extensions will be made available for additional file formats.  The `root` property references the topmost node in the asset hierarchy associated with the motion controller.  The `components` array must not be empty and contains indices into the file's `components` array. The `selectionComponent` indicates which component will cause the `select`, `selectstart`, and `selectend` WebXR input events to fire.
+
+For example:
+
+```json
+{
+    "handedness" : {
+        "none" : {
+            "asset" : "some-url",
+            "root" : "none-handedness-controller",
+            "components" : [0],
+            "selectionComponent": 0
+        }
+    }
+}
+```
+
+## Components
+Components represent buttons, thumbsticks, and touchpads. A component must contain a `dataSource` property which is an index into the profile's `dataSource` array. The data source at that index is the one that provides the component's data. A component must also contain a `root` property containing the name of the component's root node in the motion controller model.
+
+```json
+{
+    "components" : [
+        {
+            "dataSource" : 4,
+            "root" : "trigger-root",
+        }
+    ]
+}
+```
+
+A component also optionally provide a `labelTransform` which is filled in with the name of a node in the motion controller hierarchy at which a description of component behavior has safely be attached without intersecting the 3D model.  
+
+```json
+{
+    "components" : [
+        {
+            "dataSource" : 4,
+            "root" : "trigger-root",
+            "labelTransform" : "trigger-label-node"
+        }
+    ]
+}
+```
+
+Components may also optionally contain an array of indices in the `visualResponses` property. These are indices into the profile's `visualResponses` array in which animations are described for the button, thumbstick, and touchpad movement. (For more information see [Visual responses](#visual-responses))
+
+For example:
+
+```json
+{
+    "components" : [
+        {
+            "dataSource" : 4,
+            "root" : "trigger-root",
+            "labelTransform" : "trigger-label-node",
+            "visualResponses" : [0, 3]
+        }
+    ]
+}
+```
+
+## Data sources
+The [Gamepad API](https://www.w3.org/TR/gamepad/) communicates the state of buttons and axes via the `Gamepad.buttons` array and the `Gamepad.axes` array. Elements in the schema's `dataSources` array describe which indices represent the buttons and axes associated with a component. Each `dataSource` must contain a unique `id` and a `dataSource` type set to `buttonSource`, `thumbstickSource` or `touchpadSource`.  
+
+### Button data sources
+If the `dataSource` is a `buttonSource` it must also contain a `buttonIndex` representing an element in the `Gamepad.buttons` array.
 
 ```json
 {
@@ -88,52 +405,8 @@ When representing a button that can report a touched state but not a pressed sta
 }
 ```
 
-### Dpads
-A dpad is a physical part that rocks in two directions, left-right and top-bottom button. These parts are built such that only adjacent directions can be depressed at the same time.  For example, a dpad could be pressed in the top and left directions at the same time, but could not be pressed in the left and right directions at the same time.
-
-The `standard` mapping defined in the [Gamepad API](https://www.w3.org/TR/gamepad/#remapping) suggests that dpad parts should be divided into four separate entries in the `Gamepad.buttons` array.  It has been observed, however, that some hardware may report dpads as two entries in the `Gamepad.axes` array instead.  As a result, this schema provides two different subschemas that may be used to represent dpads.
-
-#### Dpads From Buttons
-A data source of this type is defined as one with the `dataSourceType` property set to `dpadFromButtonsSource`. It must include `leftButtonIndex`, `rightButtonIndex`, `topButtonIndex`, and `bottomButtonIndex` properties with values representing the indices in the `Gamepad.buttons` array at which to find the related data.  For example:
-
-```json
-{
-    "dataSources" : [
-        {
-            "id" : "dpad",
-            "type": "dpadFromButtonsSource",
-            "leftButtonIndex" : 3,
-            "rightButtonIndex" : 4,
-            "bottomButtonIndex" : 5,
-            "topButtonIndex" : 6
-        }
-    ]
-}
-```
-
-Additionally, if any of the `GamepadButton` entries referenced by this data source are capable of reporting analog values, the `analogValues` property must be present and set to `true`.
-
-#### Dpads From Axes
-A data source of this type is defined as one with the `dataSourceType` property set to `dpadFromAxesSource`. It must include `xAxisIndex` and `yAxisIndex` properties with values representing the indices in the `Gamepad.axes` array at which to find the related data.  For example:
-
-```json
-{
-    "dataSources" : [
-        {
-            "id" : "dpad",
-            "type": "dpadFromAxesSource",
-            "xAxisIndex" : 2,
-            "yAxisIndex" : 3
-        }
-    ]
-}
-```
-
-### Thumbsticks And Touchpads
-Thumbsticks are a physical part sticking up from the surface of a controller which can be rocked left/right and top/bottom with a circular range.  Often, thumbsticks can also be depressed in a button-like manner.  Touchpads are a physical part, usually circular, that are able to detect the position of a finger placed on their surface.  Often, touchpads can be depressed in the middle in a button-lime manner or at the edges in a dpad-like manner.
-
-Both thumbsticks and touchpads are represented by an entry in the `dataSources` array with the `dataSourceType` property set to `thumbstickSource` and `touchpadSource` respectively.  Both variations must include `xAxisIndex` and `yAxisIndex` properties with values representing the indices in the `Gamepad.axes` array at which to find the related data.  For example:
-
+### Touchpads and thumbsticks
+If the `dataSource` is a `thumbstickSource` or a `touchpadSource`, it must contain an `xAxisIndex` and a `yAxisIndex` representing the elements in the `Gamepad.axes` array.
 ```json
 {
     "dataSources" : [
@@ -165,231 +438,152 @@ Some thumbsticks and touchpads may be able to be depressed or they may also have
 
 If the thumbstick or touchpad is able to be depressed in an analog manner, the data source must also include an `analogButtonValues` property with a value of `true`.  If the thumbstick or touchpad is capable of reporting a deadzone "touched" status but cannot be pressed, the data source must also include a `pressUnsupported` property with a value of `true`.
 
-## Visual Responses
-The visual representation of a motion controller in a VR must respond to reflect its physical state in the real-world.  For example, when a physical thumbstick is moved to the left, the virtual thumbstick should also move to the left.  The `visualResponses` array contains descriptions of all visual changes that can occur when a controller part is considered "pressed" or touched".  Each element in this array must contain a `target` property which references a node in the asset to be modified.  It must also contain an `onTouch` property, and `onPress` property, or both.  
+## Visual responses
+The visual representation of a motion controller in a VR must respond to reflect its physical state in the real-world.  For example, when a physical thumbstick is moved to the left, the virtual thumbstick should also move to the left.  The `visualResponses` array contains descriptions of all visual changes that can occur when a controller part is interacted with.
 
-The `onPress` and `onTouch` properties must always contain a `degreesOfFreedom` property which describes the degrees of freedom the visual response will contain.  For example, an thumbstick with a button would have `3` degrees of freedom because it can rotate around two axes and translate along a third. The schema supports 1, 2, or 3 degrees of freedom and requires one of the following groups of additional properties based on the value of `degreesOfFreedom`.  The associated javascript library will report the weight to be applied to the values of each of these nodes based on the current state of the associated `dataSource`.
-1. `button`
-2. `left`, `right`, `bottom`, and `top`
-3. `left`, `right`, `bottom`, `top`, and `button`
-
-When the `visualResponse` associated with a `dataSource` is in the "pressed" state and the `visualResponse` has an `onPress` property then the `onPress` property should be applied to the `target`.  When the `visualResponse` associated with a `dataSource` is in the "touched" state and the `visualResponse` has an `onTouch` property then the `onTouch` property should be applied to the `target`.  A fallback behavior should also be applied such that the `onTouch` property is applied if no `onPress` is present in the `visualResponse` and the `dataSource` is in the "pressed" state.
-
-### Button Visual Responses
-A `buttonSource` is considered "pressed" when the associated `GamepadButton.pressed` value is true and considered "touched" when the associated `GamepadButton.touched` value is true. Visual responses for button parts are expected to interpolate `target` properties based on the associated `GamepadButton.value` attribute. For example:
+Each element in this array must contain a `rootNodeName` property which references the node containing the rest of the nodes needed for the visualization. It must also contain a `source` property set to one of four values: `buttonValue`, `xAxis`, `yAxis`, or `state`.  This indicates which component property will be used to drive the visualization.  Lastly, the element must contains a `states` array which indicates the component states for which the visualization will apply.
 
 ```json
 {
     "visualResponses" : [
         {
-            "target" : "trigger-root",
-            "onTouch": {
-                "degreesOfFreedom": 1,
-                "button" : "trigger-transform-button"
-            }
+            "rootNodeName": "THUMBSTICK_X",
+            "source": "xAxis",
+            "states": ["default", "touched", "pressed"]
         }
     ]
 }
 ```
 
-### Dpad Visual Responses
-Physical dpad parts rock around a central pivot, requiring their visual responses to interpolate between `left` and `right` as well as `bottom` and `top`.  The expected interpolation is different when associated based on a `dpadFromButtonSource` as opposed to a `dpadFromAxesSource`.  When associated with the former, `right` is weighted by the `GamepadButton.value` associated with the `rightButtonIndex`, `bottom` is weighted by the `GamepadButton.value` associated with the `bottomButtonIndex`, and so on.  When associated with the latter type of data source, the algorithm is a bit more complicated.  Only positive values in `Gamepad.axes` array at the `xAxisIndex` position are used for interpolation with the `right` node whereas only the absolute value of negative values are used for interpolation with the `left` node.  The same behavior applies to `top` and `bottom` regarding the data at the `yAxisIndex` in the `Gamepad.axes` array. In this manner, both types of data sources can be associated with a single type of visual response.
-
-The primary difference between `dpadFromButtonsSource` and `dpadFromAxesSource` is how the "pressed" or "touched" states are determined.  The former is considered "touched" or "pressed" if any of the associated `GamepadButton.touched` or `GamedpadButton.pressed` values are true respectively.  The latter is considered "touched" or "pressed" if the absolute value of either axis is over a touched value threshold or a pressed value threshold respectively.  These two values are defined within the associated javascript library.
-
-For example:
+By default the visualization will use `"VALUE"` for the name of the target node, though this can be overridden by supplying the `targetNodeName` property.
 
 ```json
 {
     "visualResponses" : [
         {
-            "target" : "dpad-root",
-            "onTouch" : {
-                "degreesOfFreedom": 2,
-                "left" : "dpad-transform-leftmost",
-                "right" : "dpad-transform-rightmost",
-                "bottom" : "dpad-transform-bottommost",
-                "top" : "dpad-transform-topmost"
-            }
+            "rootNodeName": "THUMBSTICK_X",
+            "source": "xAxis",
+            "states": ["default", "touched", "pressed"],
+            "targetNodeName": "TARGET"
         }
     ]
 }
 ```
 
-### Thumbstick Visual Responses
-Thumbsticks share physical characteristics with dpad, though they typically have a wider range of motion and may also be clickable.  For interpolating the `target` properties, only positive values in `Gamepad.axes` array at the `xAxisIndex` position are used with the `right` node, whereas only the absolute value of negative values are used with the `left` node.  The same behavior applies to `top` and `bottom` regarding the data at the `yAxisIndex` in the `Gamepad.axes` array. If clickable, `target` properties are also interpolated with `buttonMin` and `buttonMax` based on `GamepadButton.value`.
-
-If the `thumbstickSource` has a `buttonIndex`, the associated `GamepadButton.touched` and `GamepadButton.pressed` will cause the `dataSource` to be considered "touched" or "pressed" respectively.  In addition, similar to the `dpadFromAxesSource`, a `thumbstickSource` may also be considered "touched" or "pressed" if the absolute value of either axis is over a touched value threshold or a pressed value threshold respectively. These two values are defined within the associated javascript library.
-
-For example:
+By default, visualizations with a `source` of `xAxis` or `yAxis` will use `"MIN"` and `"MAX"` the names of the nodes representing the extents of axis motion. Visualizations with a `source` of `buttonValue` or `state` default their extents nodes to be named `UNPRESSED` and `PRESSED` respectively.  To override these node names in both cases, supply an alternative `minNodeName` and `maxNodeName`.
 
 ```json
 {
     "visualResponses" : [
         {
-            "target" : "thumbstick-root",
-            "onTouch" : {
-                "degreesOfFreedom": 3,
-                "button" : "thumbstick-transform-button",
-                "left" : "thumbstick-transform-leftmost",
-                "right" : "thumbstick-transform-rightmost",
-                "bottom" : "thumbstick-transform-bottommost",
-                "top" : "thumbstick-transform-topmost",
-            }
+            "rootNodeName": "THUMBSTICK_X",
+            "source": "xAxis",
+            "states": ["default", "touched", "pressed"],
+            "minNodeName": "LEFT",
+            "maxNodeName": "RIGHT"
         }
     ]
 }
 ```
 
-### Touchpad Visual Responses
-Touchpads share physical characteristics with dpad, though they may also be clickable.  Whereas all other data source types may use an `onTouch` property for all visualizations, `touchpadSources` will most likely only use an `onTouch` visualization to represent the touch-dot of the user's finger on the part.  Any motion of the touchpad itself due to being clickable, will likely be represented the `onPress` property.
-
-In either case, the algorithm for interpolating the `target` properties is roughly the same.  Only positive values in `Gamepad.axes` array at the `xAxisIndex` position are used with the `right` node, whereas only the absolute value of negative values are used with the `left` node.  The same behavior applies to `top` and `bottom` regarding the data at the `yAxisIndex` in the `Gamepad.axes` array. If clickable, response visualizations with a `userAction` set to `onPress` may also interpolate `buttonMin` and `buttonMax` based on `GamepadButton.value`.  For example:
-
-If the `touchpadSource` has a `buttonIndex`, the associated `GamepadButton.touched` and `GamepadButton.pressed` will cause the `dataSource` to be considered "touched" or "pressed" respectively.  In addition, similar to the `dpadFromAxesSource`, a `touchpadSource` may also be considered "touched" or "pressed" if the absolute value of either axis is over a touched value threshold or a pressed value threshold respectively. These two values are defined within the associated javascript library.
-
-For example:
+When a visualization is toggling a node's visibility, the `source` must be set to `state` and the additional `property` property set to `visibility`.
 
 ```json
 {
     "visualResponses" : [
         {
-            "target" : "touchpadDot-root",
-            "onTouch" : {
-                "degreesOfFreedom": 2,
-                "left" : "touchpadDot-transform-leftmost",
-                "right" : "touchpadDot-transform-rightmost",
-                "bottom" : "touchpadDot-transform-bottommost",
-                "top" : "touchpadDot-transform-topmost"
-            }
+            "rootNodeName": "TOUCH_DOT",
+            "source": "state",
+            "states": ["touched", "pressed"],
+            "property": "visibility"
+        }
+    ]
+}
+```
+
+### Thumbstick visual response example
+Commonly, the visual responses for a thumbstick will be as follows:
+```json
+{
+    "visualResponses": [
+        {
+            "rootNodeName": "THUMBSTICK_PRESS",
+            "source" : "state",
+            "states" : ["pressed"]
         },
         {
-            "target" : "touchpad-root",
-            "onPress" : {
-                "button" : "touchpad-transform-button",
-                "left" : "touchpad-transform-leftmost",
-                "right" : "touchpad-transform-rightmost",
-                "bottom" : "touchpad-transform-bottommost",
-                "top" : "touchpad-transform-topmost"
-            }
+            "rootNodeName": "THUMBSTICK_X",
+            "source" : "xAxis",
+            "states" : ["default", "touched", "pressed"]
+        },
+        {
+            "rootNodeName": "THUMBSTICK_Y",
+            "source" : "yAxis",
+            "states" : ["default", "touched", "pressed"]
         }
     ]
 }
 ```
 
-## Components
-Components connect a dataSource with the information necessary to correctly visualize it. A component must contain a `dataSource` property which points to an index in the file's `dataSources` array. It must also contain a `root` property which references the topmost node in an asset hierarchy that is associated with the physical part. A component must also contain a `labelTransform` property which references a node in the asset hierarchy at which a legend label could be placed.  It is expected that this node is located a safe distance from the body of the motion controller and oriented in a position appropriate for a label to be read.
-
-For example, here is component mapping for a single button.
+### Touchpad visual response values
+Commonly, the visual responses for a touchpad will be as follows:
 ```json
 {
-    "components" : [
+    "visualResponses": [
         {
-            "dataSource" : 4,
-            "root" : "trigger-root",
-            "labelTransform" : "trigger-label-transform"
+            "rootNodeName": "TOUCHPAD_PRESS",
+            "source" : "state",
+            "states" : ["pressed"]
+        },
+        {
+            "rootNodeName": "TOUCH",
+            "source" : "state",
+            "states" : ["touched", "pressed"],
+            "property": "visibility"
+        },
+        {
+            "rootNodeName": "TOUCHPAD_TOUCH_X",
+            "source" : "xAxis",
+            "states" : ["default", "touched", "pressed"]
+        },
+        {
+            "rootNodeName": "TOUCHPAD_TOUCH_Y",
+            "source" : "yAxis",
+            "states" : ["default", "touched", "pressed"]
         }
-    ],
-    "dataSources" : [
+    ]
+}
+```
+### Button visual response values
+Commonly, the visual response for an analog button, such as a trigger, will be as follows:
+```json
+{
+    "visualResponses": [
         {
-            "id" : "triggerButton",
-            "dataSourceType" : "buttonSource",
-            "buttonIndex" : 2
+            "rootNodeName" : "SELECT",
+            "source" : "buttonValue",
+            "states" : ["default", "touched", "pressed"]
         }
     ]
 }
 ```
 
-In addition, most components will also include the `visualResponses` array property.  The elements of this array are indices into the file's `visualResponses` array.  For example:
-
+Alternatively, digital buttons may be better represented like this example:
 ```json
 {
-    "components" : [
+    "visualResponses": [
         {
-            "dataSource" : 4,
-            "root" : "trigger-root",
-            "labelTransform" : "trigger-label-transform",
-            "visualResponses" : [0]
-        }
-    ],
-    "dataSources" : [
-        {
-            "id" : "triggerButton",
-            "dataSourceType" : "buttonSource",
-            "buttonIndex" : 2
-        }
-    ],
-    "visualResponses" : [
-        {
-            "userAction": "onTouch",
-            "target" : "trigger-root",
-            "buttonMin" : "trigger-transform-buttonMin",
-            "buttonMax" : "trigger-transform-buttonMax"
+            "rootNodeName" : "MENU",
+            "source" : "state",
+            "states" : ["pressed"]
         }
     ]
 }
 ```
 
-## Handedness
-Handedness objects connect component parts with the information necessary to correctly visualize entire motion controllers.  The `handedness` object must be populated by properties in one of the following configurations:
-
-* *`left` and `right`.* This option should be used when the underlying XR platform is expected to always report a handedness.  This may be because the motion controllers are intrinsically unique such as the Oculus Touch.  It may also be due to a system-level configuration setting which causes an intrinsically unhanded controller to report itself as either left or right such as the Google Daydream Controller.
-* *`none`.* This option should be used for motion controllers which are incapable of reporting handedness.  It does not imply that only one motion controller will be tracked at a time.
-* *`none`, `left`, and `right`.* This options should be used for motion controllers that are capable of but not guaranteed to report handedness. For example, HTC Vive Controllers are not intrinsically handed, but the underlying XR system is able to interpret usage based on relative position over time.  As a result, these controllers are capable of reporting all three types of handedness.
-
-All three of these properties are the same type and must contain an `asset`, a `root`, and a `components` property.  The `asset` property points to a .glTF or .glB file representing the motion controller; extensions will be made available for additional file formats.  The `root` property references the topmost node in the asset hierarchy associated with the motion controller.  The `components` array must not be empty and contains indices into the file's `components` array.
-
-For example:
-
-```json
-{
-    "handedness" : {
-        "none" : {
-            "asset" : "some-url",
-            "root" : "none-handedness-controller",
-            "components" : [0]
-        }
-    }
-}
-```
-
-The `none`, `left`, and `right` objects may also contain two additional properties.  When present, the `primaryButtonComponent` property contains the index into the file's `components` array at which position the motion controller's "default" button can be found.  For many motion controllers this is a trigger-style button.  When present, the `primaryAxesComponent` property contains the index into the file's `components` array at which position the motion controller's "default" thumbstick or touchpad can be found.
-
-```json
-{
-    "handedness" : {
-        "none" : {
-            "asset" : "some-url",
-            "root" : "none-handedness-controller",
-            "components" : [0],
-            "primaryButtonComponent" : 0,
-            "primaryAxisComponent" : 1
-        }
-    }
-}
-```
-
-## Additional Top-level Properties
-In addition to `handedness`, `components`, `dataSources`, and `visualResponses` the schema defines two more top-level properties: `version` and `id`.  The `version` property is a semantic version made up of major and minor version parts.  The major and minor version parts must always be up to date with the library being used to parse the mapping file.  The `id` property must match the `Gamepad.id` of the `Gamepad` object the mapping is being applied to.  The naming conventions for the `WebXR Device API` are concretely defined; the naming conventions for `WebVR` are somewhat more haphazard.
-
-```json
-{
-    "version" : "0.1",
-    "id" : "motion-controller-id"
-}
-```
-
-## WebVR
-While the main focus of this repo is for future WebXR support, the general design is also applicable to WebVR with a few small additions.  Mapping files for WebVR gamepads must be located at `./mappings/WebVR/<Gamepad.id>/` and the `mapping.json` file must include the top-level property `webVR` set to true.
-
-```json
-{
-    "webVR": true
-}
-```
-
-### TargetRay origin
-The WebXR API communicates the origin of a motion controller's targeting ray through the `XRInputSource.targetRaySpace`, but the WebVR API does not have any mechanism to communicate the same concept.  To account for this, WebVR motion controllers assets must contain an additional    node to indicate the location of the targeting ray's origin relative to the motion controller's root. This node must be referenced in the `handedness` descriptions by including the `webVR_targetRayOrigin` property.
+## Additional WebVR properties
+### Target ray origin
+The WebXR API communicates the origin of a motion controller's targeting ray through the `XRInputSource.targetRaySpace`, but the WebVR API does not have any mechanism to communicate the same concept.  To account for this, WebVR motion controllers assets must contain an additional node to indicate the location of the targeting ray's origin relative to the motion controller's root. This node must be referenced in the `handedness` descriptions by including the `webVR_targetRayOrigin` property.
 
 ```json
 {
@@ -400,15 +594,15 @@ The WebXR API communicates the origin of a motion controller's targeting ray thr
             "root" : "none-handedness-controller",
             "webVR_targetRayOrigin": "target-ray-origin-node",
             "components" : [0],
-            "primaryButtonComponent" : 0,
+            "selectionComponent" : 0,
             "primaryAxisComponent" : 1
         }
     }
 }
 ```
 
-### Axis Inversion
-Certain WebVR `Gamepad` objects have some components with an inverted `yAxis` causing positive `yAxis` values map to the `top` and negative ones map to `bottom`.  Mapping files can indicate this, or an inverted `xAxis`, on a `dataSource` by setting the `webVR_yAxisInverted` or `webVR_xAxisInverted` to true.
+### Axis inversion
+Certain WebVR `Gamepad` objects have some components with an inverted `yAxis` causing positive values at the top of its range of motion and negative ones at the bottom.  Profiles indicate this, or an inverted `xAxis`, on a `dataSource` by setting the `webVR_yAxisInverted` or `webVR_xAxisInverted` to true respectively.
 
 ```json
 {
@@ -431,131 +625,16 @@ Certain WebVR `Gamepad` objects have some components with an inverted `yAxis` ca
 }
 ```
 
-# Source Library
-This repo provides a javascript library for interpreting the `mapping.json` files and binding them to a live `Gamepad` object.  Developers can uses this library to interact with the conceptual components of the gamepad, rather than each individual button or axis.  
-
-## Connection and Disconnection
-In order to use this library, developers create a new `XRGamepad` by passing it the associated mapping file, the live `Gamepad` object, and an indication of which `handedness` should be applied.  The initialization path for a WebXR gamepad is slightly different than for a WebVR gamepad for several reasons.  First, newly connected gamepads are reported in WebXR through the `XRSession.inputsourceschange` event where as in WebVR they are reported through the `navigator.gamepadconnected` event.  Second, the handedness is passed separately due to the fact that in WebXR handedness is a property of the `XRInputSource`, whereas in WebVR handedness is a property of the `Gamepad`.
-
-### WebXR Connection and Disconnection
-This sample code shows creating an `XRGamepad` based on the `XRInputSource.gamepad` property for all newly connected `XRInputSource` objects.  When an `XRInputSource` is disconnected the `XRGamepad` is released.
-
-```js
-let xrGamepads = {};
-xrSession.addEventListener('inputsourceschange', onInputSourcesChange);
-
-function onInputSourcesChange(event) {
-  event.added.forEach((inputSource) => {
-    if (inputSource.gamepad) {
-      let mapping = Mapping.getMapping(gamepad.id, XRMappingConstants.MappingType.WebXR);
-      let xrGamepad = new XRGamepad(gamepad, mapping, inputSource.handedness);
-      xrGamepads[inputSource] = xrGamepad;
-    }
-  }
-
-  event.removed.forEach((inputSource) => {
-    if (xrGamepads[inputSource]) {
-      delete xrGamepads[inputSource];
-    }
-  });
-}
-```
-
-### WebVR Connection and Disconnection
-This sample code shows creating an `XRGamepad` for all newly connected `Gamepad` objects associated with WebVR.  When an associated `Gamepad` is disconnected the `XRGamepad` is released.
-
-```js
-let xrGamepads = {};
-navigator.addEventListener('gamepadconnected', onGamepadConnected);
-navigator.addEventListener('gamepaddisconnected', onGamepadDisconnected);
-
-function onGamepadConnected(event) {
-  let gamepad = event.gamepad;
-  if (gamepad.deviceId) {
-    let mapping = Mapping.getMapping(gamepad.id, XRMappingConstants.MappingType.WebVR);
-    let xrGamepad = new XRGamepad(gamepad, mapping, gamepad.handedness);
-    xrGamepads[gamepad] = xrGamepad;
-  }
-}
-
-function onGamepadDisconnected(event) {
-  if (xrGamepads[event.gamepad]) {
-      delete xrGamepads[event.gamepad];
-    }
-  }
-}
-```
-
-## Engine Loop
-On each frame, the gamepad data must be requeried and the engine must respond accordingly to the new data.  This will be the same for both WebXR and WebVR
-
-```js
-function updateGamepads() {
-  Object.key(xrGamepads).forEach((key) => {
-    let xrGamepad = xrGamepads[key];
-    xrGamepads.components.forEach((xrComponent) => {
-      const xrComponentData = xrComponent.getData();
-      MyEngine.respondToInput(key, xrComponentData);
-
-      const weightedVisualizations = xrComponent.getWeightedVisualizations();
-      MyEngine.updateInputVisuals(key, weightedVisualizations);
-    });
-  });
-}
-```
-
-> TODO Add an explanation for how to updated the visuals based on the weighted visualizations
-
-## Target Ray Origin
-In WebXR and WebVR a target ray may be drawn for motion controllers, however the origin of this ray is retrieved differently for each.
-
-### WebXR Target Ray Origin
-In WebXR, the `XRInputSource.targetRaySpace` should be passed into `XRFrame.getPose()` to determined the pointing origin.
-
-```js
-function getTargetRayOrigin(xrFrame, xrInputSource) {
-  return xrFrame.getPose(xrInputSource.targetRaySpace, xrReferenceSpace);
-}
-```
-
-### WebVR Target Ray Origin
-In WebVR there is no implicit mechanism for retrieving a target ray origin.  Instead, it must be retrieved from the the mapping via the `XRGamepad` and multiplied by the `Gamepad` object's pose in matrix form.
-```js
-function getTargetRayOrigin(xrGamepad){
-  let targetRayOrigin;
-
-  const gamepadPose = xrGamepad.gamepad.gamepadPose;
-  if (gamepadPose && gamepadPose.hasOrientation && gamepadPose.hasPosition) {
-    const gamepadPoseMatrix = new MyMatrixMathLibrary.RigidTransform(gamepadPose.position, gamepadPose.orientation);
-    targetRayOrigin = MyMatrixMathLibrary.Multiply(gamepadPoseMatrix, xrGamepad.targetRayOrigin);
-  }
-
-  return targetRayOrigin;
-}
-```
+# Asset requirements
+TODO
 
 # Appendices
 
 ## Licence
 Per the [LICENSE.md](LICENCE.md) file, this repository is made available under an MIT license and is copyright Amazon 2019.
 
-## Hardware
-
-### Supported
-* [Gear VR](mappings/GearVR)
-* [HTC Vive Controller](mappings/HTCViveController)
-* [Oculus Go](mappings/OculusGo)
-* [Oculus Touch](mappings/OculusTouch)
-* [Windows Mixed Reality](mappings/045E-065D)
-
-### Missing Mapping and/or Assets
-* Google Daydream
-* Google Mirage Solo
-* HTC Vive Focus
-* Magic Leap One
-* Oculus Quest
-* Valve Knuckles
-* Windows Mixed Reality for Samsung Odyssey
+## Supported hardware
+Fill this in https://github.com/immersive-web/xr-gamepad-mappings/issues/54
 
 ## References
 * [GitHub - stewdio/THREE.VRController: Support hand controllers for Oculus, Vive, Windows Mixed Reality, Daydream, GearVR, and more by adding VRController to your existing Three.js-based WebVR project.](https://github.com/stewdio/THREE.VRController)

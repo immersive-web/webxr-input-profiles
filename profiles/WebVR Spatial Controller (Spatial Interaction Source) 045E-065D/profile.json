@@ -1,0 +1,139 @@
+{
+    "version" : "0.1",
+    "id" : "WebVR Spatial Controller (Spatial Interaction Source) 045E-065D",
+    "webVR": true,
+    "handedness" : {
+        "left" : {
+            "asset" : "left.glb",
+            "root" : "left-controller-node",
+            "webVR_targetRayOrigin": "left-controller-pointing-origin",
+            "components" : [0, 1, 2, 3, 4],
+            "selectionComponent" : 0
+        },
+        "right" : {
+            "asset" : "right.glb",
+            "root" : "right-controller-node",
+            "webVR_targetRayOrigin": "right-controller-pointing-origin",
+            "components" : [0, 1, 2, 3, 4],
+            "selectionComponent" : 0
+        }
+    },
+    "components" : [
+        {
+            "dataSource" : 0,
+            "root" : "SELECT",
+            "labelTransform" : "trigger-label",
+            "visualResponses": [0]
+        },
+        {
+            "dataSource" : 1,
+            "root" : "THUMBSTICK_PRESS",
+            "labelTransform" : "thumbstick-label",
+            "visualResponses": [1, 2, 3]
+        },
+        {
+            "dataSource" : 2,
+            "root" : "GRASP",
+            "labelTransform" : "grip-label",
+            "visualResponses": [4]
+        },
+        {
+            "dataSource" : 3,
+            "root" : "TOUCHPAD_PRESS",
+            "labelTransform" : "grip-label",
+            "visualResponses": [5, 6, 7, 8],
+            "touchpadDot" : "TOUCH"
+        },
+        {
+            "dataSource" : 4,
+            "root" : "MENU",
+            "labelTransform" : "menu-label",
+            "visualResponses": [9]
+        }
+    ],
+    "dataSources" : [
+        {
+            "id" : "trigger",
+            "dataSourceType": "buttonSource",
+            "buttonIndex": 0,
+            "analogValues": true
+        },
+        {
+            "id" : "thumbstick",
+            "dataSourceType": "thumbstickSource",
+            "xAxisIndex" : 0,
+            "yAxisIndex" : 1,
+            "buttonIndex" : 1
+        },
+        {
+            "id" : "grip",
+            "dataSourceType": "buttonSource",
+            "buttonIndex" : 2
+        },
+        {
+            "id" : "touchpad",
+            "dataSourceType": "touchpadSource",
+            "xAxisIndex" : 2,
+            "yAxisIndex" : 3,
+            "buttonIndex" : 3
+        },
+        {
+            "id" : "menu",
+            "dataSourceType": "buttonSource",
+            "buttonIndex" : 4
+        }
+    ],
+    "visualResponses" : [
+        {
+            "rootNodeName" : "SELECT",
+            "source" : "buttonValue",
+            "states" : ["default", "touched", "pressed"]
+        },
+        {
+            "rootNodeName": "THUMBSTICK_PRESS",
+            "source" : "state",
+            "states" : ["pressed"]
+        },
+        {
+            "rootNodeName": "THUMBSTICK_X",
+            "source" : "xAxis",
+            "states" : ["default", "touched", "pressed"]
+        },
+        {
+            "rootNodeName": "THUMBSTICK_Y",
+            "source" : "yAxis",
+            "states" : ["default", "touched", "pressed"]
+        },
+        {
+            "rootNodeName" : "GRASP",
+            "source" : "state",
+            "states" : ["pressed"]
+        },
+        {
+            "rootNodeName": "TOUCHPAD_PRESS",
+            "source" : "state",
+            "states" : ["pressed"]
+        },
+        {
+            "rootNodeName": "TOUCH",
+            "source" : "state",
+            "states" : ["touched", "pressed"],
+            "property": "visibility"
+        },
+        {
+            "rootNodeName": "TOUCHPAD_TOUCH_X",
+            "source" : "xAxis",
+            "states" : ["default", "touched", "pressed"]
+        },
+        {
+            "rootNodeName": "TOUCHPAD_TOUCH_Y",
+            "source" : "yAxis",
+            "states" : ["default", "touched", "pressed"]
+        },
+        {
+            "rootNodeName" : "MENU",
+            "source" : "state",
+            "states" : ["pressed"]
+        }
+    ]
+}

@@ -1,0 +1,27 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://immersive-web/gamepad-profiles/0.1.0/profile.schema.json",
+    "type": "object",
+    "description": "The root object for a gamepad profile.",
+    "additionalProperties": false,
+    "required": [ "version", "id", "handedness", "components", "dataSources"],
+    "properties": {
+        "version" : {
+            "description": "The schema version",
+            "type" : "string",
+            "pattern": "^0\\.1$"
+        },
+        "id" : {
+            "description": "The Gamepad.id the profile applies to",
+            "type" : "string"
+        },
+        "webVR": {
+            "description": "Indicates the profile file is being used with a WebVR gamepad",
+            "type": "boolean"
+        },
+        "handedness": { "$ref": "handedness.schema.json"},
+        "components": { "$ref": "components.schema.json"},
+        "dataSources": { "$ref": "dataSources.schema.json"},
+        "visualResponses": { "$ref": "visualResponses.schema.json"}
+    }
+}

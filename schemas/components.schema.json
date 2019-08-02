@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://immersive-web/gamepad-mapping/0.1.0/components.schema.json",
+    "$id": "https://immersive-web/gamepad-profiles/0.1.0/components.schema.json",
     "title": "The components array",
     "description": "The components array",
     "type": "array",
@@ -13,7 +13,7 @@
         "type" : "object",
         "properties": {
             "dataSource" : {
-                "allOf": [ { "$ref": "mapping.index.schema.json#/definitions/mappingIndex"} ],
+                "allOf": [ { "$ref": "profile.index.schema.json#/definitions/profileIndex"} ],
                 "description": "The index into the dataSources array"
             },
             "root" : {
@@ -24,14 +24,18 @@
                 "type": "string",
                 "description": "The name of the component's node in the asset file at which location a legend description can safely be placed"
             },
+            "touchpadDot" : {
+                "type": "string",
+                "description": "The name of the component's node in the asset file at which location a touchpad dot will be animated"
+            },
             "visualResponses" : {
-                "description": "The indicies of the visual responses to be applied to the component",
+                "description": "The indices of the visual responses to be applied to the component",
                 "type": "array",
                 "minItems": 1,
                 "additionalItems": false,
                 "uniqueItems": true,
                 "items": {
-                    "allOf": [ { "$ref": "mapping.index.schema.json#/definitions/mappingIndex"} ]
+                    "allOf": [ { "$ref": "profile.index.schema.json#/definitions/profileIndex"} ]
                 }
             }
         },

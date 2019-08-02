@@ -1,4 +1,6 @@
-import copy from 'rollup-plugin-copy-glob';
+// import copy from 'rollup-plugin-copy-glob';
+import { eslint } from 'rollup-plugin-eslint';
+import profiles from './rollup-plugin-profiles';
 
 const DIST_FOLDER = 'dist';
 
@@ -8,21 +10,25 @@ export default [
     output: [
       {
         format: 'es',
-        file: `${DIST_FOLDER}/xr-gamepad-mappings.module.js`
+        file: `${DIST_FOLDER}/webxr-input-profiles.module.js`
       }
     ],
     plugins: [
-      copy([
-        { files: 'mappings/**/mapping.json', dest: `${DIST_FOLDER}/mappings` }
-      ])
+      eslint(),
+      profiles(
+        {
+          src: 'profiles',
+          dest: `${DIST_FOLDER}/profiles`
+        }
+      )
     ]
   },
   {
-    input: ['src/mockGamepad/mockGamepad.js'],
+    input: ['src/mocks/index.js'],
     output: [
       {
         format: 'es',
-        file: `${DIST_FOLDER}/mock-gamepad.module.js`
+        file: `${DIST_FOLDER}/webxr-input-mocks.module.js`
       }
     ]
   }

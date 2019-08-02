@@ -1,3 +1,2 @@
-export { Constants } from './constants.js';
-export { Mappings } from './mappings.js';
-export { XRGamepad } from './xrGamepad.js';
+export { default as Constants } from './constants';
+export { default as Profiles } from './profiles';
