@@ -57,6 +57,7 @@
     "acorn": "^6.1.1",
     "ajv": "^6.10.0",
     "babel-jest": "^24.1.0",
+    "chokidar": "^3.0.2",
     "concurrently": "^4.1.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
@@ -68,7 +69,7 @@
     "jest-fetch-mock": "^2.1.2",
     "jest-runner-eslint": "^0.7.3",
     "rollup": "^1.4.0",
-    "rollup-plugin-copy-glob": "^0.3.0",
+    "rollup-plugin-copy-glob": "^0.3.1",
     "rollup-plugin-eslint": "^5.1.0",
     "three": "^0.106.2",
     "yui-lint": "^0.2.0"

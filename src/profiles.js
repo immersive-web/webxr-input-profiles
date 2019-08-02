@@ -31,7 +31,7 @@ class Profiles {
     if (!this.profilesList) {
       // If there is no attempt currently in progress, start one
       if (!this.profilesListPromise) {
-        this.profilesListPromise = Profiles.fetchJsonFile(`${this.baseUri}/list.json`);
+        this.profilesListPromise = Profiles.fetchJsonFile(`${this.baseUri}/profilesList.json`);
       }
 
       try {
