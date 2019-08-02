@@ -194,15 +194,16 @@ const ModelViewer = {
     three.controls = new OrbitControls(three.camera, three.renderer.domElement);
     three.controls.enableDamping = true;
     three.controls.minDistance = 0.05;
-    three.controls.maxDistance = 0.13;
+    three.controls.maxDistance = 0.3;
     three.controls.enablePan = false;
     three.controls.update();
 
     // Set up the lights so the model can be seen
-    const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.3);
-    const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 2.5);
-    three.scene.add(ambientLight);
-    three.scene.add(directionalLight);
+    const bottomDirectionalLight = new THREE.DirectionalLight(0xFFFFFF, 2);
+    bottomDirectionalLight.position.set(0, -1, 0);
+    three.scene.add(bottomDirectionalLight);
+    const topDirectionalLight = new THREE.DirectionalLight(0xFFFFFF, 2);
+    three.scene.add(topDirectionalLight);
 
     // Add the THREE.js canvas to the page
     canvasParentElement.appendChild(three.renderer.domElement);
