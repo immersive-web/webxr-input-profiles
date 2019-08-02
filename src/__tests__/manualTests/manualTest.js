@@ -6,16 +6,36 @@ import ModelViewer from './modelViewer.js';
 import ManualControls from './buildElements.js';
 
 const profiles = new Profiles('../../../dist/profiles');
+
+const urlSearchParams = new URL(window.location).searchParams;
+
 let supportedProfilesList;
 let profileSelectorElement;
 let handednessSelectorElement;
 
 let activeProfile;
 
+function setUrl(profileId, handedness) {
+  if (profileId) {
+    urlSearchParams.set('profileId', profileId);
+  } else {
+    urlSearchParams.delete('profileId');
+  }
+
+  if (handedness) {
+    urlSearchParams.set('handedness', handedness);
+  } else {
+    urlSearchParams.delete('handedness');
+  }
+
+  history.replaceState(null, null, location.pathname + '?' + urlSearchParams.toString());
+}
+
 function changeActiveHandedness() {
   // Disable user interaction during change
   profileSelectorElement.disabled = true;
   handednessSelectorElement.disabled = true;
+  setUrl(profileSelectorElement.value, handednessSelectorElement.value);
 
   // Clear the old info
   ModelViewer.clear();
@@ -34,7 +54,7 @@ function changeActiveHandedness() {
   });
 }
 
-function changeActiveProfile() {
+function changeActiveProfile(requestedProfileId, requestedHandedness) {
   // Disable user interaction during change
   profileSelectorElement.disabled = true;
   handednessSelectorElement.disabled = true;
@@ -47,8 +67,14 @@ function changeActiveProfile() {
     <option value='loading'>Loading...</option>
   `;
 
-  // Load the new profile
-  profiles.fetchProfile([profileSelectorElement.value]).then((profile) => {
+  // Apply profileId override if supplied
+  const profileId = (requestedProfileId) ? requestedProfileId : profileSelectorElement.value;
+
+  // Set the query string
+  setUrl(profileId);
+
+  // Attempt to load the new profile
+  profiles.fetchProfile([profileId]).then((profile) => {
     activeProfile = profile;
 
     // Populate handedness selector
@@ -59,6 +85,11 @@ function changeActiveProfile() {
       `;
     });
 
+    // Apply handedness if supplied
+    if (requestedHandedness && activeProfile.handedness[requestedHandedness]) {
+      handednessSelectorElement.value = requestedHandedness;
+    }
+
     // Manually trigger the handedness to change
     changeActiveHandedness();
   }).catch((error) => {
@@ -66,6 +97,14 @@ function changeActiveProfile() {
     handednessSelectorElement.disabled = true;
     throw error;
   });
+}
+
+function onProfileSelectionChange() {
+  changeActiveProfile();
+}
+
+function onHandednessSelectionChange() {
+  changeActiveHandedness();
 }
 
 function populateProfileSelector() {
@@ -92,8 +131,15 @@ function populateProfileSelector() {
         `;
       });
 
-      // Manually trigger active profile to change
-      changeActiveProfile();
+      // Get the initial query string parameters and override the default selection if available
+      let requestedProfileId = urlSearchParams.get('profileId');
+      let requestedHandedness = urlSearchParams.get('handedness');
+      if (requestedProfileId) {
+        profileSelectorElement.value = requestedProfileId;
+      }
+
+      // Manually trigger active profile to load
+      changeActiveProfile(requestedProfileId, requestedHandedness);
     }
   });
 }
@@ -103,8 +149,8 @@ function onLoad() {
 
   profileSelectorElement = document.getElementById('profileSelector');
   handednessSelectorElement = document.getElementById('handednessSelector');
-  profileSelectorElement.addEventListener('change', changeActiveProfile);
-  handednessSelectorElement.addEventListener('change', changeActiveHandedness);
+  profileSelectorElement.addEventListener('change', onProfileSelectionChange);
+  handednessSelectorElement.addEventListener('change', onHandednessSelectionChange);
   populateProfileSelector();
 }
 window.addEventListener('load', onLoad);
