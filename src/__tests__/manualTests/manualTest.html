@@ -8,16 +8,26 @@
     </head>
     <body>
         <h1>Gamepad Test Page</h1>
-        <h2 id="profileId"></h2>
         <main id="gamepad">
-            <ul id="controls">
-            </ul>
-            <div id="motionController">
+            <section class="selectors">
+                <select id="profileSelector">
+                    <option value="loading">Loading...</option>
+                </select>
+                <select id="handednessSelector">
+                    <option value="loading">Loading...</option>
+                </select>
+            </section>
+            <section class="controls">
+                <ul id="controlsList">
+                </ul>
+            </section>
+            <section id="modelViewer">
+                <div id="assetError"></div>
                 <details class="data">
                     <summary>Data</summary>
                     <pre id="data"></pre>
                 </details>
-            </div>
+            </section>
         </main>
     </body>
 </html>

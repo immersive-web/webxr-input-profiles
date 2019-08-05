@@ -1,38 +1,57 @@
 const fs = require('fs-extra');
-const { join } = require('path');
+const path = require('path');
+const chokidar = require('chokidar');
+const globby = require('globby');
 
-export default function generateProfilesList(options) {
-  const { src, dest } = options;
+function isDirectory(targetPath) {
+  return fs.lstatSync(targetPath).isDirectory();
+}
 
-  function isDirectory(path) {
-    return fs.lstatSync(path).isDirectory();
+export default function generateProfilesList({ profilePaths, dest, watch } = {}) {
+  if (!dest || (fs.pathExistsSync(dest) && isDirectory(dest))) {
+    throw new Error(`Invalid dest supplied: ${dest}`);
   }
 
-  async function getDirectories(folder) {
-    const folderContents = await fs.readdir(folder);
-    const directories = folderContents.filter(item => isDirectory(join(folder, item)));
-    return directories;
+  const profilesList = {};
+
+  function writeProfilesList() {
+    const fileText = JSON.stringify(Object.values(profilesList), null, 2);
+    fs.writeFileSync(dest, fileText);
+  }
+
+  function addFileToList(filePath) {
+    if (filePath.endsWith('.json')) {
+      profilesList[filePath] = path.basename(path.dirname(filePath));
+      writeProfilesList();
+    }
+  }
+
+  function removeFileFromList(filePath) {
+    if (filePath.endsWith('.json')) {
+      delete profilesList[filePath];
+      writeProfilesList();
+    }
   }
 
   return {
-    name: 'profiles',
-    async generateBundle() {
-      if (!src || !(await fs.pathExists(src)) || !isDirectory(src)) {
-        throw new Error('Invalid src folder supplied');
+    name: 'buildProfilesList',
+    buildStart: async () => {
+      // Get the profilesList
+      const filePaths = await globby(profilePaths + '/*.json');
+      filePaths.forEach((filePath) => {
+        profilesList[filePath] = path.basename(path.dirname(filePath));
+      });
+
+      if (watch) {
+        profilePaths.forEach((profilePath) => {
+          chokidar.watch(profilePath)
+            .on('add', filePath => addFileToList(filePath))
+            .on('unlink', filePath => removeFileFromList(filePath))
+            .on('error', error => console.error(error)); // eslint-disable-line no-console
+        });
+      } else {
+        writeProfilesList();
       }
-
-      if (!dest || (await fs.pathExists(dest) && !isDirectory(dest))) {
-        throw new Error('Invalid dest folder supplied');
-      }
-
-      // Build list of profile paths by type
-      const profileNames = await getDirectories(src);
-
-      // Clean up the target folder
-      await fs.emptyDir(dest);
-      await fs.copy(src, dest);
-      const profileListPath = join(dest, 'list.json');
-      return fs.writeJSON(profileListPath, profileNames);
     }
   };
 }

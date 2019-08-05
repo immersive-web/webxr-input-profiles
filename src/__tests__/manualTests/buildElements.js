@@ -1,5 +1,6 @@
 /* eslint import/no-unresolved: off */
 
+let controlsListElement;
 let mockXRInputSource;
 let motionController;
 
@@ -23,14 +24,20 @@ function onAxisValueChange(event) {
   mockXRInputSource.gamepad.axes[index] = Number(event.target.value);
 }
 
-function buildElements(controller) {
+function clear() {
+  if (!controlsListElement) {
+    controlsListElement = document.getElementById('controlsList');
+  }
+  controlsListElement.innerHTML = '';
+  motionController = undefined;
+  mockXRInputSource = undefined;
+}
+
+function build(controller) {
+  clear();
+
   motionController = controller;
   mockXRInputSource = motionController.xrInputSource;
-
-  const profileIdElement = document.getElementById('profileId');
-  profileIdElement.innerText = motionController.id;
-
-  const controlsElement = document.getElementById('controls');
 
   Object.values(motionController.components).forEach((component) => {
     const { buttonIndex } = component.dataSource;
@@ -69,7 +76,7 @@ function buildElements(controller) {
 
     const listElement = document.createElement('li');
     listElement.innerHTML = innerHtml;
-    controlsElement.appendChild(listElement);
+    controlsListElement.appendChild(listElement);
 
     if (buttonIndex !== undefined) {
       document.getElementById(`buttonValue${buttonIndex}`).addEventListener('input', onButtonValueChange);
@@ -84,4 +91,4 @@ function buildElements(controller) {
   });
 }
 
-export default buildElements;
+export default { clear, build };

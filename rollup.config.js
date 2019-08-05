@@ -1,6 +1,6 @@
-// import copy from 'rollup-plugin-copy-glob';
 import { eslint } from 'rollup-plugin-eslint';
-import profiles from './rollup-plugin-profiles';
+import copy from 'rollup-plugin-copy-glob';
+import buildProfilesList from './rollup-plugin-profiles';
 
 const DIST_FOLDER = 'dist';
 
@@ -15,12 +15,18 @@ export default [
     ],
     plugins: [
       eslint(),
-      profiles(
-        {
-          src: 'profiles',
-          dest: `${DIST_FOLDER}/profiles`
-        }
-      )
+      copy(
+        [
+          { files: 'profiles/**', dest: `${DIST_FOLDER}/profiles` }
+        ],
+        { verbose: true, watch: process.env.ROLLUP_WATCH }
+      ),
+      buildProfilesList({
+        profilePaths: ['profiles/**'],
+        dest: `${DIST_FOLDER}/profiles/profilesList.json`,
+        verbose: true,
+        watch: process.env.ROLLUP_WATCH 
+      })
     ]
   },
   {

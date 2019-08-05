@@ -74,7 +74,7 @@ test('No gamepad', () => {
 });
 
 test('Successful construction', () => {
-  const mockGamepad = new MockGamepad(profile);
+  const mockGamepad = new MockGamepad(profile, Constants.Handedness.NONE);
   const mockXRInputSource = new MockXRInputSource(mockGamepad, Constants.Handedness.NONE);
   const motionController = new MotionController(mockXRInputSource, profile);
   expect(motionController).toBeDefined();

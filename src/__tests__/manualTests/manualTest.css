@@ -1,4 +1,4 @@
-#motionController {
+#modelViewer {
   width: 50%;
   height: 100vw;
   position: absolute;
@@ -6,4 +6,15 @@
   top: 0;
   padding: 0;
   margin: 0;
+}
+
+#assetError {
+  background-color: white;
+  border: solid black;
+  color: red;
+  position: fixed;
+  right: 1em;
+  top: 50%;
+  width: calc(50% - 2em);
+  z-index: 100;
 }

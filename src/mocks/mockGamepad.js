@@ -5,23 +5,28 @@ class MockGamepad {
   /**
    * @param {Object} profileDescription - The profile description to parse to determine the length
    * of the button and axes arrays
-   * @param {string} handedness - When mocking a WebVR gamepad, the handedness to report
+   * @param {string} handedness - The gamepad's handedness
    */
   constructor(profileDescription, handedness) {
-    this.id = profileDescription.id;
-    if (handedness && profileDescription.WebVR) {
-      this.hand = handedness;
-    } else if (handedness) {
-      throw new Error('Cannot supply handedness when mocking a WebXR gamepad');
-    } else if (profileDescription.WebVR) {
-      throw new Error('Must supply a handedness when mocking a WebVR gamepad');
+    if (!profileDescription) {
+      throw new Error('No profileDescription supplied');
     }
+
+    if (!handedness) {
+      throw new Error('No handedness supplied');
+    }
+
+    this.id = profileDescription.id;
 
     // Loop through the profile description to determine how many elements to put in the buttons
     // and axes arrays
     let maxButtonIndex = 0;
     let maxAxisIndex = 0;
-    profileDescription.dataSources.forEach((dataSource) => {
+    const handDescription = profileDescription.handedness[handedness];
+    handDescription.components.forEach((componentId) => {
+      const component = profileDescription.components[componentId];
+      const dataSource = profileDescription.dataSources[component.dataSource];
+
       if (dataSource.buttonIndex && dataSource.buttonIndex > maxButtonIndex) {
         maxButtonIndex = dataSource.buttonIndex;
       }
@@ -49,6 +54,11 @@ class MockGamepad {
         touched: false,
         pressed: false
       });
+    }
+
+    // Set a WebVR property
+    if (profileDescription.WebVR) {
+      this.hand = handedness;
     }
   }
 }
