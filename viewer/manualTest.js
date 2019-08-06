@@ -1,11 +1,11 @@
 /* eslint import/no-unresolved: off */
 
-import { Profiles } from '../../../dist/webxr-input-profiles.module.js';
-import { MockGamepad, MockXRInputSource } from '../../../dist/webxr-input-mocks.module.js';
+import { Profiles } from '../dist/webxr-input-profiles.module.js';
+import { MockGamepad, MockXRInputSource } from '../dist/webxr-input-mocks.module.js';
 import ModelViewer from './modelViewer.js';
 import ManualControls from './buildElements.js';
 
-const profiles = new Profiles('../../../dist/profiles');
+const profiles = new Profiles('../dist/profiles');
 
 const urlSearchParams = new URL(window.location).searchParams;
 

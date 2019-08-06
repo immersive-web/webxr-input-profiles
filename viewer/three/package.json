@@ -1,0 +1,128 @@
+{
+  "_args": [
+    [
+      "three@0.106.2",
+      "C:\\src\\github\\webxr-input-profiles"
+    ]
+  ],
+  "_development": true,
+  "_from": "three@0.106.2",
+  "_id": "three@0.106.2",
+  "_inBundle": false,
+  "_integrity": "sha512-4Tlx43uoxnIaZFW2Bzkd1rXsatvVHEWAZJy8LuE+s6Q8c66ogNnhfq1bHiBKPAnXP230LD11H/ScIZc2LZMviA==",
+  "_location": "/three",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "three@0.106.2",
+    "name": "three",
+    "escapedName": "three",
+    "rawSpec": "0.106.2",
+    "saveSpec": null,
+    "fetchSpec": "0.106.2"
+  },
+  "_requiredBy": [
+    "#DEV:/"
+  ],
+  "_resolved": "https://registry.npmjs.org/three/-/three-0.106.2.tgz",
+  "_spec": "0.106.2",
+  "_where": "C:\\src\\github\\webxr-input-profiles",
+  "author": {
+    "name": "mrdoob"
+  },
+  "bugs": {
+    "url": "https://github.com/mrdoob/three.js/issues"
+  },
+  "description": "JavaScript 3D library",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^1.11.0",
+    "@typescript-eslint/parser": "^1.11.0",
+    "concurrently": "^4.1.1",
+    "eslint": "^6.0.1",
+    "eslint-config-mdcs": "^4.2.3",
+    "eslint-plugin-html": "^6.0.0",
+    "failonlyreporter": "^1.0.0",
+    "google-closure-compiler": "20190618.0.0",
+    "http-server": "^0.11.1",
+    "qunit": "^2.9.2",
+    "rollup": "^1.16.2",
+    "typescript": "^3.5.2"
+  },
+  "directories": {
+    "doc": "docs",
+    "example": "examples",
+    "test": "test"
+  },
+  "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "extends": "mdcs",
+    "plugins": [
+      "html",
+      "@typescript-eslint"
+    ],
+    "rules": {
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/indent": [
+        "error",
+        "tab",
+        {
+          "SwitchCase": 1
+        }
+      ]
+    }
+  },
+  "files": [
+    "build/three.js",
+    "build/three.min.js",
+    "build/three.module.js",
+    "examples/js",
+    "examples/jsm",
+    "examples/fonts",
+    "LICENSE",
+    "package.json",
+    "README.md",
+    "src"
+  ],
+  "homepage": "https://threejs.org/",
+  "jsnext:main": "build/three.module.js",
+  "jspm": {
+    "files": [
+      "package.json",
+      "LICENSE",
+      "README.md",
+      "build/three.js",
+      "build/three.min.js",
+      "build/three.module.js"
+    ],
+    "directories": {}
+  },
+  "keywords": [
+    "three",
+    "three.js",
+    "3d",
+    "webgl"
+  ],
+  "license": "MIT",
+  "main": "build/three.js",
+  "module": "build/three.module.js",
+  "name": "three",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrdoob/three.js.git"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "build-closure": "rollup -c && google-closure-compiler --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
+    "build-examples": "rollup -c rollup-examples.config.js",
+    "build-test": "rollup -c test/rollup.unit.config.js",
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
+    "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"http-server -p 8080\"",
+    "lint": "eslint src --ext js --ext ts",
+    "start": "npm run dev",
+    "test": "npm run build-test && qunit -r failonlyreporter test/unit/three.source.unit.js",
+    "travis": "npm run lint && npm test"
+  },
+  "types": "src/Three.d.ts",
+  "version": "0.106.2"
+}

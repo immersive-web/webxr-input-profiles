@@ -1,8 +1,8 @@
 /* eslint import/no-unresolved: off */
 
-import * as THREE from '../../../node_modules/three/build/three.module.js';
-import { GLTFLoader } from '../../../node_modules/three/examples/jsm/loaders/GLTFLoader.js';
-import { OrbitControls } from '../../../node_modules/three/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './three/build/three.module.js';
+import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
+import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
 
 const three = {};
 let canvasParentElement;

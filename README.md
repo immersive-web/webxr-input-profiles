@@ -1,9 +1,9 @@
-# XR Gamepad Mappings
+# WebXR Input Profiles
 
 ## Motivation
-Explain what WebXR is and how its different from WebVR https://github.com/immersive-web/xr-gamepad-mappings/issues/49
+Explain what WebXR is and how its different from WebVR https://github.com/immersive-web/webxr-input-profiles/issues/49
 
-Define motion controllers https://github.com/immersive-web/xr-gamepad-mappings/issues/50
+Define motion controllers https://github.com/immersive-web/webxr-input-profiles/issues/50
 
 When a motion controller is present on XR hardware, developers often wish to do the following:
 1. Display the motion controller's virtual model at the correct location
@@ -23,10 +23,15 @@ This repository has been designed to meet the following goals:
 * *WebXR optimized, WebVR compatible.* While WebVR is still available in several user agents, the future of XR on the web is in the standards-track API, WebXR. As such, when faced with tradeoffs, the design was optimized to simplify the schema and library for WebXR usage while still maintaining a path for WebVR usage.
 
 ## Adding New Hardware
-Fill in the steps for adding a folder for a new XR device, testing the change, and submitting for PR https://github.com/immersive-web/xr-gamepad-mappings/issues/51
+Fill in the steps for adding a folder for a new XR device, testing the change, and submitting for PR https://github.com/immersive-web/webxr-input-profiles/issues/51
 
 ## Filing A Bug
-Fill in the steps for filing a bug https://github.com/immersive-web/xr-gamepad-mappings/issues/52
+Fill in the steps for filing a bug https://github.com/immersive-web/webxr-input-profiles/issues/52
+
+## Profile Viewer
+This repository also contains a page that allows for easy testing and viewing of the devices described by each profile. It renders the assets described by the profile and allows emulated manipulation of each of the inputs in order to see the rendered response.
+
+[Open the Profile Viewer](https://immersive-web.github.io/webxr-input-profiles/viewer/)
 
 # Developer usage
 This repo provides a javascript library for managing known motion controller profiles, loading the most ideal known profile for a supplied input source, and creating a MotionController object that binds them together.  Developers can use this library to interact with the conceptual components of an input source, rather than each individual button or axis.
