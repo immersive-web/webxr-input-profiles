@@ -1,5 +1,7 @@
 # WebXR Input Profiles
 
+[![Build Status](https://travis-ci.com/immersive-web/webxr-input-profiles.svg?branch=master)](https://travis-ci.org/immersive-web/webxr-input-profiles)
+
 ## Motivation
 Explain what WebXR is and how its different from WebVR https://github.com/immersive-web/webxr-input-profiles/issues/49
 
