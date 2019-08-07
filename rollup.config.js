@@ -3,6 +3,7 @@ import copy from 'rollup-plugin-copy-glob';
 import buildProfilesList from './rollup-plugin-profiles';
 
 const DIST_FOLDER = 'dist';
+const VIEWER_FOLDER = 'profileViewer';
 
 export default [
   {
@@ -17,7 +18,8 @@ export default [
       eslint(),
       copy(
         [
-          { files: 'profiles/**', dest: `${DIST_FOLDER}/profiles` }
+          { files: 'profiles/**', dest: `${DIST_FOLDER}/profiles` },
+          { files: 'node_modules/three/**', dest: `${VIEWER_FOLDER}/three` }
         ],
         { verbose: true, watch: process.env.ROLLUP_WATCH }
       ),

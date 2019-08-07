@@ -2,12 +2,12 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Gamepad test page</title>
-        <script type="module" src="./manualTest.js"></script>
-        <link rel="stylesheet" type="text/css" href="./manualTest.css" />
+        <title>WebXR Input Profile Viewer</title>
+        <script type="module" src="./profileViewer.js"></script>
+        <link rel="stylesheet" type="text/css" href="./profileViewer.css" />
     </head>
     <body>
-        <h1>Gamepad Test Page</h1>
+        <h1>WebXR Input Profile Viewer</h1>
         <main id="gamepad">
             <section class="selectors">
                 <select id="profileSelector">
@@ -22,7 +22,7 @@
                 </ul>
             </section>
             <section id="modelViewer">
-                <div id="assetError"></div>
+                <ul id="assetError"></ul>
                 <details class="data">
                     <summary>Data</summary>
                     <pre id="data"></pre>

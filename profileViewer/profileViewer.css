@@ -12,9 +12,10 @@
   background-color: white;
   border: solid black;
   color: red;
-  position: fixed;
+  position: absolute;
   right: 1em;
-  top: 50%;
-  width: calc(50% - 2em);
+  left: 1em;
+  top: 1em;
+  display: block;
   z-index: 100;
 }

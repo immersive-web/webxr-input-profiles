@@ -1,13 +1,23 @@
 /* eslint import/no-unresolved: off */
 
-import * as THREE from '../../../node_modules/three/build/three.module.js';
-import { GLTFLoader } from '../../../node_modules/three/examples/jsm/loaders/GLTFLoader.js';
-import { OrbitControls } from '../../../node_modules/three/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './three/build/three.module.js';
+import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
+import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
 
 const three = {};
 let canvasParentElement;
 let assetErrorElement;
 let activeModel;
+
+function logViewerError(errorMessage) {
+  let errorElement = document.createElement('li');
+  errorElement.innerText = errorMessage;
+
+  assetErrorElement.appendChild(errorElement);
+  assetErrorElement.hidden = false;
+
+  console.error(errorMessage);
+}
 
 /**
  * @description Attaches a small blue sphere to the point reported as touched on all touchpads
@@ -21,6 +31,13 @@ function addTouchDots({ motionController, rootNode }) {
     if (component.dataSource.dataSourceType === 'touchpadSource') {
       // Find the node to attach the touch dot.
       const componentRoot = rootNode.getObjectByName(component.rootNodeName, true);
+
+      if (!componentRoot) {
+        // eslint-disable-next-line no-console
+        logViewerError(`Could not find root node of touchpad component ${component.rootNodeName}`);
+        return;
+      }
+
       const touchDotRoot = componentRoot.getObjectByName(component.touchDotNodeName, true);
 
       const sphereGeometry = new THREE.SphereGeometry(0.001);
@@ -44,6 +61,13 @@ function findNodes(model) {
     const componentRootNode = model.rootNode.getObjectByName(component.rootNodeName, true);
     const componentNodes = {};
 
+    // If the root node cannot be found, skip this component
+    if (!componentRootNode) {
+      // eslint-disable-next-line no-console
+      logViewerError(`Could not find root node of component ${component.rootNodeName}`);
+      return;
+    }
+
     // Loop through all the visual responses to be applied to this component
     Object.values(component.visualResponses).forEach((visualResponse) => {
       const visualResponseNodes = {};
@@ -59,7 +83,7 @@ function findNodes(model) {
       // If the root node cannot be found, skip this animation
       if (!visualResponseNodes.rootNode) {
         // eslint-disable-next-line no-console
-        console.error(`Could not find root node of visual response for ${rootNodeName}`);
+        logViewerError(`Could not find root node of visual response for ${rootNodeName}`);
         return;
       }
 
@@ -75,7 +99,7 @@ function findNodes(model) {
         // If the extents cannot be found, skip this animation
         if (!visualResponseNodes.minNode || !visualResponseNodes.maxNode) {
           // eslint-disable-next-line no-console
-          console.error(`Could not find extents nodes of visual response for ${rootNodeName}`);
+          logViewerError(`Could not find extents nodes of visual response for ${rootNodeName}`);
           return;
         }
       }
@@ -137,16 +161,20 @@ function animationFrameCallback() {
     Object.values(activeModel.motionController.components).forEach((component) => {
       const componentNodes = activeModel.nodes[component.id];
 
+      // Skip if the component node is not found. No error is needed, because it
+      // will have been reported at load time.
+      if (!componentNodes)
+        return;
+
       // Update node data based on the visual responses' current states
       Object.values(component.visualResponses).forEach((visualResponse) => {
         const { description, value } = visualResponse;
         const visualResponseNodes = componentNodes[description.rootNodeName];
-
-        if (!visualResponseNodes) {
-          // eslint-disable-next-line no-console
-          console.error(`Unable to find nodes for animation of ${description.rootNodeName}`);
+        
+        // Skip if the visual response node is not found. No error is needed,
+        // because it will have been reported at load time.
+        if (!visualResponseNodes)
           return;
-        }
 
         // Calculate the new properties based on the weight supplied
         if (description.property === 'visibility') {
@@ -233,8 +261,7 @@ const ModelViewer = {
 
     const onError = () => {
       const errorMessage = `Asset failed to load either because it was missing or malformed. ${motionController.assetPath}`;
-      assetErrorElement.innerText = errorMessage;
-      assetErrorElement.hidden = false;
+      logViewerError(errorMessage);
       throw new Error(errorMessage);
     };
 
