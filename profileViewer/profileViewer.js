@@ -12,8 +12,32 @@ const urlSearchParams = new URL(window.location).searchParams;
 let supportedProfilesList;
 let profileSelectorElement;
 let handednessSelectorElement;
+let fileNamesElement;
+let fileNamesSelectorElement;
 
 let activeProfile;
+let customProfileAssets = {};
+
+function clear(saveProfile) {
+  ModelViewer.clear();
+  ManualControls.clear();
+  if (!saveProfile) {
+    activeProfile = undefined;
+    customProfileAssets = {};
+  }
+}
+
+function ensureInteractionDisabled() {
+  profileSelectorElement.disabled = true;
+  handednessSelectorElement.disabled = true;
+  fileNamesSelectorElement.disabled = true;
+}
+
+function enableInteraction() {
+  profileSelectorElement.disabled = false;
+  handednessSelectorElement.disabled = false;
+  fileNamesSelectorElement.disabled = (profileSelectorElement.value !== 'custom');
+}
 
 function setUrl(profileId, handedness) {
   if (profileId) {
@@ -31,86 +55,132 @@ function setUrl(profileId, handedness) {
   window.history.replaceState(null, null, `${window.location.pathname}?${urlSearchParams.toString()}`);
 }
 
-function changeActiveHandedness() {
-  // Disable user interaction during change
-  profileSelectorElement.disabled = true;
-  handednessSelectorElement.disabled = true;
+function onHandednessSelected() {
+  ensureInteractionDisabled();
   setUrl(profileSelectorElement.value, handednessSelectorElement.value);
+  clear(/* saveProfile */ true);
 
-  // Clear the old info
-  ModelViewer.clear();
-  ManualControls.clear();
-
-  // Create a mockgamepad that matches the profile and handedness
+  // Create a mock gamepad that matches the profile and handedness
   const handedness = handednessSelectorElement.value;
   const mockGamepad = new MockGamepad(activeProfile, handedness);
   const mockXRInputSource = new MockXRInputSource(mockGamepad, handedness);
-  profiles.createMotionController(mockXRInputSource).then((motionController) => {
+  if (profileSelectorElement.value === 'custom') {
+    const motionController = Profiles.createCustomMotionController(
+      mockXRInputSource, activeProfile
+    );
     ManualControls.build(motionController);
-    ModelViewer.loadModel(motionController);
-  }).finally(() => {
-    profileSelectorElement.disabled = false;
-    handednessSelectorElement.disabled = false;
-  });
+    ModelViewer.loadModel(motionController, customProfileAssets[motionController.assetPath]);
+    enableInteraction();
+  } else {
+    profiles.createMotionController(mockXRInputSource).then((motionController) => {
+      ManualControls.build(motionController);
+      ModelViewer.loadModel(motionController);
+    }).finally(() => {
+      enableInteraction();
+    });
+  }
 }
 
-function changeActiveProfile(requestedProfileId, requestedHandedness) {
-  // Disable user interaction during change
-  profileSelectorElement.disabled = true;
-  handednessSelectorElement.disabled = true;
+function onProfileLoaded(profile, queryStringHandedness) {
+  ensureInteractionDisabled();
 
-  // Clear the old info
-  activeProfile = undefined;
-  ModelViewer.clear();
-  ManualControls.clear();
+  activeProfile = profile;
+
+  // Populate handedness selector
+  handednessSelectorElement.innerHTML = '';
+  Object.keys(activeProfile.handedness).forEach((handedness) => {
+    handednessSelectorElement.innerHTML += `
+      <option value='${handedness}'>${handedness}</option>
+    `;
+  });
+
+  // Apply handedness if supplied
+  if (queryStringHandedness && activeProfile.handedness[queryStringHandedness]) {
+    handednessSelectorElement.value = queryStringHandedness;
+  }
+
+  // Manually trigger the handedness to change
+  onHandednessSelected();
+}
+
+function loadCustomFiles(queryStringHandedness) {
+  ensureInteractionDisabled();
+
+  let profileFile;
+  fileNamesElement.innerHTML = '';
+
+  const fileList = Array.from(fileNamesSelectorElement.files);
+  fileList.forEach((file) => {
+    fileNamesElement.innerHTML += `
+      <li>${file.name}</li>
+    `;
+
+    if (file.name === 'profile.json') {
+      profileFile = file;
+    } else {
+      customProfileAssets[file.name] = window.URL.createObjectURL(file);
+    }
+  });
+
+  if (!profileFile) {
+    enableInteraction();
+    // TODO move the error logger into its own file so I can log errors from this file too
+    console.log('No profile.json');
+    throw new Error('No profile.json');
+  }
+
+  // Attempt to load the profile
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    const profile = JSON.parse(reader.result);
+    onProfileLoaded(profile, queryStringHandedness);
+  };
+
+  reader.onerror = () => {
+    enableInteraction();
+    // TODO move the error logger into its own file so I can log errors from this file too
+    console.log('Unable to load profile.json');
+    throw new Error('Unable to load profile.json');
+  };
+
+  reader.readAsText(profileFile);
+}
+
+function onProfileIdSelected(queryStringHandedness) {
+  // Get the selected profile id
+  const profileId = profileSelectorElement.value;
+
+  ensureInteractionDisabled();
+  clear(/* saveProfile */ false);
+  setUrl(profileId);
+
   handednessSelectorElement.innerHTML = `
     <option value='loading'>Loading...</option>
   `;
 
-  // Apply profileId override if supplied
-  const profileId = (requestedProfileId) || profileSelectorElement.value;
-
-  // Set the query string
-  setUrl(profileId);
-
-  // Attempt to load the new profile
-  profiles.fetchProfile([profileId]).then((profile) => {
-    activeProfile = profile;
-
-    // Populate handedness selector
-    handednessSelectorElement.innerHTML = '';
-    Object.keys(activeProfile.handedness).forEach((handedness) => {
-      handednessSelectorElement.innerHTML += `
-        <option value='${handedness}'>${handedness}</option>
-      `;
-    });
-
-    // Apply handedness if supplied
-    if (requestedHandedness && activeProfile.handedness[requestedHandedness]) {
-      handednessSelectorElement.value = requestedHandedness;
-    }
-
-    // Manually trigger the handedness to change
-    changeActiveHandedness();
-  }).catch((error) => {
-    profileSelectorElement.disabled = false;
-    handednessSelectorElement.disabled = true;
-    throw error;
-  });
-}
-
-function onProfileSelectionChange() {
-  changeActiveProfile();
-}
-
-function onHandednessSelectionChange() {
-  changeActiveHandedness();
+  // Attempt to load the profile
+  if (profileId === 'custom') {
+    // leave profile/handedness disabled until load complete
+    fileNamesElement.disabled = false;
+    loadCustomFiles(queryStringHandedness);
+  } else {
+    fileNamesElement.disabled = true;
+    profiles.fetchProfile([profileId])
+      .then((profile) => {
+        onProfileLoaded(profile, queryStringHandedness);
+      })
+      .catch((error) => {
+        enableInteraction();
+        console.error(error);
+        throw error;
+      });
+  }
 }
 
 function populateProfileSelector() {
-  // Disable user interaction during load
-  profileSelectorElement.disabled = true;
-  handednessSelectorElement.disabled = true;
+  ensureInteractionDisabled();
+  clear(/* saveProfile */ false);
 
   profiles.fetchSupportedProfilesList().then((profilesList) => {
     supportedProfilesList = profilesList;
@@ -118,29 +188,31 @@ function populateProfileSelector() {
     // Remove loading entry
     profileSelectorElement.innerHTML = '';
 
-    if (supportedProfilesList.length === 0) {
-      // No supported profiles found
-      profileSelectorElement.innerHTML = `
-        <option value='No profiles found'>No profiles found</option>
-      `;
-    } else {
+    if (supportedProfilesList.length > 0) {
       // Populate the selector with the profiles list
       supportedProfilesList.forEach((supportedProfile) => {
         profileSelectorElement.innerHTML += `
         <option value='${supportedProfile}'>${supportedProfile}</option>
         `;
       });
-
-      // Get the initial query string parameters and override the default selection if available
-      const requestedProfileId = urlSearchParams.get('profileId');
-      const requestedHandedness = urlSearchParams.get('handedness');
-      if (requestedProfileId) {
-        profileSelectorElement.value = requestedProfileId;
-      }
-
-      // Manually trigger active profile to load
-      changeActiveProfile(requestedProfileId, requestedHandedness);
     }
+
+    // Add the custom option at the end of the list
+    profileSelectorElement.innerHTML += `
+      <option value='custom'>Custom</option>
+    `;
+
+    // Get the optional query string parameters
+    const queryStringProfileId = urlSearchParams.get('profileId');
+    const queryStringHandedness = urlSearchParams.get('handedness');
+
+    // Override the default selection if values in query string
+    if (queryStringProfileId) {
+      profileSelectorElement.value = queryStringProfileId;
+    }
+
+    // Manually trigger profile to load
+    onProfileIdSelected(queryStringHandedness);
   });
 }
 
@@ -149,8 +221,13 @@ function onLoad() {
 
   profileSelectorElement = document.getElementById('profileSelector');
   handednessSelectorElement = document.getElementById('handednessSelector');
-  profileSelectorElement.addEventListener('change', onProfileSelectionChange);
-  handednessSelectorElement.addEventListener('change', onHandednessSelectionChange);
+  fileNamesElement = document.getElementById('localFileNames');
+  fileNamesSelectorElement = document.getElementById('localFilesSelector');
+
   populateProfileSelector();
+
+  fileNamesSelectorElement.addEventListener('change', loadCustomFiles);
+  profileSelectorElement.addEventListener('change', onProfileIdSelected);
+  handednessSelectorElement.addEventListener('change', onHandednessSelected);
 }
 window.addEventListener('load', onLoad);

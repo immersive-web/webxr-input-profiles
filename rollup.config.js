@@ -27,7 +27,7 @@ export default [
         profilePaths: ['profiles/**'],
         dest: `${DIST_FOLDER}/profiles/profilesList.json`,
         verbose: true,
-        watch: process.env.ROLLUP_WATCH 
+        watch: process.env.ROLLUP_WATCH
       })
     ]
   },

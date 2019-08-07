@@ -10,12 +10,18 @@
         <h1>WebXR Input Profile Viewer</h1>
         <main id="gamepad">
             <section class="selectors">
+                <label for="profileSelector">Select existing profile</label>
                 <select id="profileSelector">
                     <option value="loading">Loading...</option>
                 </select>
                 <select id="handednessSelector">
                     <option value="loading">Loading...</option>
                 </select>
+                <br>
+                <label for="localFilesSelector">Select custom profile</label>
+                <input id="localFilesSelector" type="file" multiple webkitdirectory>
+                <ul id="localFileNames">
+                </ul>
             </section>
             <section class="controls">
                 <ul id="controlsList">

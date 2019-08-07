@@ -241,7 +241,7 @@ const ModelViewer = {
     window.requestAnimationFrame(animationFrameCallback);
   },
 
-  loadModel: (motionController) => {
+  loadModel: (motionController, assetPath) => {
     // Remove any existing model from the scene
     clear();
 
@@ -266,7 +266,7 @@ const ModelViewer = {
     };
 
     three.loader.load(
-      motionController.assetPath,
+      (assetPath) || motionController.assetPath,
       onLoad,
       null,
       onError
