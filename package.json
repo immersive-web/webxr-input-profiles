@@ -18,12 +18,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/immersive-web/xr-gamepad-mappings.git"
+    "url": "https://github.com/immersive-web/webxr-input-profiles.git"
   },
   "bugs": {
-    "url": "https://github.com/immersive-web/xr-gamepad-mappings/issues"
+    "url": "https://github.com/immersive-web/webxr-input-profiles/issues"
   },
-  "homepage": "https://github.com/immersive-web/xr-gamepad-mappings",
+  "homepage": "https://immersive-web.github.io/webxr-input-profiles",
   "keywords": [
     "WebXR",
     "WebVR",
@@ -86,8 +86,7 @@
           "^.+\\.jsx?$": "babel-jest"
         },
         "testPathIgnorePatterns": [
-          "<rootDir>/node_modules/",
-          "<rootDir>/src/__tests__/manualTests/"
+          "<rootDir>/node_modules/"
         ]
       },
       {
@@ -95,7 +94,6 @@
         "runner": "jest-runner-eslint",
         "testMatch": [
           "<rootDir>/jestSetup/**.js",
-          "<rootDir>/manualTests/**.js",
           "<rootDir>/**/*.test.js"
         ]
       }

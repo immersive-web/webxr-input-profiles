@@ -21,6 +21,13 @@ function addTouchDots({ motionController, rootNode }) {
     if (component.dataSource.dataSourceType === 'touchpadSource') {
       // Find the node to attach the touch dot.
       const componentRoot = rootNode.getObjectByName(component.rootNodeName, true);
+
+      if (!componentRoot) {
+        // eslint-disable-next-line no-console
+        console.error(`Could not find root node of touchpad component ${component.rootNodeName}`);
+        return;
+      }
+
       const touchDotRoot = componentRoot.getObjectByName(component.touchDotNodeName, true);
 
       const sphereGeometry = new THREE.SphereGeometry(0.001);
@@ -43,6 +50,13 @@ function findNodes(model) {
   Object.values(model.motionController.components).forEach((component) => {
     const componentRootNode = model.rootNode.getObjectByName(component.rootNodeName, true);
     const componentNodes = {};
+
+    // If the root node cannot be found, skip this component
+    if (!componentRootNode) {
+      // eslint-disable-next-line no-console
+      console.error(`Could not find root node of component ${component.rootNodeName}`);
+      return;
+    }
 
     // Loop through all the visual responses to be applied to this component
     Object.values(component.visualResponses).forEach((visualResponse) => {
@@ -136,6 +150,9 @@ function animationFrameCallback() {
     // Update the 3D model to reflect the button, thumbstick, and touchpad state
     Object.values(activeModel.motionController.components).forEach((component) => {
       const componentNodes = activeModel.nodes[component.id];
+
+      if (!componentNodes)
+        return;
 
       // Update node data based on the visual responses' current states
       Object.values(component.visualResponses).forEach((visualResponse) => {
