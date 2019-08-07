@@ -7,14 +7,13 @@ import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
 const three = {};
 let canvasParentElement;
 let assetErrorElement;
-let assetErrorList;
 let activeModel;
 
 function logViewerError(errorMessage) {
   let errorElement = document.createElement('li');
   errorElement.innerText = errorMessage;
 
-  assetErrorList.appendChild(errorElement);
+  assetErrorElement.appendChild(errorElement);
   assetErrorElement.hidden = false;
 
   console.error(errorMessage);
@@ -129,7 +128,7 @@ function clear() {
     activeModel = null;
   }
 
-  assetErrorList.innerText = '';
+  assetErrorElement.innerText = '';
   assetErrorElement.hidden = true;
 }
 /**
@@ -206,8 +205,6 @@ const ModelViewer = {
   initialize: () => {
     canvasParentElement = document.getElementById('modelViewer');
     assetErrorElement = document.getElementById('assetError');
-    assetErrorList = document.createElement('ul');
-    assetErrorElement.appendChild(assetErrorList);
     const width = canvasParentElement.clientWidth;
     const height = canvasParentElement.clientHeight;
 
