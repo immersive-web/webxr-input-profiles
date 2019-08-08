@@ -19,7 +19,7 @@ export default [
       copy(
         [
           { files: 'profiles/**', dest: `${DIST_FOLDER}/profiles` },
-          { files: 'profileViewer/**', dest: `${VIEWER_FOLDER}`}
+          { files: 'profileViewer/**', dest: `${VIEWER_FOLDER}` }
         ],
         { verbose: true, watch: process.env.ROLLUP_WATCH }
       ),

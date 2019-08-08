@@ -148,18 +148,16 @@ function animationFrameCallback() {
 
       // Skip if the component node is not found. No error is needed, because it
       // will have been reported at load time.
-      if (!componentNodes)
-        return;
+      if (!componentNodes) return;
 
       // Update node data based on the visual responses' current states
       Object.values(component.visualResponses).forEach((visualResponse) => {
         const { description, value } = visualResponse;
         const visualResponseNodes = componentNodes[description.rootNodeName];
-        
+
         // Skip if the visual response node is not found. No error is needed,
         // because it will have been reported at load time.
-        if (!visualResponseNodes)
-          return;
+        if (!visualResponseNodes) return;
 
         // Calculate the new properties based on the weight supplied
         if (description.property === 'visibility') {
@@ -245,7 +243,8 @@ const ModelViewer = {
 
     const onError = () => {
       ErrorLogging.throw(
-        `Asset failed to load either because it was missing or malformed. ${motionController.assetPath}`);
+        `Asset failed to load either because it was missing or malformed. ${motionController.assetPath}`
+      );
     };
 
     three.loader.load(

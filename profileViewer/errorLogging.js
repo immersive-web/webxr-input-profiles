@@ -6,14 +6,14 @@ function toggleVisibility() {
   errorsElement.hidden = errorsElement.children.length === 0;
 }
 
-function addErrorElement(errorMessage){
+function addErrorElement(errorMessage) {
   const errorsElement = document.getElementById(errorsElementId);
   if (!listElement) {
     listElement = document.createElement('ul');
     errorsElement.appendChild(listElement);
   }
 
-  let itemElement = document.createElement('li');
+  const itemElement = document.createElement('li');
   itemElement.innerText = errorMessage;
   listElement.appendChild(itemElement);
 
@@ -34,7 +34,7 @@ const ErrorLogging = {
   },
 
   clear: () => {
-    if (listElement){
+    if (listElement) {
       const errorsElement = document.getElementById(errorsElementId);
       errorsElement.removeChild(listElement);
       listElement = undefined;
@@ -48,6 +48,6 @@ const ErrorLogging = {
     listElement = undefined;
     toggleVisibility();
   }
-}
+};
 
 export default ErrorLogging;
