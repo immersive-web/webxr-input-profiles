@@ -43,11 +43,12 @@
     "MotionControllers"
   ],
   "scripts": {
-    "clean": "rm -r dist",
+    "clean": "rm -r dist && rm -r profileViewerDist",
     "build": "rollup -c",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
     "lint": "eslint ./",
     "test": "jest",
+    "travis": "npm run clean && npm run build && npm run test && npm run lint",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {},
