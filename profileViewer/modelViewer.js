@@ -1,23 +1,13 @@
 /* eslint import/no-unresolved: off */
 
+import ErrorLogging from './errorLogging.js';
 import * as THREE from './three/build/three.module.js';
 import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
 
 const three = {};
 let canvasParentElement;
-let assetErrorElement;
 let activeModel;
-
-function logViewerError(errorMessage) {
-  let errorElement = document.createElement('li');
-  errorElement.innerText = errorMessage;
-
-  assetErrorElement.appendChild(errorElement);
-  assetErrorElement.hidden = false;
-
-  console.error(errorMessage);
-}
 
 /**
  * @description Attaches a small blue sphere to the point reported as touched on all touchpads
@@ -33,8 +23,7 @@ function addTouchDots({ motionController, rootNode }) {
       const componentRoot = rootNode.getObjectByName(component.rootNodeName, true);
 
       if (!componentRoot) {
-        // eslint-disable-next-line no-console
-        logViewerError(`Could not find root node of touchpad component ${component.rootNodeName}`);
+        ErrorLogging.log(`Could not find root node of touchpad component ${component.rootNodeName}`);
         return;
       }
 
@@ -63,8 +52,7 @@ function findNodes(model) {
 
     // If the root node cannot be found, skip this component
     if (!componentRootNode) {
-      // eslint-disable-next-line no-console
-      logViewerError(`Could not find root node of component ${component.rootNodeName}`);
+      ErrorLogging.log(`Could not find root node of component ${component.rootNodeName}`);
       return;
     }
 
@@ -82,8 +70,7 @@ function findNodes(model) {
 
       // If the root node cannot be found, skip this animation
       if (!visualResponseNodes.rootNode) {
-        // eslint-disable-next-line no-console
-        logViewerError(`Could not find root node of visual response for ${rootNodeName}`);
+        ErrorLogging.log(`Could not find root node of visual response for ${rootNodeName}`);
         return;
       }
 
@@ -98,8 +85,7 @@ function findNodes(model) {
 
         // If the extents cannot be found, skip this animation
         if (!visualResponseNodes.minNode || !visualResponseNodes.maxNode) {
-          // eslint-disable-next-line no-console
-          logViewerError(`Could not find extents nodes of visual response for ${rootNodeName}`);
+          ErrorLogging.log(`Could not find extents nodes of visual response for ${rootNodeName}`);
           return;
         }
       }
@@ -128,8 +114,7 @@ function clear() {
     activeModel = null;
   }
 
-  assetErrorElement.innerText = '';
-  assetErrorElement.hidden = true;
+  ErrorLogging.clear();
 }
 /**
  * @description Event handler for window resizing.
@@ -204,7 +189,6 @@ function animationFrameCallback() {
 const ModelViewer = {
   initialize: () => {
     canvasParentElement = document.getElementById('modelViewer');
-    assetErrorElement = document.getElementById('assetError');
     const width = canvasParentElement.clientWidth;
     const height = canvasParentElement.clientHeight;
 
@@ -260,9 +244,8 @@ const ModelViewer = {
     };
 
     const onError = () => {
-      const errorMessage = `Asset failed to load either because it was missing or malformed. ${motionController.assetPath}`;
-      logViewerError(errorMessage);
-      throw new Error(errorMessage);
+      ErrorLogging.throw(
+        `Asset failed to load either because it was missing or malformed. ${motionController.assetPath}`);
     };
 
     three.loader.load(

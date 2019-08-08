@@ -4,6 +4,7 @@ import { Profiles } from '../dist/webxr-input-profiles.module.js';
 import { MockGamepad, MockXRInputSource } from '../dist/webxr-input-mocks.module.js';
 import ModelViewer from './modelViewer.js';
 import ManualControls from './buildElements.js';
+import ErrorLogging from './errorLogging.js';
 
 const profiles = new Profiles('../dist/profiles');
 
@@ -19,6 +20,7 @@ let activeProfile;
 let customProfileAssets = {};
 
 function clear(saveProfile) {
+  ErrorLogging.clearAll();
   ModelViewer.clear();
   ManualControls.clear();
   if (!saveProfile) {
@@ -124,9 +126,7 @@ function loadCustomFiles(queryStringHandedness) {
 
   if (!profileFile) {
     enableInteraction();
-    // TODO move the error logger into its own file so I can log errors from this file too
-    console.log('No profile.json');
-    throw new Error('No profile.json');
+    ErrorLogging.log('No profile.json');
   }
 
   // Attempt to load the profile
@@ -139,9 +139,7 @@ function loadCustomFiles(queryStringHandedness) {
 
   reader.onerror = () => {
     enableInteraction();
-    // TODO move the error logger into its own file so I can log errors from this file too
-    console.log('Unable to load profile.json');
-    throw new Error('Unable to load profile.json');
+    ErrorLogging.logAndThrow('Unable to load profile.json');
   };
 
   reader.readAsText(profileFile);
@@ -172,7 +170,7 @@ function onProfileIdSelected(queryStringHandedness) {
       })
       .catch((error) => {
         enableInteraction();
-        console.error(error);
+        ErrorLogging.log(error.message);
         throw error;
       });
   }
