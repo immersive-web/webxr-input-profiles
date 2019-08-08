@@ -61,14 +61,8 @@ class VisualResponse {
     }
 
     // Looks for min/max node names and sets defaults if they are not defined
-    // TODO: Button and state responses have different named values, though this should be changed
-    if (this.description.source === 'buttonValue' || this.description.source === 'state') {
-      this.description.maxNodeName = (this.description.maxNodeName) ? this.description.maxNodeName : 'PRESSED';
-      this.description.minNodeName = (this.description.minNodeName) ? this.description.minNodeName : 'UNPRESSED';
-    } else {
-      this.description.maxNodeName = (this.description.maxNodeName) ? this.description.maxNodeName : 'MAX';
-      this.description.minNodeName = (this.description.minNodeName) ? this.description.minNodeName : 'MIN';
-    }
+    this.description.maxNodeName = (this.description.maxNodeName) ? this.description.maxNodeName : 'MAX';
+    this.description.minNodeName = (this.description.minNodeName) ? this.description.minNodeName : 'MIN';
 
     // Looks for the property name and sets a default if it is not defined
     this.description.property = (this.description.property) ? this.description.property : 'transform';

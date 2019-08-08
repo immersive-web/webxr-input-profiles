@@ -19,11 +19,8 @@ describe('Construction tests', () => {
     }).toThrow();
   });
   test.each([
-    ['buttonValue', 'PRESSED', 'UNPRESSED'],
-    ['state', 'PRESSED', 'UNPRESSED'],
-    ['xAxis', 'MAX', 'MIN'],
-    ['yAxis', 'MAX', 'MIN']
-  ])('Create with %s source and no additional properties', (source, minNodeName, maxNodeName) => {
+    ['buttonValue', 'state', 'xAxis', 'yAxis']
+  ])('Create with %s source and no additional properties', (source) => {
     const responseDescription = {
       rootNodeName: 'ROOT',
       source,
@@ -32,8 +29,8 @@ describe('Construction tests', () => {
 
     const expectedResponse = Object.assign(responseDescription, {
       targetNodeName: 'ROOT',
-      minNodeName,
-      maxNodeName,
+      minNodeName: 'MIN',
+      maxNodeName: 'MAX',
       property: 'transform'
     });
 
