@@ -7,9 +7,9 @@
         <link rel="stylesheet" type="text/css" href="./profileViewer.css" />
     </head>
     <body>
-        <h1>WebXR Input Profile Viewer</h1>
         <main>
             <div class="leftSide">
+                <h1>WebXR Input Profile Viewer</h1>
                 <section id="selectors">
                     <label for="profileSelector">Select existing profile</label>
                     <select id="profileSelector">
@@ -18,11 +18,12 @@
                     <select id="handednessSelector">
                         <option value="loading">Loading...</option>
                     </select>
-                    <br>
-                    <label for="localFilesSelector">Select custom profile</label>
-                    <input id="localFilesSelector" type="file" multiple webkitdirectory>
-                    <ul id="localFileNames">
-                    </ul>
+                    <div id="customProfile">
+                        <label for="localFilesSelector">Select custom profile</label>
+                        <input id="localFilesSelector" type="file" multiple webkitdirectory>
+                        <ul id="localFileNames">
+                        </ul>
+                    </div>
                 </section>
                 <section id="errors" hidden="true">
                 </section>

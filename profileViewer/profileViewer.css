@@ -3,6 +3,10 @@
   margin: 0;
 }
 
+h1 {
+  padding-bottom: .5em;
+}
+
 .leftSide {
   width: calc(50% - 2em);
   padding: 1em;
@@ -39,4 +43,13 @@ section {
   width: 50%;
   right: 0;
   top: 0;
+}
+
+#customProfile {
+  margin-top: .5em;
+}
+
+#customProfile ul {
+  margin-left: .5em;
+  list-style: inside;
 }

@@ -11,13 +11,9 @@ const profiles = new Profiles('../dist/profiles');
 const urlSearchParams = new URL(window.location).searchParams;
 
 let supportedProfilesList;
-let profileSelectorElement;
-let handednessSelectorElement;
-let fileNamesElement;
-let fileNamesSelectorElement;
-
 let activeProfile;
 let customProfileAssets = {};
+const pageElements = {};
 
 function clear(saveProfile) {
   ErrorLogging.clearAll();
@@ -30,15 +26,15 @@ function clear(saveProfile) {
 }
 
 function ensureInteractionDisabled() {
-  profileSelectorElement.disabled = true;
-  handednessSelectorElement.disabled = true;
-  fileNamesSelectorElement.disabled = true;
+  pageElements.profileSelector.disabled = true;
+  pageElements.handednessSelector.disabled = true;
+  pageElements.fileNamesSelector.disabled = true;
 }
 
 function enableInteraction() {
-  profileSelectorElement.disabled = false;
-  handednessSelectorElement.disabled = false;
-  fileNamesSelectorElement.disabled = (profileSelectorElement.value !== 'custom');
+  pageElements.profileSelector.disabled = false;
+  pageElements.handednessSelector.disabled = false;
+  pageElements.fileNamesSelector.disabled = (pageElements.profileSelector.value !== 'custom');
 }
 
 function setUrl(profileId, handedness) {
@@ -59,14 +55,14 @@ function setUrl(profileId, handedness) {
 
 function onHandednessSelected() {
   ensureInteractionDisabled();
-  setUrl(profileSelectorElement.value, handednessSelectorElement.value);
+  setUrl(pageElements.profileSelector.value, pageElements.handednessSelector.value);
   clear(/* saveProfile */ true);
 
   // Create a mock gamepad that matches the profile and handedness
-  const handedness = handednessSelectorElement.value;
+  const handedness = pageElements.handednessSelector.value;
   const mockGamepad = new MockGamepad(activeProfile, handedness);
   const mockXRInputSource = new MockXRInputSource(mockGamepad, handedness);
-  if (profileSelectorElement.value === 'custom') {
+  if (pageElements.profileSelector.value === 'custom') {
     const motionController = Profiles.createCustomMotionController(
       mockXRInputSource, activeProfile
     );
@@ -89,16 +85,16 @@ function onProfileLoaded(profile, queryStringHandedness) {
   activeProfile = profile;
 
   // Populate handedness selector
-  handednessSelectorElement.innerHTML = '';
+  pageElements.handednessSelector.innerHTML = '';
   Object.keys(activeProfile.handedness).forEach((handedness) => {
-    handednessSelectorElement.innerHTML += `
+    pageElements.handednessSelector.innerHTML += `
       <option value='${handedness}'>${handedness}</option>
     `;
   });
 
   // Apply handedness if supplied
   if (queryStringHandedness && activeProfile.handedness[queryStringHandedness]) {
-    handednessSelectorElement.value = queryStringHandedness;
+    pageElements.handednessSelector.value = queryStringHandedness;
   }
 
   // Manually trigger the handedness to change
@@ -109,11 +105,11 @@ function loadCustomFiles(queryStringHandedness) {
   ensureInteractionDisabled();
 
   let profileFile;
-  fileNamesElement.innerHTML = '';
+  pageElements.fileNames.innerHTML = '';
 
-  const fileList = Array.from(fileNamesSelectorElement.files);
+  const fileList = Array.from(pageElements.fileNamesSelector.files);
   fileList.forEach((file) => {
-    fileNamesElement.innerHTML += `
+    pageElements.fileNames.innerHTML += `
       <li>${file.name}</li>
     `;
 
@@ -147,23 +143,23 @@ function loadCustomFiles(queryStringHandedness) {
 
 function onProfileIdSelected(queryStringHandedness) {
   // Get the selected profile id
-  const profileId = profileSelectorElement.value;
+  const profileId = pageElements.profileSelector.value;
 
   ensureInteractionDisabled();
   clear(/* saveProfile */ false);
   setUrl(profileId);
 
-  handednessSelectorElement.innerHTML = `
+  pageElements.handednessSelector.innerHTML = `
     <option value='loading'>Loading...</option>
   `;
 
   // Attempt to load the profile
   if (profileId === 'custom') {
     // leave profile/handedness disabled until load complete
-    fileNamesElement.disabled = false;
+    pageElements.customProfile.hidden = false;
     loadCustomFiles(queryStringHandedness);
   } else {
-    fileNamesElement.disabled = true;
+    pageElements.customProfile.hidden = true;
     profiles.fetchProfile([profileId])
       .then((profile) => {
         onProfileLoaded(profile, queryStringHandedness);
@@ -184,19 +180,19 @@ function populateProfileSelector() {
     supportedProfilesList = profilesList;
 
     // Remove loading entry
-    profileSelectorElement.innerHTML = '';
+    pageElements.profileSelector.innerHTML = '';
 
     if (supportedProfilesList.length > 0) {
       // Populate the selector with the profiles list
       supportedProfilesList.forEach((supportedProfile) => {
-        profileSelectorElement.innerHTML += `
+        pageElements.profileSelector.innerHTML += `
         <option value='${supportedProfile}'>${supportedProfile}</option>
         `;
       });
     }
 
     // Add the custom option at the end of the list
-    profileSelectorElement.innerHTML += `
+    pageElements.profileSelector.innerHTML += `
       <option value='custom'>Custom</option>
     `;
 
@@ -206,7 +202,7 @@ function populateProfileSelector() {
 
     // Override the default selection if values in query string
     if (queryStringProfileId) {
-      profileSelectorElement.value = queryStringProfileId;
+      pageElements.profileSelector.value = queryStringProfileId;
     }
 
     // Manually trigger profile to load
@@ -217,15 +213,16 @@ function populateProfileSelector() {
 function onLoad() {
   ModelViewer.initialize();
 
-  profileSelectorElement = document.getElementById('profileSelector');
-  handednessSelectorElement = document.getElementById('handednessSelector');
-  fileNamesElement = document.getElementById('localFileNames');
-  fileNamesSelectorElement = document.getElementById('localFilesSelector');
+  pageElements.profileSelector = document.getElementById('profileSelector');
+  pageElements.handednessSelector = document.getElementById('handednessSelector');
+  pageElements.customProfile = document.getElementById('customProfile');
+  pageElements.fileNames = document.getElementById('localFileNames');
+  pageElements.fileNamesSelector = document.getElementById('localFilesSelector');
 
   populateProfileSelector();
 
-  fileNamesSelectorElement.addEventListener('change', loadCustomFiles);
-  profileSelectorElement.addEventListener('change', onProfileIdSelected);
-  handednessSelectorElement.addEventListener('change', onHandednessSelected);
+  pageElements.fileNamesSelector.addEventListener('change', loadCustomFiles);
+  pageElements.profileSelector.addEventListener('change', onProfileIdSelected);
+  pageElements.handednessSelector.addEventListener('change', onHandednessSelected);
 }
 window.addEventListener('load', onLoad);
