@@ -93,6 +93,16 @@ class Profiles {
     const motionController = new MotionController(xrInputSource, profile);
     return motionController;
   }
+
+  /**
+   * @description Create a MotionController from an XRInputSource
+   * @param {Object} xrInputSource - The input source to build a MotionController from
+   * @param {Object} profile - The custom profile to use
+   */
+  static createCustomMotionController(xrInputSource, profile) {
+    const motionController = new MotionController(xrInputSource, profile);
+    return motionController;
+  }
 }
 
 export default Profiles;

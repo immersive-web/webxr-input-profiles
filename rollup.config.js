@@ -3,7 +3,7 @@ import copy from 'rollup-plugin-copy-glob';
 import buildProfilesList from './rollup-plugin-profiles';
 
 const DIST_FOLDER = 'dist';
-const VIEWER_FOLDER = 'profileViewer';
+const VIEWER_FOLDER = 'profileViewerDist';
 
 export default [
   {
@@ -15,11 +15,10 @@ export default [
       }
     ],
     plugins: [
-      eslint(),
+      eslint({ throwOnError: true }),
       copy(
         [
-          { files: 'profiles/**', dest: `${DIST_FOLDER}/profiles` },
-          { files: 'node_modules/three/**', dest: `${VIEWER_FOLDER}/three` }
+          { files: 'profiles/**', dest: `${DIST_FOLDER}/profiles` }
         ],
         { verbose: true, watch: process.env.ROLLUP_WATCH }
       ),
@@ -27,7 +26,7 @@ export default [
         profilePaths: ['profiles/**'],
         dest: `${DIST_FOLDER}/profiles/profilesList.json`,
         verbose: true,
-        watch: process.env.ROLLUP_WATCH 
+        watch: process.env.ROLLUP_WATCH
       })
     ]
   },
@@ -38,6 +37,40 @@ export default [
         format: 'es',
         file: `${DIST_FOLDER}/webxr-input-mocks.module.js`
       }
+    ],
+    plugins: [
+      eslint({ throwOnError: true })
+    ]
+  },
+  {
+    input: ['profileViewer/profileViewer.js'],
+    output: [
+      {
+        format: 'es',
+        file: `${VIEWER_FOLDER}/profileViewer.js`
+      }
+    ],
+    external: [
+      './three/build/three.module.js',
+      './three/examples/jsm/loaders/GLTFLoader.js',
+      './three/examples/jsm/controls/OrbitControls.js',
+      '../dist/webxr-input-profiles.module.js',
+      '../dist/webxr-input-mocks.module.js'
+    ],
+    plugins: [
+      eslint({ throwOnError: true }),
+      copy(
+        [
+          { files: 'profileViewer/*.{html,css}', dest: `${VIEWER_FOLDER}` }
+        ],
+        { verbose: true, watch: process.env.ROLLUP_WATCH }
+      ),
+      copy(
+        [
+          { files: 'node_modules/three/**', dest: `${VIEWER_FOLDER}/three` }
+        ],
+        { verbose: false, watch: process.env.ROLLUP_WATCH }
+      )
     ]
   }
 ];

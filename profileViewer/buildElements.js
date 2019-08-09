@@ -75,6 +75,7 @@ function build(controller) {
     }
 
     const listElement = document.createElement('li');
+    listElement.setAttribute('class', 'component');
     listElement.innerHTML = innerHtml;
     controlsListElement.appendChild(listElement);
 

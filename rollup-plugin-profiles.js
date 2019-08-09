@@ -37,7 +37,7 @@ export default function generateProfilesList({ profilePaths, dest, watch } = {})
     name: 'buildProfilesList',
     buildStart: async () => {
       // Get the profilesList
-      const filePaths = await globby(profilePaths + '/*.json');
+      const filePaths = await globby(`${profilePaths}/*.json`);
       filePaths.forEach((filePath) => {
         profilesList[filePath] = path.basename(path.dirname(filePath));
       });

@@ -56,7 +56,13 @@ class MotionController {
   }
 
   get assetPath() {
-    return `${this.profile.baseUri}/${this.hand.asset}`;
+    let assetPath;
+    if (this.profile.baseUri) {
+      assetPath = `${this.profile.baseUri}/${this.hand.asset}`;
+    } else {
+      assetPath = this.hand.asset;
+    }
+    return assetPath;
   }
 
   get gripSpace() {

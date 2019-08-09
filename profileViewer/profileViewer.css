@@ -1,21 +1,55 @@
-#modelViewer {
-  width: 50%;
-  height: 100vw;
-  position: absolute;
-  right: 0;
-  top: 0;
+* {
   padding: 0;
   margin: 0;
 }
 
-#assetError {
+h1 {
+  padding-bottom: .5em;
+}
+
+.leftSide {
+  width: calc(50% - 2em);
+  padding: 1em;
+}
+
+section {
+  margin-bottom: 1em;
+}
+
+.component {
+  border: 1px dashed black;
+  list-style: none;
+  margin-top: .25em;
+  margin-bottom: .25em;
+  padding: .5em;
+}
+
+#errors {
   background-color: white;
   border: solid black;
   color: red;
+  margin: .5em;
+  margin-bottom: 1em;
+}
+
+#errors ul {
+  margin: 0.5em;
+  list-style-position: inside;
+}
+
+#modelViewer {
+  height: 100vw;
   position: absolute;
-  right: 1em;
-  left: 1em;
-  top: 1em;
-  display: block;
-  z-index: 100;
+  width: 50%;
+  right: 0;
+  top: 0;
+}
+
+#customProfile {
+  margin-top: .5em;
+}
+
+#customProfile ul {
+  margin-left: .5em;
+  list-style: inside;
 }
