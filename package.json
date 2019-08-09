@@ -43,12 +43,12 @@
     "MotionControllers"
   ],
   "scripts": {
-    "clean": "rm -r dist && rm -r profileViewerDist",
+    "clean": "rm -r dist 2> /dev/null & rm -r profileViewerDist 2> /dev/null || true",
     "build": "rollup -c",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
-    "lint": "eslint ./",
+    "lintAll": "eslint ./",
     "test": "jest",
-    "travis": "npm run clean && npm run build && npm run test && npm run lint",
+    "travis": "npm run clean && npm run build && npm run test",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {},
@@ -94,7 +94,7 @@
         "displayName": "eslint",
         "runner": "jest-runner-eslint",
         "testMatch": [
-          "<rootDir>/jestSetup/**.js",
+          "<rootDir>/testHelpers/**.js",
           "<rootDir>/**/*.test.js"
         ]
       }
