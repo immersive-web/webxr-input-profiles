@@ -38,7 +38,7 @@ section {
 }
 
 #modelViewer {
-  height: 100vw;
+  height: 100vh;
   position: absolute;
   width: 50%;
   right: 0;
