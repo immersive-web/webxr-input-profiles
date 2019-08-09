@@ -21,7 +21,7 @@
             {
                 "devDependencies": [
                     "**/__tests__/**.js", 
-                    "testHelpers/**",
+                    "src/testHelpers/**",
                     "rollup**"
                 ]
             }
@@ -31,7 +31,7 @@
         {
             "files": [
                 "**/__tests__/**.test.js",
-                "testHelpers/**"
+                "src/testHelpers/**"
             ],
             "env": {
                 "jest": true

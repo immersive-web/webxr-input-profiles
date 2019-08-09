@@ -43,7 +43,7 @@
     "MotionControllers"
   ],
   "scripts": {
-    "clean": "rm -r dist 2> /dev/null & rm -r profileViewerDist 2> /dev/null || true",
+    "clean": "rm -r dist 2> /dev/null & rm -r profileViewer 2> /dev/null || true",
     "build": "rollup -c",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
     "lintAll": "eslint ./",
@@ -81,7 +81,7 @@
       {
         "displayName": "test",
         "setupFiles": [
-          "./testHelpers/testHelpers.js"
+          "./src/testHelpers/testHelpers.js"
         ],
         "transform": {
           "^.+\\.jsx?$": "babel-jest"

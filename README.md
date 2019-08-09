@@ -33,7 +33,7 @@ Fill in the steps for filing a bug https://github.com/immersive-web/webxr-input-
 ## Profile Viewer
 This repository also contains a page that allows for easy testing and viewing of the devices described by each profile. It renders the assets described by the profile and allows emulated manipulation of each of the inputs in order to see the rendered response.
 
-[Open the Profile Viewer](https://immersive-web.github.io/webxr-input-profiles/profileViewerDist/)
+[Open the Profile Viewer](https://immersive-web.github.io/webxr-input-profiles/profileViewer/)
 
 # Developer usage
 This repo provides a javascript library for managing known motion controller profiles, loading the most ideal known profile for a supplied input source, and creating a MotionController object that binds them together.  Developers can use this library to interact with the conceptual components of an input source, rather than each individual button or axis.

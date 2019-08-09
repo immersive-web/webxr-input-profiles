@@ -3,11 +3,11 @@ import copy from 'rollup-plugin-copy-glob';
 import buildProfilesList from './rollup-plugin-profiles';
 
 const DIST_FOLDER = 'dist';
-const VIEWER_FOLDER = 'profileViewerDist';
+const VIEWER_FOLDER = 'profileViewer';
 
 export default [
   {
-    input: ['src/index.js'],
+    input: ['src/lib/index.js'],
     output: [
       {
         format: 'es',
@@ -18,12 +18,12 @@ export default [
       eslint({ throwOnError: true }),
       copy(
         [
-          { files: 'profiles/**', dest: `${DIST_FOLDER}/profiles` }
+          { files: 'src/profiles/**', dest: `${DIST_FOLDER}/profiles` }
         ],
         { verbose: true, watch: process.env.ROLLUP_WATCH }
       ),
       buildProfilesList({
-        profilePaths: ['profiles/**'],
+        profilePaths: ['src/profiles/**'],
         dest: `${DIST_FOLDER}/profiles/profilesList.json`,
         verbose: true,
         watch: process.env.ROLLUP_WATCH
@@ -43,7 +43,7 @@ export default [
     ]
   },
   {
-    input: ['profileViewer/profileViewer.js'],
+    input: ['src/profileViewer/profileViewer.js'],
     output: [
       {
         format: 'es',
@@ -61,7 +61,7 @@ export default [
       eslint({ throwOnError: true }),
       copy(
         [
-          { files: 'profileViewer/*.{html,css}', dest: `${VIEWER_FOLDER}` }
+          { files: 'src/profileViewer/*.{html,css}', dest: `${VIEWER_FOLDER}` }
         ],
         { verbose: true, watch: process.env.ROLLUP_WATCH }
       ),

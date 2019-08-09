@@ -1,7 +1,7 @@
 import Constants from '../constants';
 import MotionController from '../motionController';
-import MockXRInputSource from '../mocks/mockXRInputSource';
-import MockGamepad from '../mocks/mockGamepad';
+import MockXRInputSource from '../../mocks/mockXRInputSource';
+import MockGamepad from '../../mocks/mockGamepad';
 
 const gamepadId = 'mock';
 const profile = {

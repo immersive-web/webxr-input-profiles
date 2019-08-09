@@ -1,6 +1,6 @@
 import Constants from '../constants';
 import { Axes } from '../components';
-import MockGamepad from '../mocks/mockGamepad';
+import MockGamepad from '../../mocks/mockGamepad';
 
 const xAxisIndex = 0;
 const yAxisIndex = 1;
