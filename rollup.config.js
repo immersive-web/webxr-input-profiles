@@ -18,12 +18,12 @@ export default [
       eslint({ throwOnError: true }),
       copy(
         [
-          { files: 'profiles/**', dest: `${DIST_FOLDER}/profiles` }
+          { files: 'src/profiles/**', dest: `${DIST_FOLDER}/profiles` }
         ],
         { verbose: true, watch: process.env.ROLLUP_WATCH }
       ),
       buildProfilesList({
-        profilePaths: ['profiles/**'],
+        profilePaths: ['src/profiles/**'],
         dest: `${DIST_FOLDER}/profiles/profilesList.json`,
         verbose: true,
         watch: process.env.ROLLUP_WATCH

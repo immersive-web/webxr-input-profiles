@@ -4,7 +4,7 @@ const Ajv = require('ajv');
 const { join } = require('path');
 const fs = require('fs-extra');
 
-const profilesFolderPath = join(__dirname, '../../profiles');
+const profilesFolderPath = join(__dirname, '../profiles');
 
 const TestHelpers = {
   profilesFolderPath,
