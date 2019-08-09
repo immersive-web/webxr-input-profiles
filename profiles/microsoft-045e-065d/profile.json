@@ -84,12 +84,16 @@
         {
             "rootNodeName" : "SELECT",
             "source" : "buttonValue",
-            "states" : ["default", "touched", "pressed"]
+            "states" : ["default", "touched", "pressed"],
+            "minNodeName": "UNPRESSED",
+            "maxNodeName": "PRESSED"
         },
         {
             "rootNodeName": "THUMBSTICK_PRESS",
             "source" : "state",
-            "states" : ["pressed"]
+            "states" : ["pressed"],
+            "minNodeName": "UNPRESSED",
+            "maxNodeName": "PRESSED"
         },
         {
             "rootNodeName": "THUMBSTICK_X",
@@ -104,12 +108,16 @@
         {
             "rootNodeName" : "GRASP",
             "source" : "state",
-            "states" : ["pressed"]
+            "states" : ["pressed"],
+            "minNodeName": "UNPRESSED",
+            "maxNodeName": "PRESSED"
         },
         {
             "rootNodeName": "TOUCHPAD_PRESS",
             "source" : "state",
-            "states" : ["pressed"]
+            "states" : ["pressed"],
+            "minNodeName": "UNPRESSED",
+            "maxNodeName": "PRESSED"
         },
         {
             "rootNodeName": "TOUCH",
@@ -130,7 +138,9 @@
         {
             "rootNodeName" : "MENU",
             "source" : "state",
-            "states" : ["pressed"]
+            "states" : ["pressed"],
+            "minNodeName": "UNPRESSED",
+            "maxNodeName": "PRESSED"
         }
     ]
 }
