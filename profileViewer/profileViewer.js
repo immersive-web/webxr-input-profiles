@@ -8,8 +8,6 @@ import ErrorLogging from './errorLogging.js';
 
 const profiles = new Profiles('../dist/profiles');
 
-const urlSearchParams = new URL(window.location).searchParams;
-
 let supportedProfilesList;
 let activeProfile;
 let customProfileAssets = {};
@@ -39,18 +37,16 @@ function enableInteraction() {
 
 function setUrl(profileId, handedness) {
   if (profileId) {
-    urlSearchParams.set('profileId', profileId);
+    window.localStorage.setItem('profileId', profileId);
   } else {
-    urlSearchParams.delete('profileId');
+    window.localStorage.removeItem('profileId');
   }
 
   if (handedness) {
-    urlSearchParams.set('handedness', handedness);
+    window.localStorage.setItem('handedness', handedness);
   } else {
-    urlSearchParams.delete('handedness');
+    window.localStorage.removeItem('handedness');
   }
-
-  window.history.replaceState(null, null, `${window.location.pathname}?${urlSearchParams.toString()}`);
 }
 
 function onHandednessSelected() {
@@ -79,7 +75,7 @@ function onHandednessSelected() {
   }
 }
 
-function onProfileLoaded(profile, queryStringHandedness) {
+function onProfileLoaded(profile, localStorageHandedness) {
   ensureInteractionDisabled();
 
   activeProfile = profile;
@@ -93,15 +89,15 @@ function onProfileLoaded(profile, queryStringHandedness) {
   });
 
   // Apply handedness if supplied
-  if (queryStringHandedness && activeProfile.handedness[queryStringHandedness]) {
-    pageElements.handednessSelector.value = queryStringHandedness;
+  if (localStorageHandedness && activeProfile.handedness[localStorageHandedness]) {
+    pageElements.handednessSelector.value = localStorageHandedness;
   }
 
   // Manually trigger the handedness to change
   onHandednessSelected();
 }
 
-function loadCustomFiles(queryStringHandedness) {
+function loadCustomFiles(localStorageHandedness) {
   ensureInteractionDisabled();
 
   let profileFile;
@@ -130,7 +126,7 @@ function loadCustomFiles(queryStringHandedness) {
 
   reader.onload = () => {
     const profile = JSON.parse(reader.result);
-    onProfileLoaded(profile, queryStringHandedness);
+    onProfileLoaded(profile, localStorageHandedness);
   };
 
   reader.onerror = () => {
@@ -141,7 +137,7 @@ function loadCustomFiles(queryStringHandedness) {
   reader.readAsText(profileFile);
 }
 
-function onProfileIdSelected(queryStringHandedness) {
+function onProfileIdSelected(localStorageHandedness) {
   // Get the selected profile id
   const profileId = pageElements.profileSelector.value;
 
@@ -157,12 +153,12 @@ function onProfileIdSelected(queryStringHandedness) {
   if (profileId === 'custom') {
     // leave profile/handedness disabled until load complete
     pageElements.customProfile.hidden = false;
-    loadCustomFiles(queryStringHandedness);
+    loadCustomFiles(localStorageHandedness);
   } else {
     pageElements.customProfile.hidden = true;
     profiles.fetchProfile([profileId])
       .then((profile) => {
-        onProfileLoaded(profile, queryStringHandedness);
+        onProfileLoaded(profile, localStorageHandedness);
       })
       .catch((error) => {
         enableInteraction();
@@ -196,17 +192,17 @@ function populateProfileSelector() {
       <option value='custom'>Custom</option>
     `;
 
-    // Get the optional query string parameters
-    const queryStringProfileId = urlSearchParams.get('profileId');
-    const queryStringHandedness = urlSearchParams.get('handedness');
+    // Get the last known state from local storage
+    const localStorageProfileId = window.localStorage.getItem('profileId');
+    const localStorageHandedness = window.localStorage.getItem('handedness');
 
-    // Override the default selection if values in query string
-    if (queryStringProfileId) {
-      pageElements.profileSelector.value = queryStringProfileId;
+    // Override the default selection if values were present in local storage
+    if (localStorageProfileId) {
+      pageElements.profileSelector.value = localStorageProfileId;
     }
 
     // Manually trigger profile to load
-    onProfileIdSelected(queryStringHandedness);
+    onProfileIdSelected(localStorageHandedness);
   });
 }
 
