@@ -81,7 +81,7 @@
       {
         "displayName": "test",
         "setupFiles": [
-          "./testHelpers/testHelpers.js"
+          "./src/testHelpers/testHelpers.js"
         ],
         "transform": {
           "^.+\\.jsx?$": "babel-jest"
