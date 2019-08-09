@@ -15,7 +15,7 @@ export default [
       }
     ],
     plugins: [
-      eslint(),
+      eslint('.eslintrc.json'),
       copy(
         [
           { files: 'profiles/**', dest: `${DIST_FOLDER}/profiles` },
