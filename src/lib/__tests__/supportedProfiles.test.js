@@ -16,7 +16,7 @@ describe.each(profilesList)('Validate %s profile', (profileName) => {
   });
 
   test('Matched schema and package version', () => {
-    const { version } = fs.readJSONSync(join(__dirname, '../../package.json'));
+    const { version } = fs.readJSONSync(join(__dirname, '../../../package.json'));
     const schemaVersion = version.replace(/\.[0-9]+$/, '');
     expect(profile.version).toEqual(schemaVersion);
   });

@@ -1,6 +1,6 @@
 import Constants from '../constants';
 import { Button } from '../components';
-import MockGamepad from '../mocks/mockGamepad';
+import MockGamepad from '../../mocks/mockGamepad';
 
 const buttonIndex = 0;
 const handednessDescription = {

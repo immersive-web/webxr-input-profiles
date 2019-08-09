@@ -7,7 +7,7 @@ const VIEWER_FOLDER = 'profileViewerDist';
 
 export default [
   {
-    input: ['src/index.js'],
+    input: ['src/lib/index.js'],
     output: [
       {
         format: 'es',

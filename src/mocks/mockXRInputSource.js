@@ -1,4 +1,4 @@
-import Constants from '../constants';
+import Constants from '../lib/constants';
 
 /**
  * A fake XRInputSource that can be used to initialize a MotionController. Supports being created
