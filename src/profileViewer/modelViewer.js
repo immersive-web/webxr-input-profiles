@@ -1,9 +1,10 @@
-/* eslint import/no-unresolved: off */
-
-import ErrorLogging from './errorLogging.js';
+/* eslint-disable import/no-unresolved */
 import * as THREE from './three/build/three.module.js';
 import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
+/* eslint-enable */
+
+import ErrorLogging from './errorLogging.js';
 
 const three = {};
 let canvasParentElement;
@@ -223,7 +224,7 @@ const ModelViewer = {
     window.requestAnimationFrame(animationFrameCallback);
   },
 
-  loadModel: (motionController, assetPath) => {
+  loadModel: (motionController) => {
     // Remove any existing model from the scene
     clear();
 
@@ -243,12 +244,12 @@ const ModelViewer = {
 
     const onError = () => {
       ErrorLogging.throw(
-        `Asset failed to load either because it was missing or malformed. ${motionController.assetPath}`
+        `Asset failed to load either because it was missing or malformed. ${motionController.assetUrl}`
       );
     };
 
     three.loader.load(
-      (assetPath) || motionController.assetPath,
+      motionController.assetUrl,
       onLoad,
       null,
       onError

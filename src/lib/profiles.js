@@ -1,5 +1,3 @@
-import MotionController from './motionController';
-
 class Profiles {
   /**
    * @description Initializes the class to point to the URI with the profiles and assets
@@ -61,48 +59,41 @@ class Profiles {
     const supportedProfilesList = await this.fetchSupportedProfilesList();
 
     // Find the relative path to the first requested profile that is recognized
-    let relativePath;
+    let profileBaseUri;
     profilesToMatch.some((profileName) => {
       if (supportedProfilesList.includes(profileName)) {
-        relativePath = profileName;
+        profileBaseUri = `${this.baseUri}/${profileName}`;
       }
-      return !!relativePath;
+      return !!profileBaseUri;
     });
 
-    if (!relativePath) {
+    if (!profileBaseUri) {
       throw new Error('No matching profile name found');
     }
 
-    // Fetch the profile description
-    const profileFolder = `${this.baseUri}/${relativePath}`;
-    const profile = await Profiles.fetchJsonFile(`${profileFolder}/profile.json`);
-
-    // Add the folder URI to the profile description so the asset can be retrieved
-    profile.baseUri = profileFolder;
+    const profile = await Profiles.fetchJsonFile(`${profileBaseUri}/profile.json`);
 
     return profile;
   }
 
-  /**
-   * @description Create a MotionController from an XRInputSource by first fetching the best
-   * available profile match
-   * @param {Object} xrInputSource - The input source to build a MotionController from
-   */
-  async createMotionController(xrInputSource) {
-    const profile = await this.fetchProfile(xrInputSource.getProfiles());
-    const motionController = new MotionController(xrInputSource, profile);
-    return motionController;
-  }
+  getAssetUrl(profile, handedness) {
+    if (!profile || !profile.handedness || !profile.id) {
+      throw new Error('Malformed profile');
+    }
 
-  /**
-   * @description Create a MotionController from an XRInputSource
-   * @param {Object} xrInputSource - The input source to build a MotionController from
-   * @param {Object} profile - The custom profile to use
-   */
-  static createCustomMotionController(xrInputSource, profile) {
-    const motionController = new MotionController(xrInputSource, profile);
-    return motionController;
+    const hand = profile.handedness[handedness];
+    if (!hand) {
+      throw new Error(`Handedness ${handedness} not present in the profile`);
+    }
+
+    const assetName = hand.asset;
+    if (!assetName) {
+      throw new Error(`Handedness ${handedness} does not have an asset defined`);
+    }
+
+    const profileBaseUrl = `${this.baseUri}/${profile.id}`;
+    const assetUrl = `${profileBaseUrl}/${assetName}`;
+    return assetUrl;
   }
 }
-
 export default Profiles;

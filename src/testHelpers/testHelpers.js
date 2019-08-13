@@ -27,15 +27,10 @@ const TestHelpers = {
   /**
    * @description Loads a profile description
    * @param {string} profileName - The name of the profile to load
-   * @param {boolean} includeBaseUri - Adds the baseUri property to the profile description.
-   * False by default to make object comparisons in tests easier in the common case.
    */
-  getProfile(profileName, includeBaseUri) {
+  getProfile(profileName) {
     const folderPath = join(profilesFolderPath, profileName);
     const profile = fs.readJSONSync(join(folderPath, 'profile.json'));
-    if (includeBaseUri) {
-      profile.baseUri = folderPath;
-    }
     return profile;
   },
 

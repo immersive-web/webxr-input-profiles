@@ -43,11 +43,11 @@ export default [
     ]
   },
   {
-    input: ['src/profileViewer/profileViewer.js'],
+    input: ['src/profileViewer/index.js'],
     output: [
       {
         format: 'es',
-        file: `${VIEWER_FOLDER}/profileViewer.js`
+        file: `${VIEWER_FOLDER}/index.js`
       }
     ],
     external: [

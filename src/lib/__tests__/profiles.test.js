@@ -1,7 +1,7 @@
 import Profiles from '../profiles';
+import Constants from '../constants';
 
 const expectedProfilesList = TestHelpers.getSupportedProfilesList();
-const includeBaseUri = true;
 
 beforeEach(() => { fetch.resetMocks(); });
 
@@ -43,7 +43,7 @@ test('fail to fetch profiles list on first attempt and retry', async () => {
 
 test('fetch profile from array length 1', async () => {
   const profileName = 'button-controller';
-  const expectedProfile = TestHelpers.getProfile(profileName, includeBaseUri);
+  const expectedProfile = TestHelpers.getProfile(profileName);
   fetch
     .once(JSON.stringify(expectedProfilesList))
     .once(JSON.stringify(expectedProfile));
@@ -55,7 +55,7 @@ test('fetch profile from array length 1', async () => {
 
 test('fetch second profile from array length 2', async () => {
   const profileName = 'button-controller';
-  const expectedProfile = TestHelpers.getProfile(profileName, includeBaseUri);
+  const expectedProfile = TestHelpers.getProfile(profileName);
   fetch
     .once(JSON.stringify(expectedProfilesList))
     .once(JSON.stringify(expectedProfile));
@@ -67,7 +67,7 @@ test('fetch second profile from array length 2', async () => {
 
 test('fetch second profile from array length 3', async () => {
   const profileName = 'button-controller';
-  const expectedProfile = TestHelpers.getProfile(profileName, includeBaseUri);
+  const expectedProfile = TestHelpers.getProfile(profileName);
   fetch
     .once(JSON.stringify(expectedProfilesList))
     .once(JSON.stringify(expectedProfile));
@@ -94,4 +94,84 @@ test('fetch missing profile', async () => {
 
   const profiles = new Profiles(TestHelpers.profilesFolderPath);
   await expect(profiles.fetchProfile([missingProfileName])).rejects.toEqual(new Error('File not found'));
+});
+
+test('getAssetUrl success', () => {
+  const profiles = new Profiles(TestHelpers.profilesFolderPath);
+  const assetName = 'none asset';
+  const profile = {
+    id: 'test profile',
+    handedness: {
+      none: { asset: assetName }
+    }
+  };
+
+  const assetUrl = profiles.getAssetUrl(profile, Constants.Handedness.NONE);
+  const expectedUrl = `${TestHelpers.profilesFolderPath}/${profile.id}/${assetName}`;
+  expect(assetUrl).toEqual(expectedUrl);
+});
+
+test('getAssetUrl profile missing', () => {
+  const profiles = new Profiles(TestHelpers.profilesFolderPath);
+
+  expect(() => {
+    // eslint-disable-next-line no-unused-vars
+    const assetUrl = profiles.getAssetUrl(null, Constants.Handedness.NONE);
+  }).toThrow();
+
+  expect(() => {
+    // eslint-disable-next-line no-unused-vars
+    const assetUrl = profiles.getAssetUrl(undefined, Constants.Handedness.NONE);
+  }).toThrow();
+});
+
+test('getAssetUrl profile id missing', () => {
+  const profiles = new Profiles(TestHelpers.profilesFolderPath);
+  const profile = {
+    handedness: {
+      none: { asset: 'assetName' }
+    }
+  };
+
+  expect(() => {
+    // eslint-disable-next-line no-unused-vars
+    const assetUrl = profiles.getAssetUrl(profile, Constants.Handedness.NONE);
+  }).toThrow();
+});
+
+test('getAssetUrl profile.handedness missing', () => {
+  const profiles = new Profiles(TestHelpers.profilesFolderPath);
+  const profile = {
+    id: 'test profile'
+  };
+
+  expect(() => {
+    // eslint-disable-next-line no-unused-vars
+    const assetUrl = profiles.getAssetUrl(profile, Constants.Handedness.NONE);
+  }).toThrow();
+});
+
+test('getAssetUrl invalid handedness', () => {
+  const profiles = new Profiles(TestHelpers.profilesFolderPath);
+  const profile = {
+    id: 'test profile',
+    handedness: {
+      none: { asset: 'none asset' }
+    }
+  };
+
+  expect(() => {
+    // eslint-disable-next-line no-unused-vars
+    const assetUrl = profiles.getAssetUrl(profile, Constants.Handedness.LEFT);
+  }).toThrow();
+
+  expect(() => {
+    // eslint-disable-next-line no-unused-vars
+    const assetUrl = profiles.getAssetUrl(profile, null);
+  }).toThrow();
+
+  expect(() => {
+    // eslint-disable-next-line no-unused-vars
+    const assetUrl = profiles.getAssetUrl(profile, undefined);
+  }).toThrow();
 });
