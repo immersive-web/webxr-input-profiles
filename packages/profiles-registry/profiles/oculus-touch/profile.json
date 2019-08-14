@@ -67,13 +67,6 @@
     ],
     "dataSources" : [
         {
-            "id" : "thumbstick",
-            "dataSourceType": "thumbstickSource",
-            "xAxisIndex" : 0,
-            "yAxisIndex" : 1,
-            "buttonIndex" : 3
-        },
-        {
             "id" : "trigger",
             "dataSourceType": "buttonSource",
             "buttonIndex" : 0,
@@ -83,6 +76,13 @@
             "id" : "grip",
             "dataSourceType": "buttonSource",
             "buttonIndex" : 1
+        },
+        {
+            "id" : "thumbstick",
+            "dataSourceType": "thumbstickSource",
+            "xAxisIndex" : 0,
+            "yAxisIndex" : 1,
+            "buttonIndex" : 3
         },
         {
             "id" : "x",

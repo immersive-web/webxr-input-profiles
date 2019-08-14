@@ -56,13 +56,6 @@
             "analogValues": true
         },
         {
-            "id" : "thumbstick",
-            "dataSourceType": "thumbstickSource",
-            "xAxisIndex" : 0,
-            "yAxisIndex" : 1,
-            "buttonIndex" : 3
-        },
-        {
             "id" : "grip",
             "dataSourceType": "buttonSource",
             "buttonIndex" : 1
@@ -73,6 +66,13 @@
             "xAxisIndex" : 2,
             "yAxisIndex" : 3,
             "buttonIndex" : 2
+        },
+        {
+            "id" : "thumbstick",
+            "dataSourceType": "thumbstickSource",
+            "xAxisIndex" : 0,
+            "yAxisIndex" : 1,
+            "buttonIndex" : 3
         },
         {
             "id" : "menu",

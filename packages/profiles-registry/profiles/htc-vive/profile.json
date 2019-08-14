@@ -44,13 +44,6 @@
     ],
     "dataSources" : [
         {
-            "id" : "trackpad",
-            "dataSourceType": "touchpadSource",
-            "xAxisIndex" : 0,
-            "yAxisIndex" : 1,
-            "buttonIndex" : 2
-        },
-        {
             "id" : "trigger",
             "dataSourceType": "buttonSource",
             "buttonIndex" : 0,
@@ -60,6 +53,13 @@
             "id" : "grip",
             "dataSourceType": "buttonSource",
             "buttonIndex" : 1
+        },
+        {
+            "id" : "trackpad",
+            "dataSourceType": "touchpadSource",
+            "xAxisIndex" : 0,
+            "yAxisIndex" : 1,
+            "buttonIndex" : 2
         }
     ],
     "visualResponses" : [
