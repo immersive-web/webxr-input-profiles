@@ -48,18 +48,18 @@
             "dataSourceType": "touchpadSource",
             "xAxisIndex" : 0,
             "yAxisIndex" : 1,
-            "buttonIndex" : 0
+            "buttonIndex" : 2
         },
         {
             "id" : "trigger",
             "dataSourceType": "buttonSource",
-            "buttonIndex" : 1,
+            "buttonIndex" : 0,
             "analogValues" : true
         },
         {
             "id" : "grip",
             "dataSourceType": "buttonSource",
-            "buttonIndex" : 2
+            "buttonIndex" : 1
         }
     ],
     "visualResponses" : [

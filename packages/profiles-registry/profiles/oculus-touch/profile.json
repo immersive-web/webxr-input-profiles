@@ -71,43 +71,43 @@
             "dataSourceType": "thumbstickSource",
             "xAxisIndex" : 0,
             "yAxisIndex" : 1,
-            "buttonIndex" : 0
+            "buttonIndex" : 3
         },
         {
             "id" : "trigger",
             "dataSourceType": "buttonSource",
-            "buttonIndex" : 1,
+            "buttonIndex" : 0,
             "analogValues" : true
         },
         {
             "id" : "grip",
             "dataSourceType": "buttonSource",
-            "buttonIndex" : 2
+            "buttonIndex" : 1
         },
         {
             "id" : "x",
             "dataSourceType": "buttonSource",
-            "buttonIndex" : 3
+            "buttonIndex" : 4
         },
         {
             "id" : "y",
             "dataSourceType": "buttonSource",
-            "buttonIndex" : 4
+            "buttonIndex" : 5
         },
         {
             "id" : "a",
             "dataSourceType": "buttonSource",
-            "buttonIndex" : 3
+            "buttonIndex" : 4
         },
         {
             "id" : "b",
             "dataSourceType": "buttonSource",
-            "buttonIndex" : 4
+            "buttonIndex" : 5
         },
         {
             "id" : "thumbrest",
             "dataSourceType": "buttonSource",
-            "buttonIndex" : 5,
+            "buttonIndex" : 6,
             "pressUnsupported": true
         }
     ],
