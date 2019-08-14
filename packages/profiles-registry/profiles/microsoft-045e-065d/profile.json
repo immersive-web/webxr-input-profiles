@@ -5,13 +5,13 @@
         "left" : {
             "asset" : "left.glb",
             "root" : "left-controller-node",
-            "components" : [ 0, 1, 2, 3, 4],
+            "components" : [ 0, 1, 2, 3],
             "selectionComponent" : 0
         },
         "right" : {
             "asset" : "right.glb",
             "root" : "right-controller-node",
-            "components" : [ 0, 1, 2, 3, 4],
+            "components" : [ 0, 1, 2, 3],
             "selectionComponent" : 0
         }
     },
@@ -40,12 +40,6 @@
             "labelTransform" : "grip-label",
             "visualResponses": [5, 6, 7, 8],
             "touchpadDot" : "TOUCH"
-        },
-        {
-            "dataSource" : 4,
-            "root" : "MENU",
-            "labelTransform" : "menu-label",
-            "visualResponses": [9]
         }
     ],
     "dataSources" : [
@@ -73,11 +67,6 @@
             "xAxisIndex" : 0,
             "yAxisIndex" : 1,
             "buttonIndex" : 3
-        },
-        {
-            "id" : "menu",
-            "dataSourceType": "buttonSource",
-            "buttonIndex" : 4
         }
     ],
     "visualResponses" : [
@@ -134,13 +123,6 @@
             "rootNodeName": "TOUCHPAD_TOUCH_Y",
             "source" : "yAxis",
             "states" : ["default", "touched", "pressed"]
-        },
-        {
-            "rootNodeName" : "MENU",
-            "source" : "state",
-            "states" : ["pressed"],
-            "minNodeName": "UNPRESSED",
-            "maxNodeName": "PRESSED"
         }
     ]
 }
