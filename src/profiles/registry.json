@@ -1,0 +1,28 @@
+{
+    "genericProfiles" : [
+        "button-controller", 
+        "thumbstick-controller", 
+        "touchpad-controller", 
+        "thumbstick-touchpad-controller"
+    ],
+    "customProfiles" : {
+        "google-daydream" : [ "touchpad-controller" ],
+        "htc-vive" : [ "touchpad-controller" ],
+        "microsoft-045e-065d" : [ "thumbstick-touchpad-controller" ],
+        "microsoft-045e-065b" : [ "microsoft-045e-065d", "thumbstick-touchpad-controller" ],
+        "oculus-go" : [ "touchpad-controller"],
+        "oculus-quest" : [ "oculus-touch", "oculus-go", "thumbstick-controller" ],
+        "oculus-touch" : [ "thumbstick-controller" ],
+        "samsung-gearvr" : [ "touchpad-controller" ],
+        "valve-index" : [ "htc-vive", "touchpad-controller" ]
+    },
+    "legacyWebVRProfiles" : [ 
+        "Daydream Controller",
+        "Oculus Go Controller", 
+        "Oculus Touch (Left)", 
+        "Oculus Touch (Right)", 
+        "OpenVR Gamepad",
+        "Spatial Controller (Spatial Interaction Source) O45E-065B",
+        "Spatial Controller (Spatial Interaction Source) O45E-065D"
+    ]
+}
