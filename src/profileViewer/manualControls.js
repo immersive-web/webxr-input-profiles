@@ -1,5 +1,3 @@
-/* eslint import/no-unresolved: off */
-
 let controlsListElement;
 let mockXRInputSource;
 let motionController;

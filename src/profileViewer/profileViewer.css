@@ -45,11 +45,11 @@ section {
   top: 0;
 }
 
-#customProfile {
+#localProfile {
   margin-top: .5em;
 }
 
-#customProfile ul {
+#localProfile ul {
   margin-left: .5em;
   list-style: inside;
 }

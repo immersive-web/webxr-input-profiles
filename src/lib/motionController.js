@@ -10,8 +10,9 @@ class MotionController {
   /**
    * @param {Object} xrInputSource - The XRInputSource to build the MotionController around
    * @param {Object} profile - The best matched profile description for the supplied xrInputSource
+   * @param {Object} assetUrl
    */
-  constructor(xrInputSource, profile) {
+  constructor(xrInputSource, profile, assetUrl) {
     if (!xrInputSource) {
       throw new Error('No xrInputSource supplied');
     }
@@ -20,8 +21,13 @@ class MotionController {
       throw new Error('No profile supplied');
     }
 
-    this.profile = profile;
+    if (!assetUrl) {
+      throw new Error('No asset URL supplied');
+    }
+
     this.xrInputSource = xrInputSource;
+    this.profile = profile;
+    this.assetUrl = assetUrl;
 
     // Build child components as described in the profile description
     this.components = {};
@@ -53,16 +59,6 @@ class MotionController {
 
   get id() {
     return this.profile.id;
-  }
-
-  get assetPath() {
-    let assetPath;
-    if (this.profile.baseUri) {
-      assetPath = `${this.profile.baseUri}/${this.hand.asset}`;
-    } else {
-      assetPath = this.hand.asset;
-    }
-    return assetPath;
   }
 
   get gripSpace() {

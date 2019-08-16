@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <title>WebXR Input Profile Viewer</title>
-        <script type="module" src="./profileViewer.js"></script>
+        <script type="module" src="./index.js"></script>
         <link rel="stylesheet" type="text/css" href="./profileViewer.css" />
     </head>
     <body>
@@ -11,18 +11,22 @@
             <div class="leftSide">
                 <h1>WebXR Input Profile Viewer</h1>
                 <section id="selectors">
-                    <label for="profileSelector">Select existing profile</label>
-                    <select id="profileSelector">
-                        <option value="loading">Loading...</option>
-                    </select>
-                    <select id="handednessSelector">
-                        <option value="loading">Loading...</option>
-                    </select>
-                    <div id="customProfile">
-                        <label for="localFilesSelector">Select custom profile</label>
-                        <input id="localFilesSelector" type="file" multiple webkitdirectory>
-                        <ul id="localFileNames">
-                        </ul>
+                    <div id="profileSourceType">
+                        <label>Select profiles source</label>
+                        <br>
+                        <label for="repositoryRadioButton">Repository</label>
+                        <input id="repositoryRadioButton" value="repository" checked="true" type="radio" name="sourceSelector">
+                        <label for="localProfileRadioButton">Local Profile</label>
+                        <input id="localProfileRadioButton" value="localProfile" type="radio" name="sourceSelector">
+                    </div>
+                    <div id="repository" hidden=true disabled=true>
+                        <label for="repositoryProfileIdSelector">Select profile</label>
+                        <select id="repositoryProfileIdSelector"></select>
+                    </div>
+                    <div id="localProfile" hidden="true" disabled=true>
+                        <label for="localProfilesSelector">Select local files</label>
+                        <input id="localProfilesSelector" type="file" multiple>
+                        <ul id="localFilesList"></ul>
                     </div>
                 </section>
                 <section id="errors" hidden="true">

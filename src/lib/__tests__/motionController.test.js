@@ -37,16 +37,17 @@ const profile = {
     {}
   ]
 };
+const assetUrl = 'assetUrl string';
 
 test('No xrInputSource', () => {
   expect(() => {
     // eslint-disable-next-line no-unused-vars
-    const motionController = new MotionController(undefined, profile);
+    const motionController = new MotionController(undefined, profile, assetUrl);
   }).toThrow();
 
   expect(() => {
     // eslint-disable-next-line no-unused-vars
-    const motionController = new MotionController(null, profile);
+    const motionController = new MotionController(null, profile, assetUrl);
   }).toThrow();
 });
 
@@ -55,12 +56,26 @@ test('No profile', () => {
 
   expect(() => {
     // eslint-disable-next-line no-unused-vars
-    const motionController = new MotionController(mockXRInputSource, undefined);
+    const motionController = new MotionController(mockXRInputSource, undefined, assetUrl);
   }).toThrow();
 
   expect(() => {
     // eslint-disable-next-line no-unused-vars
-    const motionController = new MotionController(mockXRInputSource, null);
+    const motionController = new MotionController(mockXRInputSource, null, assetUrl);
+  }).toThrow();
+});
+
+test('No assetUrl', () => {
+  const mockXRInputSource = new MockXRInputSource(gamepadId, Constants.Handedness.NONE);
+
+  expect(() => {
+    // eslint-disable-next-line no-unused-vars
+    const motionController = new MotionController(mockXRInputSource, profile, null);
+  }).toThrow();
+
+  expect(() => {
+    // eslint-disable-next-line no-unused-vars
+    const motionController = new MotionController(mockXRInputSource, profile, undefined);
   }).toThrow();
 });
 
@@ -69,13 +84,13 @@ test('No gamepad', () => {
 
   expect(() => {
     // eslint-disable-next-line no-unused-vars
-    const motionController = new MotionController(mockXRInputSource, profile);
+    const motionController = new MotionController(mockXRInputSource, profile, assetUrl);
   }).toThrow();
 });
 
 test('Successful construction', () => {
   const mockGamepad = new MockGamepad(profile, Constants.Handedness.NONE);
   const mockXRInputSource = new MockXRInputSource(mockGamepad, Constants.Handedness.NONE);
-  const motionController = new MotionController(mockXRInputSource, profile);
+  const motionController = new MotionController(mockXRInputSource, profile, assetUrl);
   expect(motionController).toBeDefined();
 });
