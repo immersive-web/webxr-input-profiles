@@ -8,7 +8,7 @@ cache:
     - node_modules
 
 script:
-  - npm run travis
+  - npm run test
 
 deploy:
   provider: pages

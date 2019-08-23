@@ -1,0 +1,23 @@
+{
+  "name": "@webxr-input-profiles/viewer",
+  "private": true,
+  "version": "0.1.0",
+  "description": "A viewer",
+  "main": "dist/index.js",
+  "files": [
+    "package.json",
+    "LICENSE",
+    "README.md",
+    "dist/**"
+  ],
+  "scripts": {
+    "clean": "rm -r dist 2> /dev/null || true",
+    "build": "rollup -c",
+    "watch": "rollup -c -w -m inline",
+    "test": "echo \"Run tests from root\" && exit 1"
+  },
+  "dependencies": {
+    "@webxr-input-profiles/profiles-registry": "0.1.0",
+    "@webxr-input-profiles/motion-controllers": "0.1.0"
+  }
+}

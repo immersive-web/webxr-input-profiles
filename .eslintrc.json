@@ -16,22 +16,12 @@
     },
     "rules": {
         "comma-dangle": ["error", "never"],
-        "import/no-extraneous-dependencies": [
-            "error", 
-            {
-                "devDependencies": [
-                    "**/__tests__/**.js", 
-                    "src/testHelpers/**",
-                    "rollup**"
-                ]
-            }
-        ]
+        "import/no-extraneous-dependencies": ["error", {"packageDir": "./"}]
     },
     "overrides": [
         {
             "files": [
-                "**/__tests__/**.test.js",
-                "src/testHelpers/**"
+                "**/__tests__/**"
             ],
             "env": {
                 "jest": true

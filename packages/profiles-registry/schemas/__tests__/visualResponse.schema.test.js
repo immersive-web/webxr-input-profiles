@@ -1,3 +1,5 @@
+const TestHelpers = require('./testHelpers');
+
 const validator = TestHelpers.getValidator('visualResponses.schema.json');
 
 test('Valid visualResponse', () => {

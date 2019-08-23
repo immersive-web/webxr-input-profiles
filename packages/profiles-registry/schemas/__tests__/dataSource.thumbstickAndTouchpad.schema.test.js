@@ -1,11 +1,15 @@
-const validator = TestHelpers.getValidator('dataSource.button.schema.json', ['dataSource.properties.schema.json']);
+const TestHelpers = require('./testHelpers');
+
+const validator = TestHelpers.getValidator('dataSource.thumbstickAndTouchpad.schema.json', ['dataSource.properties.schema.json']);
+
 const validDataSource = Object.freeze({
-  id: 'a button',
-  dataSourceType: 'buttonSource',
-  buttonIndex: 0
+  id: 'a thumbstick or touchpad',
+  dataSourceType: 'thumbstickSource',
+  xAxisIndex: 0,
+  yAxisIndex: 1
 });
 
-test('Valid button sources', () => {
+test('Valid thumbstick sources', () => {
   let valid = false;
   const dataSource = TestHelpers.copyJsonObject(validDataSource);
 
@@ -14,13 +18,24 @@ test('Valid button sources', () => {
     expect(validator.errors).toBeNull();
   }
 
-  dataSource.pressUnsupported = true;
+  dataSource.buttonIndex = 0;
   valid = validator(dataSource);
   if (!valid) {
     expect(validator.errors).toBeNull();
   }
 
-  dataSource.analogValues = true;
+  dataSource.analogButtonValues = true;
+  valid = validator(dataSource);
+  if (!valid) {
+    expect(validator.errors).toBeNull();
+  }
+});
+
+test('Valid touchpad source', () => {
+  let valid = false;
+  const dataSource = TestHelpers.copyJsonObject(validDataSource);
+  dataSource.dataSourceType = 'touchpadSource';
+
   valid = validator(dataSource);
   if (!valid) {
     expect(validator.errors).toBeNull();
@@ -43,13 +58,30 @@ test('Invalid dataSourceType', () => {
   expect(validator(dataSource)).toBe(false);
 });
 
+test('Invalid xAxisIndex', () => {
+  const dataSource = TestHelpers.copyJsonObject(validDataSource);
+
+  dataSource.xAxisIndex = -1;
+  expect(validator(dataSource)).toBe(false);
+});
+
+test('Invalid yAxisIndex', () => {
+  const dataSource = TestHelpers.copyJsonObject(validDataSource);
+
+  dataSource.yAxisIndex = -1;
+  expect(validator(dataSource)).toBe(false);
+});
+
 test('Invalid buttonIndex', () => {
   const dataSource = TestHelpers.copyJsonObject(validDataSource);
 
-  delete dataSource.buttonIndex;
-  expect(validator(dataSource)).toBe(false);
-
   dataSource.buttonIndex = -1;
+  expect(validator(dataSource)).toBe(false);
+});
+
+test('Invalid analogButtonValues', () => {
+  const dataSource = TestHelpers.copyJsonObject(validDataSource);
+  dataSource.analogButtonValues = true;
   expect(validator(dataSource)).toBe(false);
 });
 
