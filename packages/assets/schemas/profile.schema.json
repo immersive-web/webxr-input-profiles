@@ -1,0 +1,45 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://immersive-web/webxr-input-profiles/assets/0.1.0/profile.schema.json",
+    "type": "object",
+    "description": "The root object for a gamepad profile.",
+    "additionalProperties": false,
+    "required": [ "profileId", "assets", "layouts" ],
+    "properties": {
+        "profileId" : { "$ref": "common.schema.json#/definitions/profileId" },
+        "assets": {
+            "allOf": [
+                {
+                    "additionalProperties": false,
+                    "properties": {        
+                        "none": { "$ref": "asset.schema.json" },
+                        "left": { "$ref": "asset.schema.json" },
+                        "right": { "$ref": "asset.schema.json" },
+                        "left-right": { "$ref": "asset.schema.json" },
+                        "left-right-none": { "$ref": "asset.schema.json" }
+                    }
+                },
+                { 
+                    "$ref": "common.schema.json#/definitions/handedness" 
+                }
+            ]
+        },
+        "layouts" : { 
+            "allOf": [
+                {
+                    "additionalProperties": false,
+                    "properties": {        
+                        "none": { "$ref": "layout.schema.json" },
+                        "left": { "$ref": "layout.schema.json" },
+                        "right": { "$ref": "layout.schema.json" },
+                        "left-right": { "$ref": "layout.schema.json" },
+                        "left-right-none": { "$ref": "layout.schema.json" }
+                    }
+                },
+                { 
+                    "$ref": "common.schema.json#/definitions/handedness" 
+                }
+            ]
+        }
+    }
+}

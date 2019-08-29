@@ -31,16 +31,15 @@
     "MotionControllers"
   ],
   "scripts": {
-    "clean": "npx lerna run clean",
+    "clean": "npx lerna clean --yes && npx lerna run clean && npx lerna bootstrap --hoist",
     "lint": "eslint ./",
     "lintFix": "eslint ./ --fix",
     "build": "npx lerna run build",
+    "cleanBuild": "npx lerna run cleanBuild",
     "testOnly": "jest",
-
     "watch": "npx lerna run watch --no-sort --stream",
-    "dev": "http-server -c-1 -p 8080",
-
-    "prepublishOnly": "npm run lint && npm run build && npx lerna bootstrap",
+    "dev": "http-server ./packages/viewer/dist -c-1 -p 8080",
+    "prepublishOnly": "npm run clean && npm run lint && npm run build",
     "pretest": "npm run prepublishOnly",
     "test": "npm run testOnly"
   },
@@ -60,8 +59,11 @@
     "jest": "^24.1.0",
     "jest-fetch-mock": "^2.1.2",
     "lerna": "^3.16.4",
+    "merge-deep": "^3.0.2",
+    "optional-require": "^1.0.0",
     "rollup": "^1.4.0",
     "rollup-plugin-copy-glob": "^0.3.1",
-    "three": "^0.106.2"
+    "three": "^0.106.2",
+    "through2": "^3.0.1"
   }
 }

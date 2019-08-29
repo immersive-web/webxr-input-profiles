@@ -1,0 +1,21 @@
+{
+    "profileId" : "generic-trigger-grip",
+    "fallbackProfileIds": [],
+    "layouts" : {
+        "left-right-none" : {
+            "selectSource": "xr-standard-trigger",
+            "components": {
+                "xr-standard-trigger": { "type": "trigger" },
+                "xr-standard-grip": { "type": "grip" }
+            },
+            "gamepad": {
+                "mapping": "xr-standard",
+                "buttons": [ 
+                    "xr-standard-trigger",
+                    "xr-standard-grip"
+                ],
+                "axes":[]
+            }
+        }
+    }
+}

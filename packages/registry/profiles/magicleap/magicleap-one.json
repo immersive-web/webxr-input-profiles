@@ -1,0 +1,26 @@
+{
+    "profileId": "magicleap-one",
+    "fallbackProfileIds": ["generic-trigger-grip-touchpad"],
+    "layouts" : {
+        "none" : {
+            "selectSource": "xr-standard-trigger",
+            "components": {
+                "xr-standard-trigger": { "type": "trigger" },
+                "xr-standard-grip": { "type": "grip" },
+                "xr-standard-touchpad": { "type": "touchpad" }
+            },
+            "gamepad": {
+                "mapping": "xr-standard",
+                "buttons": [ 
+                    "xr-standard-trigger", 
+                    "xr-standard-grip", 
+                    "xr-standard-touchpad"
+                ],
+                "axes":[
+                    { "componentId": "xr-standard-touchpad", "axis": "xAxis"},
+                    { "componentId": "xr-standard-touchpad", "axis": "yAxis"}
+                ]
+            }
+        }
+    }
+}

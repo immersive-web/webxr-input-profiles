@@ -1,0 +1,25 @@
+{
+  "name": "@webxr-input-profiles/assets",
+  "private": true,
+  "version": "0.1.0",
+  "description": "assets",
+  "main": "dist/profilesList.json",
+  "files": [
+    "package.json",
+    "LICENSE",
+    "README.md",
+    "dist/profiles/",
+    "schemas/",
+    "src/**"
+  ],
+  "scripts": {
+    "clean": "gulp clean",
+    "build": "gulp",
+    "cleanBuild": "npm run clean && npm run build",
+    "watch": "gulp watch",
+    "test": "echo \"Run tests from root\" && exit 1"
+  },
+  "devDependencies": {
+    "@webxr-input-profiles/registry": "^0.1.0"
+  }
+}

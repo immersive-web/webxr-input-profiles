@@ -1,8 +1,9 @@
 /* eslint-disable import/no-unresolved */
 import { MotionController } from './motion-controllers.module.js';
-import { MockGamepad, MockXRInputSource } from './motion-controllers-mocks.module.js';
 /* eslint-enable */
 
+import MockGamepad from './mocks/mockGamepad.js';
+import MockXRInputSource from './mocks/mockXRInputSource.js';
 import ErrorLogging from './errorLogging.js';
 import HandednessSelector from './handednessSelector.js';
 

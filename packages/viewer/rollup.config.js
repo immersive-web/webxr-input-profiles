@@ -16,7 +16,7 @@ export default [
       './three/examples/jsm/loaders/GLTFLoader.js',
       './three/examples/jsm/controls/OrbitControls.js',
       './motion-controllers.module.js',
-      './motion-controllers-mocks.module.js'
+      '../motion-controllers.module.js'
     ],
     plugins: [
       copy(
@@ -33,7 +33,7 @@ export default [
       ),
       copy(
         [
-          { files: '../profiles-registry/dist/**', dest: `${DIST_FOLDER}/profiles` }
+          { files: '../assets/dist/**', dest: `${DIST_FOLDER}/profiles` }
         ],
         { verbose: true, watch: process.env.ROLLUP_WATCH }
       ),

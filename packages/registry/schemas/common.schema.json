@@ -1,0 +1,36 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://immersive-web/webxr-input-profiles/registry/common.schema.json",
+    "definitions": {
+        "profileId": {
+            "description": "A properly formatted string uniquely identifying a profile",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)+$"
+        },
+        "handedness": {
+            "type": "object",
+            "minProperties": 1,
+            "dependencies": {
+                "left-right-none": { "not": { "required": ["none", "left", "right", "left-right"] } },
+                "left-right": { "not": { "required": ["left", "right", "left-right-none"] } },
+                "left": { "required": ["right"], "not": { "required": ["left-right", "left-right-none"] } },
+                "right": { "required": ["left"], "not": { "required": ["left-right", "left-right-none"] } },
+                "none": { "not": { "required": ["left-right-none"] } }
+            }
+        },
+        "componentId": {
+            "description": "A well-formatted component id",
+            "type": "string",
+            "pattern": "^[^\\s]+.+[^\\s]$"
+        },
+        "components": {
+            "description": "The collection of components in the layout",
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": false,
+            "patternProperties": {
+                "^[^\\s]+.+[^\\s]$": { "$ref": "component.schema.json" }
+            }
+        }
+    }
+}

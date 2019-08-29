@@ -57,7 +57,7 @@ class HandednessSelector {
 
     // Populate handedness selector
     this.element.innerHTML = '';
-    Object.keys(this.selectedProfile.handedness).forEach((handedness) => {
+    Object.keys(this.selectedProfile.layouts).forEach((handedness) => {
       this.element.innerHTML += `
         <option value='${handedness}'>${handedness}</option>
       `;
@@ -68,7 +68,7 @@ class HandednessSelector {
     }
 
     // Apply stored handedness if found
-    if (storedHandedness && this.selectedProfile.handedness[storedHandedness]) {
+    if (storedHandedness && this.selectedProfile.layouts[storedHandedness]) {
       this.element.value = storedHandedness;
     }
 

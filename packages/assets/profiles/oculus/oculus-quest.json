@@ -1,0 +1,167 @@
+{
+    "profileId" : "oculus-quest",
+    "assets" : {
+        "left" : {
+            "path" : "left.glb",
+            "rootNodeName" : "left-controller-node"
+        },
+        "right" : {
+            "path" : "right.glb",
+            "rootNodeName" : "right-controller-node"
+        }
+    },
+    "layouts": {
+        "left": {
+            "components" : {
+                "xr-standard-trigger" : {
+                    "rootNodeName" : "SELECT",
+                    "labelAnchorNodeName" : "trigger-label",
+                    "analogButtonValues": true,
+                    "visualResponses": [
+                        {
+                            "rootNodeName" : "SELECT",
+                            "source" : "button",
+                            "states" : ["default", "touched", "pressed"],
+                            "minNodeName": "UNPRESSED",
+                            "maxNodeName": "PRESSED"
+                        }
+                    ]
+                },
+                "xr-standard-grip": {
+                    "rootNodeName" : "GRASP",
+                    "labelAnchorNodeName" : "grip-label",
+                    "visualResponses": [
+                        {
+                            "rootNodeName" : "GRASP",
+                            "source" : "state",
+                            "states" : ["pressed"],
+                            "minNodeName": "UNPRESSED",
+                            "maxNodeName": "PRESSED"
+                        }
+                    ]
+                },
+                "xr-standard-thumbstick" : {
+                    "rootNodeName" : "THUMBSTICK_PRESS",
+                    "labelAnchorNodeName" : "thumbstick-label",
+                    "visualResponses": [
+                        {
+                            "rootNodeName": "THUMBSTICK_PRESS",
+                            "source" : "state",
+                            "states" : ["pressed"],
+                            "minNodeName": "UNPRESSED",
+                            "maxNodeName": "PRESSED"
+                        },
+                        {
+                            "rootNodeName": "THUMBSTICK_X",
+                            "source" : "xAxis",
+                            "states" : ["default", "touched", "pressed"]
+                        },
+                        {
+                            "rootNodeName": "THUMBSTICK_Y",
+                            "source" : "yAxis",
+                            "states" : ["default", "touched", "pressed"]
+                        }
+                    ]
+                },
+                "a-button": {
+                    "rootNodeName" : "A-BUTTON",
+                    "labelAnchorNodeName" : "A-BUTTON-label",
+                    "visualResponses": [
+                        {
+                            "rootNodeName" : "A-BUTTON",
+                            "source" : "state",
+                            "states" : ["pressed"]
+                        }
+                    ]
+                },
+                "b-button": {
+                    "rootNodeName" : "B-BUTTON",
+                    "labelAnchorNodeName" : "B-BUTTON-label",
+                    "visualResponses": [
+                        {
+                            "rootNodeName" : "B-BUTTON",
+                            "source" : "state",
+                            "states" : ["pressed"]
+                        }
+                    ]
+                }
+            }
+        },
+        "right": {
+            "components" : {
+                "xr-standard-trigger" : {
+                    "rootNodeName" : "SELECT",
+                    "labelAnchorNodeName" : "trigger-label",
+                    "analogButtonValues": true,
+                    "visualResponses": [
+                        {
+                            "rootNodeName" : "SELECT",
+                            "source" : "button",
+                            "states" : ["default", "touched", "pressed"],
+                            "minNodeName": "UNPRESSED",
+                            "maxNodeName": "PRESSED"
+                        }
+                    ]
+                },
+                "xr-standard-grip": {
+                    "rootNodeName" : "GRASP",
+                    "labelAnchorNodeName" : "grip-label",
+                    "visualResponses": [
+                        {
+                            "rootNodeName" : "GRASP",
+                            "source" : "state",
+                            "states" : ["pressed"],
+                            "minNodeName": "UNPRESSED",
+                            "maxNodeName": "PRESSED"
+                        }
+                    ]
+                },
+                "xr-standard-thumbstick" : {
+                    "rootNodeName" : "THUMBSTICK_PRESS",
+                    "labelAnchorNodeName" : "thumbstick-label",
+                    "visualResponses": [
+                        {
+                            "rootNodeName": "THUMBSTICK_PRESS",
+                            "source" : "state",
+                            "states" : ["pressed"],
+                            "minNodeName": "UNPRESSED",
+                            "maxNodeName": "PRESSED"
+                        },
+                        {
+                            "rootNodeName": "THUMBSTICK_X",
+                            "source" : "xAxis",
+                            "states" : ["default", "touched", "pressed"]
+                        },
+                        {
+                            "rootNodeName": "THUMBSTICK_Y",
+                            "source" : "yAxis",
+                            "states" : ["default", "touched", "pressed"]
+                        }
+                    ]
+                },
+                "x-button": {
+                    "rootNodeName" : "X-BUTTON",
+                    "labelAnchorNodeName" : "X-BUTTON-label",
+                    "visualResponses": [
+                        {
+                            "rootNodeName" : "X-BUTTON",
+                            "source" : "state",
+                            "states" : ["pressed"]
+                        }
+                    ]
+                },
+                "y-button": {
+                    "rootNodeName" : "Y-BUTTON",
+                    "labelAnchorNodeName" : "Y-BUTTON-label",
+                    "visualResponses": [
+                        {
+                            "rootNodeName" : "Y-BUTTON",
+                            "source" : "state",
+                            "states" : ["pressed"]
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

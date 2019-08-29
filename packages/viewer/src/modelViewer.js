@@ -2,6 +2,7 @@
 import * as THREE from './three/build/three.module.js';
 import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
+import { Constants } from './motion-controllers.module.js';
 /* eslint-enable */
 
 import ErrorLogging from './errorLogging.js';
@@ -17,9 +18,10 @@ let activeModel;
  * @param {Object} rootNode - The root node in the asset to be animated
  */
 function addTouchDots({ motionController, rootNode }) {
-  Object.values(motionController.components).forEach((component) => {
+  Object.keys(motionController.components).forEach((componentId) => {
+    const component = motionController.components[componentId];
     // Find the touchpads
-    if (component.dataSource.dataSourceType === 'touchpadSource') {
+    if (component.type === Constants.ComponentType.TOUCHPAD) {
       // Find the node to attach the touch dot.
       const componentRoot = rootNode.getObjectByName(component.rootNodeName, true);
 
@@ -28,12 +30,15 @@ function addTouchDots({ motionController, rootNode }) {
         return;
       }
 
-      const touchDotRoot = componentRoot.getObjectByName(component.touchDotNodeName, true);
+      const touchPointRoot = componentRoot.getObjectByName(component.touchPointNodeName, true);
+      if (!touchPointRoot) {
+        ErrorLogging.log(`Could not find touch dot, ${component.touchPointNodeName}, in touchpad component ${componentId}`);
+      }
 
       const sphereGeometry = new THREE.SphereGeometry(0.001);
       const material = new THREE.MeshBasicMaterial({ color: 0x0000FF });
       const sphere = new THREE.Mesh(sphereGeometry, material);
-      touchDotRoot.add(sphere);
+      touchPointRoot.add(sphere);
     }
   });
 }
@@ -224,36 +229,30 @@ const ModelViewer = {
     window.requestAnimationFrame(animationFrameCallback);
   },
 
-  loadModel: (motionController) => {
+  loadModel: async (motionController) => {
+    const gltfAsset = await new Promise(((resolve, reject) => {
+      three.loader.load(
+        motionController.assetUrl,
+        (loadedAsset) => { resolve(loadedAsset); },
+        null,
+        reject
+      );
+    }));
+
     // Remove any existing model from the scene
     clear();
 
-    const onLoad = (gltfAsset) => {
-      const model = {
-        motionController,
-        rootNode: gltfAsset.scene
-      };
-
-      model.nodes = findNodes(model);
-      addTouchDots(model);
-
-      // Set the new model
-      activeModel = model;
-      three.scene.add(activeModel.rootNode);
+    const model = {
+      motionController,
+      rootNode: gltfAsset.scene
     };
 
-    const onError = () => {
-      ErrorLogging.throw(
-        `Asset failed to load either because it was missing or malformed. ${motionController.assetUrl}`
-      );
-    };
+    model.nodes = findNodes(model);
+    addTouchDots(model);
 
-    three.loader.load(
-      motionController.assetUrl,
-      onLoad,
-      null,
-      onError
-    );
+    // Set the new model
+    activeModel = model;
+    three.scene.add(activeModel.rootNode);
   },
 
   clear
