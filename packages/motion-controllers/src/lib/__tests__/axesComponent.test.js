@@ -2,6 +2,8 @@ import Constants from '../constants';
 import { Axes } from '../components';
 import MockGamepad from '../../mocks/mockGamepad';
 
+const TestHelpers = require('./testHelpers');
+
 const xAxisIndex = 0;
 const yAxisIndex = 1;
 const buttonIndex = 0;

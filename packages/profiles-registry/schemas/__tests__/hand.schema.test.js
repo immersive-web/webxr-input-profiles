@@ -1,4 +1,7 @@
+const TestHelpers = require('./testHelpers');
+
 const validator = TestHelpers.getValidator('hand.schema.json', ['profile.index.schema.json']);
+
 const validHand = Object.freeze({
   asset: 'asset uri',
   root: 'root node',

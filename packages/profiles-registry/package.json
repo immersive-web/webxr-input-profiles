@@ -1,0 +1,20 @@
+{
+  "name": "@webxr-input-profiles/profiles-registry",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Registry for profile ids and their associated button layouts",
+  "main": "dist/profilesList.json",
+  "files": [
+    "package.json",
+    "LICENSE",
+    "README.md",
+    "dist/profiles/",
+    "schemas/"
+  ],
+  "scripts": {
+    "clean": "gulp clean",
+    "build": "gulp",
+    "watch": "gulp watch",
+    "test": "echo \"Run tests from root\" && exit 1"
+  }
+}

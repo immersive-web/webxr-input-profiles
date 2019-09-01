@@ -3,6 +3,8 @@ import {
   Button, Thumbstick, Touchpad, Axes, Component
 } from '../components';
 
+const TestHelpers = require('./testHelpers');
+
 const componentDescription = { dataSource: 0 };
 
 const buttonProfile = {

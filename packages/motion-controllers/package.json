@@ -1,0 +1,24 @@
+{
+  "name": "@webxr-input-profiles/motion-controllers",
+  "private": true,
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/motion-controllers.module.js",
+  "files": [
+    "package.json",
+    "LICENSE",
+    "README.md",
+    "dist/motion-controllers.module.js",
+    "dist/motion-controllers-mock.module.js",
+    "src/**"
+  ],
+  "scripts": {
+    "clean": "rm -r dist 2> /dev/null || true",
+    "build": "rollup -c",
+    "watch": "rollup -c -w -m inline",
+    "test": "echo \"Run tests from root\" && exit 1"
+  },
+  "devDependencies": {
+    "@webxr-input-profiles/profiles-registry": "0.1.0"
+  }
+}

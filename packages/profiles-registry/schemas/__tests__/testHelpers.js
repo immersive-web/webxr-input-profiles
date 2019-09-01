@@ -1,14 +1,11 @@
-global.fetch = require('jest-fetch-mock');
-
 const Ajv = require('ajv');
 const { join } = require('path');
 const fs = require('fs-extra');
 
-const profilesFolderPath = join(__dirname, '../profiles');
+const profilesFolderPath = join(__dirname, '../../profiles');
+const schemasFolderPath = join(__dirname, '../');
 
 const TestHelpers = {
-  profilesFolderPath,
-
   /**
    * @description Builds and retrieves the list of supported profiles
    */
@@ -45,7 +42,6 @@ const TestHelpers = {
    * @returns {Object} An AJV validator that can be used to validate profiles
    */
   getValidator(schemaFilename, dependencies) {
-    const schemasFolder = join(__dirname, '../schemas/');
     const ajv = new Ajv();
 
     let mainSchema;
@@ -54,16 +50,16 @@ const TestHelpers = {
       // Set the target schema to the one supplied and load all specified dependencies
       if (dependencies) {
         dependencies.forEach((dependency) => {
-          ajv.addMetaSchema(fs.readJSONSync(join(schemasFolder, dependency)));
+          ajv.addMetaSchema(fs.readJSONSync(join(schemasFolderPath, dependency)));
         });
       }
-      mainSchema = fs.readJSONSync(join(schemasFolder, schemaFilename));
+      mainSchema = fs.readJSONSync(join(schemasFolderPath, schemaFilename));
     } else {
       // Set the target schema to the top-level schema and load all other schemas as dependencies
       const mainSchemaId = 'https://immersive-web/gamepad-profiles/0.1.0/profile.schema.json';
-      const items = fs.readdirSync(schemasFolder);
+      const items = fs.readdirSync(schemasFolderPath);
       items.forEach((filename) => {
-        const schemaPath = join(schemasFolder, filename);
+        const schemaPath = join(schemasFolderPath, filename);
         if (schemaPath.endsWith('.schema.json')) {
           const schema = fs.readJSONSync(schemaPath);
           if (schema.$id === mainSchemaId) {
@@ -90,4 +86,4 @@ const TestHelpers = {
 
 };
 
-global.TestHelpers = TestHelpers;
+module.exports = TestHelpers;

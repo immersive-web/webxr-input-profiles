@@ -1,4 +1,7 @@
+const TestHelpers = require('./testHelpers');
+
 const validator = TestHelpers.getValidator();
+
 const validProfile = {
   version: '0.1',
   id: 'mock1',

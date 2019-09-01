@@ -1,6 +1,9 @@
 import Profiles from '../profiles';
 import Constants from '../constants';
 
+const TestHelpers = require('./testHelpers');
+global.fetch = require('jest-fetch-mock');
+
 const expectedProfilesList = TestHelpers.getSupportedProfilesList();
 
 beforeEach(() => { fetch.resetMocks(); });

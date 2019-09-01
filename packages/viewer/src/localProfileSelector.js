@@ -1,6 +1,6 @@
 /* eslint-disable import/no-unresolved */
-import { MotionController } from '../dist/webxr-input-profiles.module.js';
-import { MockGamepad, MockXRInputSource } from '../dist/webxr-input-mocks.module.js';
+import { MotionController } from './motion-controllers.module.js';
+import { MockGamepad, MockXRInputSource } from './motion-controllers-mocks.module.js';
 /* eslint-enable */
 
 import ErrorLogging from './errorLogging.js';

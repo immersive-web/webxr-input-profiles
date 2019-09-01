@@ -1,4 +1,7 @@
+const TestHelpers = require('./testHelpers');
+
 const validator = TestHelpers.getValidator('components.schema.json', ['profile.index.schema.json']);
+
 const validComponent = Object.freeze({
   dataSource: 0,
   root: 'root node',

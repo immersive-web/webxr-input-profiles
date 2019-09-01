@@ -1,6 +1,6 @@
 /* eslint-disable import/no-unresolved */
-import { Profiles, MotionController } from '../dist/webxr-input-profiles.module.js';
-import { MockGamepad, MockXRInputSource } from '../dist/webxr-input-mocks.module.js';
+import { Profiles, MotionController } from './motion-controllers.module.js';
+import { MockGamepad, MockXRInputSource } from './motion-controllers-mocks.module.js';
 /* eslint-enable */
 
 import ErrorLogging from './errorLogging.js';
@@ -12,7 +12,7 @@ const profileIdStorageKey = 'repository_profileId';
  */
 class RepositorySelector {
   constructor() {
-    this.profiles = new Profiles('../dist/profiles');
+    this.profiles = new Profiles('./profiles');
     this.element = document.getElementById('repository');
 
     // Get the profile id dropdown and listen for changes

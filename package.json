@@ -2,18 +2,6 @@
   "name": "webxr-input-profiles",
   "version": "0.1.0",
   "description": "A tool for making W3C Gamepad objects easier to work with in XR on the web",
-  "main": "dist/webxr-input-profiles.module.js",
-  "files": [
-    "package.json",
-    "LICENSE",
-    "README.md",
-    "dist/webxr-input-profiles.module.js",
-    "dist/mock-gamepad.module.js",
-    "dist/profiles/",
-    "schemas/*.json",
-    "src/*.js",
-    "src/mockGamepad/*.js"
-  ],
   "author": "Nell Waliczek <nell@nell.dev>",
   "license": "MIT",
   "repository": {
@@ -43,61 +31,37 @@
     "MotionControllers"
   ],
   "scripts": {
-    "clean": "rm -r dist 2> /dev/null & rm -r profileViewer 2> /dev/null || true",
-    "build": "rollup -c",
-    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
-    "lintAll": "eslint ./",
-    "test": "jest",
-    "travis": "npm run clean && npm run build && npm run test",
-    "prepublishOnly": "npm run build"
+    "clean": "npx lerna run clean",
+    "lint": "eslint ./",
+    "lintFix": "eslint ./ --fix",
+    "build": "npx lerna run build",
+    "testOnly": "jest",
+
+    "watch": "npx lerna run watch --no-sort --stream",
+    "dev": "http-server -c-1 -p 8080",
+
+    "prepublishOnly": "npm run lint && npm run build && npx lerna bootstrap",
+    "pretest": "npm run prepublishOnly",
+    "test": "npm run testOnly"
   },
-  "dependencies": {},
   "devDependencies": {
     "@babel/plugin-transform-spread": "^7.2.2",
     "@babel/preset-env": "^7.3.4",
-    "acorn": "^6.1.1",
     "ajv": "^6.10.0",
     "babel-jest": "^24.1.0",
-    "chokidar": "^3.0.2",
-    "concurrently": "^4.1.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.17.2",
-    "eslint-plugin-jest": "^22.5.1",
-    "fs-extra": "^7.0.1",
-    "globby": "^10.0.1",
+    "eslint-plugin-jest": "^22.15.2",
+    "fs-extra": "^8.1.0",
+    "glob": "^7.1.4",
+    "gulp": "^4.0.2",
     "http-server": "^0.11.1",
     "jest": "^24.1.0",
     "jest-fetch-mock": "^2.1.2",
-    "jest-runner-eslint": "^0.7.3",
+    "lerna": "^3.16.4",
     "rollup": "^1.4.0",
     "rollup-plugin-copy-glob": "^0.3.1",
-    "rollup-plugin-eslint": "^5.1.0",
-    "three": "^0.106.2",
-    "yui-lint": "^0.2.0"
-  },
-  "jest": {
-    "projects": [
-      {
-        "displayName": "test",
-        "setupFiles": [
-          "./src/testHelpers/testHelpers.js"
-        ],
-        "transform": {
-          "^.+\\.jsx?$": "babel-jest"
-        },
-        "testPathIgnorePatterns": [
-          "<rootDir>/node_modules/"
-        ]
-      },
-      {
-        "displayName": "eslint",
-        "runner": "jest-runner-eslint",
-        "testMatch": [
-          "<rootDir>/testHelpers/**.js",
-          "<rootDir>/**/*.test.js"
-        ]
-      }
-    ]
+    "three": "^0.106.2"
   }
 }
