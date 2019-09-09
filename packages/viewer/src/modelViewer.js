@@ -33,12 +33,12 @@ function addTouchDots({ motionController, rootNode }) {
       const touchPointRoot = componentRoot.getObjectByName(component.touchPointNodeName, true);
       if (!touchPointRoot) {
         ErrorLogging.log(`Could not find touch dot, ${component.touchPointNodeName}, in touchpad component ${componentId}`);
+      } else {
+        const sphereGeometry = new THREE.SphereGeometry(0.001);
+        const material = new THREE.MeshBasicMaterial({ color: 0x0000FF });
+        const sphere = new THREE.Mesh(sphereGeometry, material);
+        touchPointRoot.add(sphere);
       }
-
-      const sphereGeometry = new THREE.SphereGeometry(0.001);
-      const material = new THREE.MeshBasicMaterial({ color: 0x0000FF });
-      const sphere = new THREE.Mesh(sphereGeometry, material);
-      touchPointRoot.add(sphere);
     }
   });
 }
@@ -230,29 +230,33 @@ const ModelViewer = {
   },
 
   loadModel: async (motionController) => {
-    const gltfAsset = await new Promise(((resolve, reject) => {
-      three.loader.load(
-        motionController.assetUrl,
-        (loadedAsset) => { resolve(loadedAsset); },
-        null,
-        reject
-      );
-    }));
+    try {
+      const gltfAsset = await new Promise(((resolve, reject) => {
+        three.loader.load(
+          motionController.assetUrl,
+          (loadedAsset) => { resolve(loadedAsset); },
+          null,
+          () => { reject(new Error(`Asset ${motionController.assetUrl} missing or malformed.`)); }
+        );
+      }));
 
-    // Remove any existing model from the scene
-    clear();
+      // Remove any existing model from the scene
+      clear();
 
-    const model = {
-      motionController,
-      rootNode: gltfAsset.scene
-    };
+      const model = {
+        motionController,
+        rootNode: gltfAsset.scene
+      };
 
-    model.nodes = findNodes(model);
-    addTouchDots(model);
+      model.nodes = findNodes(model);
+      addTouchDots(model);
 
-    // Set the new model
-    activeModel = model;
-    three.scene.add(activeModel.rootNode);
+      // Set the new model
+      activeModel = model;
+      three.scene.add(activeModel.rootNode);
+    } catch (error) {
+      ErrorLogging.throw(error);
+    }
   },
 
   clear

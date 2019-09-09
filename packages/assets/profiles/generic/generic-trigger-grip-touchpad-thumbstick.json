@@ -42,7 +42,7 @@
                 "xr-standard-touchpad": {
                     "rootNodeName" : "touchpad-node",
                     "labelAnchorNodeName" : "touchpad-label-transform",
-                    "touchpadDotNodeName" : "touchpad-dot",
+                    "touchPointNodeName" : "touchpad-dot",
                     "visualResponses" : [
                         {
                             "rootNodeName": "TOUCHPAD_PRESS",

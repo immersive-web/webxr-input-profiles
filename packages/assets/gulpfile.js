@@ -22,13 +22,14 @@ function buildProfilesList() {
     profilesList = {};
     files.forEach((file) => {
       const profileId = path.basename(file, '.json');
-      profilesList[profileId] = file;
+      const relativePath = file.substr(('profiles/'.length));
+      profilesList[profileId] = relativePath;
     });
   });
 }
 
 function writeProfilesList() {
-  const profilesListPath = path.join(destFolder, 'profilesList.json');
+  const profilesListPath = path.join(profilesAndAssetsDestFolder, 'profilesList.json');
   return fs.outputJson(profilesListPath, profilesList, { spaces: 2 });
 }
 

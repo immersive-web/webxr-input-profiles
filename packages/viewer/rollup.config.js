@@ -33,7 +33,7 @@ export default [
       ),
       copy(
         [
-          { files: '../assets/dist/**', dest: `${DIST_FOLDER}/profiles` }
+          { files: '../assets/dist/profiles/**', dest: `${DIST_FOLDER}/profiles` }
         ],
         { verbose: true, watch: process.env.ROLLUP_WATCH }
       ),
