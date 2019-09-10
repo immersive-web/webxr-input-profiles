@@ -48,26 +48,18 @@ function normalizeAxes(x = 0, y = 0) {
  */
 class VisualResponse {
   constructor(visualResponseDescription) {
-    // Copies the description properties into a member attribute for modification
-    this.description = Object.assign(visualResponseDescription);
+    this.componentProperty = visualResponseDescription.componentProperty;
+    this.states = visualResponseDescription.states;
+    this.valueNodeName = visualResponseDescription.valueNodeName;
+    this.valueNodeProperty = visualResponseDescription.valueNodeProperty;
 
-    // Looks for a root node name and sets a default if one is not defined
-    if (!this.description.targetNodeName) {
-      if (this.description.property === 'visibility') {
-        this.description.targetNodeName = this.description.rootNodeName;
-      } else {
-        this.description.targetNodeName = 'VALUE';
-      }
+    if (this.valueNodeProperty === Constants.VisualResponseProperty.TRANSFORM) {
+      this.minNodeName = visualResponseDescription.minNodeName;
+      this.maxNodeName = visualResponseDescription.maxNodeName;
     }
 
-    // Looks for min/max node names and sets defaults if they are not defined
-    this.description.maxNodeName = (this.description.maxNodeName) ? this.description.maxNodeName : 'MAX';
-    this.description.minNodeName = (this.description.minNodeName) ? this.description.minNodeName : 'MIN';
-
-    // Looks for the property name and sets a default if it is not defined
-    this.description.property = (this.description.property) ? this.description.property : 'transform';
-
     // Initializes the response's current value based on default data
+    this.value = 0;
     this.updateFromComponent(defaultComponentValues);
   }
 
@@ -83,25 +75,25 @@ class VisualResponse {
     xAxis, yAxis, button, state
   }) {
     const { normalizedXAxis, normalizedYAxis } = normalizeAxes(xAxis, yAxis);
-    switch (this.description.componentProperty) {
+    switch (this.componentProperty) {
       case Constants.ComponentProperty.X_AXIS:
-        this.value = (this.description.states.includes(state)) ? normalizedXAxis : 0.5;
+        this.value = (this.states.includes(state)) ? normalizedXAxis : 0.5;
         break;
       case Constants.ComponentProperty.Y_AXIS:
-        this.value = (this.description.states.includes(state)) ? normalizedYAxis : 0.5;
+        this.value = (this.states.includes(state)) ? normalizedYAxis : 0.5;
         break;
       case Constants.ComponentProperty.BUTTON:
-        this.value = (this.description.states.includes(state)) ? button : 0;
+        this.value = (this.states.includes(state)) ? button : 0;
         break;
       case Constants.ComponentProperty.STATE:
-        if (this.description.property === 'visibility') {
-          this.value = (this.description.states.includes(state));
+        if (this.valueNodeProperty === Constants.VisualResponseProperty.VISIBILITY) {
+          this.value = (this.states.includes(state));
         } else {
-          this.value = this.description.states.includes(state) ? 1.0 : 0.0;
+          this.value = this.states.includes(state) ? 1.0 : 0.0;
         }
         break;
       default:
-        throw new Error('Unexpected visualResponse source');
+        throw new Error(`Unexpected visualResponse componentProperty ${this.componentProperty}`);
     }
   }
 }

@@ -23,14 +23,7 @@ function addTouchDots({ motionController, rootNode }) {
     // Find the touchpads
     if (component.type === Constants.ComponentType.TOUCHPAD) {
       // Find the node to attach the touch dot.
-      const componentRoot = rootNode.getObjectByName(component.rootNodeName, true);
-
-      if (!componentRoot) {
-        ErrorLogging.log(`Could not find root node of touchpad component ${component.rootNodeName}`);
-        return;
-      }
-
-      const touchPointRoot = componentRoot.getObjectByName(component.touchPointNodeName, true);
+      const touchPointRoot = rootNode.getObjectByName(component.touchPointNodeName, true);
       if (!touchPointRoot) {
         ErrorLogging.log(`Could not find touch dot, ${component.touchPointNodeName}, in touchpad component ${componentId}`);
       } else {
@@ -53,55 +46,38 @@ function findNodes(model) {
 
   // Loop through the components and find the nodes needed for each components' visual responses
   Object.values(model.motionController.components).forEach((component) => {
-    const componentRootNode = model.rootNode.getObjectByName(component.rootNodeName, true);
-    const componentNodes = {};
-
-    // If the root node cannot be found, skip this component
-    if (!componentRootNode) {
-      ErrorLogging.log(`Could not find root node of component ${component.rootNodeName}`);
-      return;
+    const { touchPointNodeName, visualResponses } = component;
+    if (touchPointNodeName) {
+      nodes[touchPointNodeName] = model.rootNode.getObjectByName(touchPointNodeName);
     }
 
     // Loop through all the visual responses to be applied to this component
-    Object.values(component.visualResponses).forEach((visualResponse) => {
-      const visualResponseNodes = {};
-      const { rootNodeName, targetNodeName, property } = visualResponse.description;
-
-      // Find the node at the top of the visualization
-      if (rootNodeName === component.root) {
-        visualResponseNodes.rootNode = componentRootNode;
-      } else {
-        visualResponseNodes.rootNode = componentRootNode.getObjectByName(rootNodeName, true);
-      }
-
-      // If the root node cannot be found, skip this animation
-      if (!visualResponseNodes.rootNode) {
-        ErrorLogging.log(`Could not find root node of visual response for ${rootNodeName}`);
-        return;
-      }
-
-      // Find the node to be changed
-      visualResponseNodes.targetNode = visualResponseNodes.rootNode.getObjectByName(targetNodeName);
-
+    Object.values(visualResponses).forEach((visualResponse) => {
+      const {
+        valueNodeName, minNodeName, maxNodeName, valueNodeProperty
+      } = visualResponse;
       // If animating a transform, find the two nodes to be interpolated between.
-      if (property === 'transform') {
-        const { minNodeName, maxNodeName } = visualResponse.description;
-        visualResponseNodes.minNode = visualResponseNodes.rootNode.getObjectByName(minNodeName);
-        visualResponseNodes.maxNode = visualResponseNodes.rootNode.getObjectByName(maxNodeName);
+      if (valueNodeProperty === Constants.VisualResponseProperty.TRANSFORM) {
+        nodes[minNodeName] = model.rootNode.getObjectByName(minNodeName);
+        nodes[maxNodeName] = model.rootNode.getObjectByName(maxNodeName);
 
         // If the extents cannot be found, skip this animation
-        if (!visualResponseNodes.minNode || !visualResponseNodes.maxNode) {
-          ErrorLogging.log(`Could not find extents nodes of visual response for ${rootNodeName}`);
+        if (!nodes[minNodeName]) {
+          ErrorLogging.log(`Could not find ${minNodeName} in the model`);
+          return;
+        }
+        if (!nodes[maxNodeName]) {
+          ErrorLogging.log(`Could not find ${maxNodeName} in the model`);
           return;
         }
       }
 
-      // Add the animation to the component's nodes dictionary
-      componentNodes[rootNodeName] = visualResponseNodes;
+      // If the target node cannot be found, skip this animation
+      nodes[valueNodeName] = model.rootNode.getObjectByName(valueNodeName);
+      if (!nodes[valueNodeName]) {
+        ErrorLogging.log(`Could not find ${valueNodeName} in the model`);
+      }
     });
-
-    // Add the component's animations to the controller's nodes dictionary
-    nodes[component.id] = componentNodes;
   });
 
   return nodes;
@@ -141,35 +117,33 @@ function animationFrameCallback() {
 
     // Update the 3D model to reflect the button, thumbstick, and touchpad state
     Object.values(activeModel.motionController.components).forEach((component) => {
-      const componentNodes = activeModel.nodes[component.id];
-
-      // Skip if the component node is not found. No error is needed, because it
-      // will have been reported at load time.
-      if (!componentNodes) return;
-
       // Update node data based on the visual responses' current states
       Object.values(component.visualResponses).forEach((visualResponse) => {
-        const { description, value } = visualResponse;
-        const visualResponseNodes = componentNodes[description.rootNodeName];
+        const {
+          valueNodeName, minNodeName, maxNodeName, value, valueNodeProperty
+        } = visualResponse;
+        const valueNode = activeModel.nodes[valueNodeName];
 
         // Skip if the visual response node is not found. No error is needed,
         // because it will have been reported at load time.
-        if (!visualResponseNodes) return;
+        if (!valueNode) return;
 
         // Calculate the new properties based on the weight supplied
-        if (description.property === 'visibility') {
-          visualResponseNodes.targetNode.visible = value;
-        } else if (description.property === 'transform') {
+        if (valueNodeProperty === Constants.VisualResponseProperty.VISIBILITY) {
+          valueNode.visible = value;
+        } else if (valueNodeProperty === Constants.VisualResponseProperty.TRANSFORM) {
+          const minNode = activeModel.nodes[minNodeName];
+          const maxNode = activeModel.nodes[maxNodeName];
           THREE.Quaternion.slerp(
-            visualResponseNodes.minNode.quaternion,
-            visualResponseNodes.maxNode.quaternion,
-            visualResponseNodes.targetNode.quaternion,
+            minNode.quaternion,
+            maxNode.quaternion,
+            valueNode.quaternion,
             value
           );
 
-          visualResponseNodes.targetNode.position.lerpVectors(
-            visualResponseNodes.minNode.position,
-            visualResponseNodes.maxNode.position,
+          valueNode.position.lerpVectors(
+            minNode.position,
+            maxNode.position,
             value
           );
         }
@@ -222,7 +196,7 @@ const ModelViewer = {
 
   loadModel: async (motionController) => {
     try {
-      const gltfAsset = await new Promise(((resolve, reject) => {
+      const asset = await new Promise(((resolve, reject) => {
         three.loader.load(
           motionController.assetUrl,
           (loadedAsset) => { resolve(loadedAsset); },
@@ -236,7 +210,7 @@ const ModelViewer = {
 
       const model = {
         motionController,
-        rootNode: gltfAsset.scene
+        rootNode: asset.scene
       };
 
       model.nodes = findNodes(model);

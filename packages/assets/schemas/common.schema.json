@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://immersive-web/webxr-input-profiles/registry/common.schema.json",
+    "$id": "https://immersive-web/webxr-input-profiles/assets/0.1.0/common.schema.json",
     "definitions": {
         "profileId": {
             "description": "A properly formatted string uniquely identifying a profile",

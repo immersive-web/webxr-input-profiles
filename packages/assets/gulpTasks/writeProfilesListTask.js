@@ -14,7 +14,7 @@ function generate() {
         reject(error);
       } else {
         files.forEach((file) => {
-          const profileId = path.basename(file, '.json');
+          const profileId = path.basename(path.dirname(file));
           const relativePath = file.substr((taskPaths.profilesSrc.length) + 1);
           profilesList[profileId] = relativePath;
         });

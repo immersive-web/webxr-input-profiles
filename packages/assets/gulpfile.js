@@ -2,7 +2,7 @@ const gulp = require('gulp');
 const fs = require('fs-extra');
 
 const taskPaths = require('./gulpTasks/taskPaths');
-const mergeProfiles = require('./gulpTasks/mergeProfilesTask');
+const buildProfiles = require('./gulpTasks/buildProfilesTask');
 const copySchemas = require('./gulpTasks/copySchemasTask');
 const copyTools = require('./gulpTasks/copyToolsTask');
 const writeProfilesList = require('./gulpTasks/writeProfilesListTask');
@@ -17,7 +17,7 @@ function copyAssets() {
 
 const build = gulp.series(
   copySchemas,
-  mergeProfiles,
+  buildProfiles,
   gulp.parallel(copyAssets, copyTools, writeProfilesList)
 );
 

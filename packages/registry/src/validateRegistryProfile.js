@@ -1,205 +1,152 @@
+class RegistryProfileError extends Error {
+  constructor(profileId, handedness, ...params) {
+    super(...params);
 
-const xrStandardMapping = 'xr-standard';
-const xrStandardComponents = {
-  TRIGGER: { id: 'xr-standard-trigger', type: 'trigger' },
-  SQUEEZE: { id: 'xr-standard-squeeze', type: 'squeeze' },
-  TOUCHPAD: { id: 'xr-standard-touchpad', type: 'touchpad' },
-  THUMBSTICK: { id: 'xr-standard-thumbstick', type: 'thumbstick' }
-};
+    this.name = 'RegistryProfileError';
 
-/**
- * Validate button-related things that cannot be done via schema validation
- * @param {Object} layout - The layout to validate
- * @param {string} id - The layout id
- * @param {object} components - The components in a specific layout
- * @param {*} buttons - The array mapping to the Gamepad.buttons array
- * @param {*} mapping - The layout's Gamepad.mapping value
- */
-function validateGamepadButtonIndices({ id, components, gamepad: { buttons } }, mapping) {
-  // Validate no duplicates of non-null entries
+    this.profileId = profileId;
+    this.handedness = handedness;
+
+    this.message = `[${profileId}] [${handedness}] ${this.message}`;
+  }
+}
+
+function validateComponents(registryInfo, handedness) {
+  if (registryInfo.layouts[handedness].gamepad.mapping === 'xr-standard') {
+    const { profileId } = registryInfo;
+    const { components } = registryInfo.layouts[handedness];
+    const XR_STANDARD_COMPONENTS = {
+      'xr-standard-trigger': { type: 'trigger' },
+      'xr-standard-squeeze': { type: 'squeeze' },
+      'xr-standard-touchpad': { type: 'touchpad' },
+      'xr-standard-thumbstick': { type: 'thumbstick' }
+    };
+
+    // Ensure that at least the trigger is present
+    if (!components['xr-standard-trigger']) {
+      throw new RegistryProfileError(profileId, handedness, '\'xr-standard\' requres the presence of the \'xr-standard-trigger\'');
+    }
+
+    // Ensure that the selection component is the trigger
+    if (registryInfo.layouts[handedness].selectComponentId !== 'xr-standard-trigger') {
+      throw new RegistryProfileError(profileId, handedness, '\'xr-standard\' requires the selectComponentId to be the \'xr-standard-trigger\'');
+    }
+
+    // Validate all xr-standard components are of the correct type
+    Object.keys(components).forEach((componentId) => {
+      const standardComponent = XR_STANDARD_COMPONENTS[componentId];
+      if (standardComponent) {
+        const component = components[componentId];
+        if (component.type !== standardComponent.type) {
+          throw new RegistryProfileError(profileId, handedness, `'xr-standard' component ${componentId} must be type ${standardComponent.type}`);
+        }
+      }
+    });
+  }
+}
+
+function validateGamepadButtons(registryInfo, handedness) {
+  const { profileId } = registryInfo;
+  const { components } = registryInfo.layouts[handedness];
+  const { buttons } = registryInfo.layouts[handedness].gamepad;
+  const XR_STANDARD_BUTTONS_MAPPING = [
+    'xr-standard-trigger',
+    'xr-standard-squeeze',
+    'xr-standard-touchpad',
+    'xr-standard-thumbstick'
+  ];
+
+  buttons.forEach((componentId, index) => {
+    if (componentId !== null) {
+      // Validate gamepad buttons match a component
+      if (!components[componentId]) {
+        throw new RegistryProfileError(profileId, handedness, `Component id ${componentId} at gamepad.buttons[${index}] does not match a defined component`);
+      }
+
+      // Validate mapping order, if applicable
+      if (registryInfo.layouts[handedness].gamepad.mapping === 'xr-standard' && index < XR_STANDARD_BUTTONS_MAPPING.length) {
+        const standardComponentId = XR_STANDARD_BUTTONS_MAPPING[index];
+        if (componentId !== standardComponentId) {
+          throw new RegistryProfileError(profileId, handedness, `The 'xr-standard' mapping requires button index ${index} to match the ${standardComponentId} component`);
+        }
+      }
+    }
+  });
+
+  // Validate no duplicates exist
   const noNulls = buttons.filter(item => item !== null);
   const noDuplicates = new Set(noNulls);
   if (noNulls.length !== noDuplicates.size) {
-    throw new Error(`Layout ${id} has duplicate components gamepad.buttons`);
+    throw new RegistryProfileError(profileId, handedness, 'Buttons array contains duplicate componentIds');
   }
-
-  // Validate the references in the buttons array are valid
-  buttons.forEach((componentId, index) => {
-    // Skip null entries
-    if (!componentId) {
-      return;
-    }
-
-    // Check the there is an actual component with the id at the Gamepad.buttons entry
-    const component = components[componentId];
-    if (!component) {
-      throw new Error(
-        `Layout ${id} has unknown component id ${componentId} at gamepad.buttons[${index}]`
-      );
-    }
-
-    // If the gamepad is of the 'xr-standard' mapping, check that the components in
-    // the first four entries in the Gamepad.buttons array have types that match
-    // component types as described in the WebXR Gamepads Module
-    if (mapping === xrStandardMapping && index < 4) {
-      const xrStandardButtonOrder = [
-        xrStandardComponents.TRIGGER.id,
-        xrStandardComponents.SQUEEZE.id,
-        xrStandardComponents.TOUCHPAD.id,
-        xrStandardComponents.THUMBSTICK.id
-      ];
-      if (componentId !== xrStandardButtonOrder[index]) {
-        throw new Error(
-          `Layout ${id} must have a ${xrStandardButtonOrder[index]} at gamepad.buttons[${index}]`
-        );
-      }
-    }
-  });
 }
 
-/**
- * Validate button-related things that cannot be done via schema validation
- * @param {Object} layout - The layout to validate
- * @param {string} id - The layout id
- * @param {object} components - The components in a specific layout
- * @param {object} axes - The array mapping to the Gamepad.axes array
- * @param {string} mapping - The layout's Gamepad.mapping value
- */
-function validateGamepadAxesIndices({ id, components, gamepad: { axes } }, mapping) {
-  // Validate no duplicates of non-null entries
+function validateGamepadAxes(registryInfo, handedness) {
+  const { profileId } = registryInfo;
+  const { components } = registryInfo.layouts[handedness];
+  const { axes } = registryInfo.layouts[handedness].gamepad;
+  const XR_STANDARD_AXES_MAPPING = [
+    { componentId: 'xr-standard-touchpad', axis: 'x-axis' },
+    { componentId: 'xr-standard-touchpad', axis: 'y-axis' },
+    { componentId: 'xr-standard-thumbstick', axis: 'x-axis' },
+    { componentId: 'xr-standard-thumbstick', axis: 'y-axis' }
+  ];
+
+  // Validate no duplicates exist
   const noNulls = axes.filter(item => item !== null).map(item => JSON.stringify(item));
   const noDuplicates = new Set(noNulls);
   if (noNulls.length !== noDuplicates.size) {
-    throw new Error(`Layout ${id} has duplicate components gamepad.axes`);
+    throw new RegistryProfileError(profileId, handedness, 'Axes array contains duplicates');
   }
 
-  // Check each axis Gamepad.axes to make sure all entries are valid
-  const xAxisId = 'x-axis';
-  const yAxisId = 'y-axis';
-  let previousAxisDescription = null;
-  axes.forEach((axisDescription, index) => {
-    // Skip null entries
-    if (!axisDescription) {
-      previousAxisDescription = null;
-      return;
-    }
+  // Validate each axis description
+  axes.forEach((axisInfo, index) => {
+    if (axisInfo !== null) {
+      const component = components[axisInfo.componentId];
 
-    // Ensure the entry has the necessary parts
-    if (!axisDescription.componentId || !axisDescription.axis) {
-      throw new Error(
-        `Layout ${id} must have a valid component/axis pairing in Gamepad.axes[${index}]`
-      );
-    }
-
-    // Check the there is an actual component with the id at the Gamepad.buttons entry
-    const { componentId, axis } = axisDescription;
-    const component = components[componentId];
-    if (!component) {
-      throw new Error(
-        `Layout ${id} has unknown component id ${componentId} at gamepad.axis[${index}]`
-      );
-    }
-
-    // Check that the first four entries are exactly correct for the xr-standard mapping.
-    // For all other entries, ensure the component can report axes and that the axis ordering
-    // is valid
-    if (mapping === xrStandardMapping && index < 4) {
-      const xrStandardAxisOrder = [
-        xrStandardComponents.TOUCHPAD.id,
-        xrStandardComponents.TOUCHPAD.id,
-        xrStandardComponents.THUMBSTICK.id,
-        xrStandardComponents.THUMBSTICK.id
-      ];
-
-      if (componentId !== xrStandardAxisOrder[index]) {
-        throw new Error(
-          `Layout ${id} requires ${xrStandardAxisOrder[index]} at gamepad.axes[${index}]`
-        );
+      // Validate gamepad axes match a component
+      if (!component) {
+        throw new RegistryProfileError(profileId, handedness, `No matching component for gamepad.axes[${index}]`);
       }
-    } else if (!(component.type === 'thumbstick' || component.type === 'touchpad')) {
-      throw new Error(`Layout ${id} Component at gamepad.axes[${index}] must support axes`);
-    }
 
-    // Ensure the axis ids are in order x-axis followed by y-axis for a single component
-    let expectedAxisId = xAxisId;
-    if (previousAxisDescription
-      && previousAxisDescription.componentId === componentId
-      && previousAxisDescription.axis === xAxisId) {
-      expectedAxisId = yAxisId;
-    }
+      // Validate the matching component can report axes
+      if (component.type !== 'thumbstick' && component.type !== 'touchpad') {
+        throw new RegistryProfileError(profileId, handedness, `gamepad.axes[${index}] maps to ${axisInfo.componentId} which cannot report axis data`);
+      }
 
-    if (axis !== expectedAxisId) {
-      throw new Error(`Layout ${id} axis must be ${expectedAxisId} at gamepad.axes[${index}`);
-    }
+      // Validate that axes are in x,y,z order, if present, for each component
+      if (index > 0) {
+        const previousAxisInfo = axes[index - 1];
+        if (previousAxisInfo && previousAxisInfo.componentId === axisInfo.componentId) {
+          if (axisInfo.axis === 'x-axis' || (axisInfo.axis === 'y-axis' && previousAxisInfo.axis !== 'x-axis')) {
+            throw new RegistryProfileError(profileId, handedness, `Axes must be in x, y, z order for ${axisInfo.componentId}`);
+          }
+        }
+      }
 
-    // Save the axis description for comparing next time
-    previousAxisDescription = axisDescription;
+      // If applicable, validate the order matches the xr-standard
+      if (registryInfo.layouts[handedness].gamepad.mapping === 'xr-standard' && index < XR_STANDARD_AXES_MAPPING.length) {
+        const standardAxisInfo = XR_STANDARD_AXES_MAPPING[index];
+
+        if (axisInfo.componentId !== standardAxisInfo.componentId) {
+          throw new RegistryProfileError(profileId, handedness, `The 'xr-standard' mapping requires axis index ${index} to match the ${standardAxisInfo.componentId} component`);
+        }
+
+        if (axisInfo.axis !== standardAxisInfo.axis) {
+          throw new RegistryProfileError(profileId, handedness, `The 'xr-standard' mapping requires axis index ${index} to match the ${standardAxisInfo.axis}`);
+        }
+      }
+    }
   });
 }
 
-function validateComponents({ id, components }, mapping) {
-  if (mapping === xrStandardMapping) {
-    let triggerFound = false;
-    Object.keys(components).forEach((componentId) => {
-      if (xrStandardComponents[componentId]) {
-        triggerFound = triggerFound || (componentId === xrStandardComponents.TRIGGER);
-
-        const expectedType = xrStandardComponents[componentId].type;
-        if (components[componentId].type !== expectedType) {
-          throw new Error(`Layout ${id} xr-standard ${componentId} must be type ${expectedType}`);
-        }
-      }
-    });
-
-    if (!triggerFound) {
-      throw new Error(`Layout ${id} does not have the ${xrStandardComponents.TRIGGER} component`);
-    }
-  }
+// Validate the layouts conform with requirements not expressable in schema validation
+function validateProfile(registryInfo) {
+  Object.keys(registryInfo.layouts).forEach((layoutId) => {
+    validateComponents(registryInfo, layoutId);
+    validateGamepadButtons(registryInfo, layoutId);
+    validateGamepadAxes(registryInfo, layoutId);
+  });
 }
 
-function validate(profileJson, profilesListJson) {
-  if (!profileJson.profileId) {
-    throw new Error('Profile does not have id');
-  }
-
-  try {
-    Object.keys(profileJson.layouts).forEach((layoutId) => {
-      const layout = profileJson.layouts[layoutId];
-
-      validateComponents(layout, profileJson.mapping);
-
-      // Validate select source points to a valid component
-      if (!layout.components[layout.selectComponentId]) {
-        throw new Error(`Layout ${layout.id} no selectComponentId ${layout.selectComponentId}`);
-      }
-
-      // Validate gamepad arrays match components
-      if (layout.gamepad) {
-        validateGamepadButtonIndices(layout, profileJson.mapping);
-        validateGamepadAxesIndices(layout, profileJson.mapping);
-      }
-    });
-
-    const fallbackIds = profileJson.fallbackProfileIds;
-    if (profilesListJson) {
-      // Validate fallbackProfiles are real
-      fallbackIds.forEach((profileId) => {
-        if (!profilesListJson[profileId]) {
-          throw new Error(`Fallback profile ${profileId} does not exist`);
-        }
-      });
-    }
-
-    if (!profileJson.profileId.startsWith('generic-')) {
-      const lastFallbackId = fallbackIds[fallbackIds.length - 1];
-      if (!lastFallbackId.startsWith('generic-')) {
-        throw new Error('Final fallback profile id must be for a generic profile');
-      }
-    }
-  } catch (error) {
-    error.message = `${profileJson.profileId} - ${error.message}`;
-    throw error;
-  }
-}
-
-module.exports = validate;
+module.exports = validateProfile;

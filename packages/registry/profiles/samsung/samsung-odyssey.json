@@ -17,8 +17,7 @@
                     "xr-standard-trigger",
                     "xr-standard-squeeze",
                     "xr-standard-touchpad",
-                    "xr-standard-thumbstick",
-                    "menu"
+                    "xr-standard-thumbstick"
                 ],
                 "axes":[
                     { "componentId": "xr-standard-touchpad", "axis": "x-axis"},

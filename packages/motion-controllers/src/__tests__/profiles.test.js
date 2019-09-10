@@ -5,20 +5,19 @@ global.fetch = require('jest-fetch-mock');
 
 // Setup mock objects
 const basePath = 'madeup/base/path';
-const validProfilePrefix = 'generic';
 const validProfileId = 'generic-trigger';
-const validAssetPath = 'this/is/an/asset.path';
+const validAssetPath = 'none.glb';
 
 const validProfile = {
   layouts: {
     none: {
-      path: validAssetPath
+      assetPath: validAssetPath
     }
   }
 };
 
 const profilesList = {
-  [validProfileId]: `${validProfilePrefix}/${validProfileId}.json`
+  [validProfileId]: `${validProfileId}/profile.json`
 };
 
 function buildXRInputSource(profiles = [], handedness = Constants.Handedness.NONE) {
@@ -82,7 +81,7 @@ describe('fetchProfile', () => {
 
     const { profile, assetPath } = await fetchProfile(xrInputSource, basePath);
     expect(profile).toEqual(validProfile);
-    expect(assetPath).toEqual(`${basePath}/${validProfilePrefix}/${validAssetPath}`);
+    expect(assetPath).toEqual(`${basePath}/${validProfileId}/${validAssetPath}`);
   });
 
   test('Successfully fetch profile with no asset path', async () => {

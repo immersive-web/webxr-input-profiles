@@ -5,7 +5,7 @@ const taskPaths = {};
 taskPaths.dest = path.join(__dirname, '../dist');
 
 taskPaths.profilesSrc = path.join(__dirname, '../profiles');
-taskPaths.profilesGlob = path.join(taskPaths.profilesSrc, '**/*.json');
+taskPaths.profilesGlob = path.join(taskPaths.profilesSrc, '**/profile.json');
 taskPaths.profilesDest = path.join(taskPaths.dest, 'profiles');
 
 taskPaths.assetsGlob = ['profiles/**', `!${taskPaths.profilesGlob}`];

@@ -61,8 +61,8 @@ async function fetchProfile(xrInputSource, basePath, getAssetPath = true) {
       );
     }
 
-    if (layout.path) {
-      assetPath = match.profilePath.replace(`${match.profileId}.json`, layout.path);
+    if (layout.assetPath) {
+      assetPath = match.profilePath.replace('profile.json', layout.assetPath);
     }
   }
 
