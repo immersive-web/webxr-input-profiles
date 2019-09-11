@@ -16,12 +16,12 @@ Per the [LICENSE.md](LICENSE.md) file, this repository is made available under a
 In general, this package should be built and tested from the root of the repository using the following command:
 > npm run test
 
-To build just this package invoke the following command from the root of the repository:
+To build just this package without running tests, invoke the following command from the root of the repository:
 > npm run build -- --scope @webxr-input-profiles/viewer
 
 ### Filing a bug
 Fill in the steps for filing a bug https://github.com/immersive-web/webxr-input-profiles/issues/52
 
 ### Filing a pull request
-Fill in the steps for filing a bug https://github.com/immersive-web/webxr-input-profiles/issues/52
+Fill in the steps for filing a pull request https://github.com/immersive-web/webxr-input-profiles/issues/52
 

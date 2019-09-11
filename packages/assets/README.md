@@ -8,7 +8,7 @@ This package provides 3D assets and JSON descriptions of how to relate those ass
 ### Getting started
 To install this package:
 ```
-npm install webxr-input-profiles
+npm install @webxr-input-profiles/assets
 ```
 
 ### Licence
@@ -23,15 +23,12 @@ Fill in the steps for filing a bug https://github.com/immersive-web/webxr-input-
 ### Adding a profile
 The new profile JSON file must match an existing hardware profile in the [registry](../registry/README.md) repository and be conformant with the schema in this package's './schemas' folder.  It must also pass the verification steps performed as part of the package build. Once ready, submit a pull request using the [this](https://github.com/immersive-web/webxr-input-profiles/issues/52) template.
 
-### Building and testing
+### Development
 In general, this package should be built and tested from the root of the repository using the following command:
 > npm run test
 
-To build just this package invoke the following command from the root of the repository:
+To build just this package without running tests, invoke the following command from the root of the repository:
 > npm run build -- --scope @webxr-input-profiles/assets
-
-To test just this package invoke the following command from the root of the repository:
-> npm run testOnly -- assets
 
 ## Schema
 

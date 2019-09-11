@@ -2,7 +2,7 @@
     "profileId": "samsung-gearvr",
     "fallbackProfileIds": [ "generic-trigger-touchpad"],
     "layouts" : {
-        "none" : {
+        "left-right-none" : {
             "selectSource": "xr-standard-trigger",
             "components": {
                 "xr-standard-trigger": { "type": "trigger" },

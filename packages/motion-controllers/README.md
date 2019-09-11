@@ -23,17 +23,17 @@ Per the [LICENSE.md](LICENCE.md) file, this package is made available under an M
 In general, this package should be built and tested from the root of the repository using the following command:
 > npm run test
 
-To build just this package invoke the following command from the root of the repository:
+To build just this package without running tests, invoke the following command from the root of the repository:
 > npm run build -- --scope @webxr-input-profiles/motion-controllers
 
-To test just this package invoke the following command from the root of the repository:
+To test just this package without building anything, invoke the following command from the root of the repository:
 > npm run testOnly -- motion-controllers
 
 ### Filing a bug
 Fill in the steps for filing a bug https://github.com/immersive-web/webxr-input-profiles/issues/52
 
 ### Filing a pull request
-Fill in the steps for filing a bug https://github.com/immersive-web/webxr-input-profiles/issues/52
+Fill in the steps for filing a pull request https://github.com/immersive-web/webxr-input-profiles/issues/52
 
 ### Profile Viewer
 Visual validation of this package combined with the [assets](../assets/README.md) package can be done using the [viewer](../viewer/README.md) package.

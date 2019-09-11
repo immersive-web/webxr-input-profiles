@@ -1,13 +1,13 @@
 {
     "profileId" : "samsung-gearvr",
     "assets" : {
-        "none" : {
+        "left-right-none" : {
             "path" : "none.glb",
             "rootNodeName" : "none-controller-node"
         }
     },
     "layouts": {
-        "none": {
+        "left-right-none": {
             "components" : {
                 "xr-standard-trigger" : {
                     "rootNodeName" : "SELECT",
