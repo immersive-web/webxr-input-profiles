@@ -1,9 +1,49 @@
-const path = require('path');
-const fs = require('fs-extra');
-const merge = require('merge-deep');
-const optionalRequire = require('optional-require')(require);
+function validateKeyMatch(obj1, obj2) {
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
 
-const registryModulePath = optionalRequire.resolve('@webxr-input-profiles/registry', '');
+  const match = (keys1.length === keys2.length)
+              && keys1.every(key => obj2[key]);
+  return match;
+}
+
+function mergeComponents(components1, components2) {
+  if (!validateKeyMatch(components1, components2)) {
+    throw new Error('Layout handedness keys do not match');
+  }
+
+  const mergedComponents = {};
+  Object.keys(components1).forEach((componentId) => {
+    const component = { ...components1[componentId], ...components2[componentId] };
+    mergedComponents[componentId] = component;
+  });
+
+  return mergedComponents;
+}
+
+function mergeLayouts(layouts1, layouts2) {
+  if (!validateKeyMatch(layouts1, layouts2)) {
+    throw new Error('Layout handedness keys do not match');
+  }
+
+  const mergedLayouts = {};
+  Object.keys(layouts1).forEach((handedness) => {
+    const layout1 = layouts1[handedness];
+    const layout2 = layouts2[handedness];
+
+    mergedLayouts[handedness] = {
+      ...layout1,
+      ...layout2
+    };
+
+    if (layout1.components && layout2.components) {
+      const components = mergeComponents(layout1.components, layout2.components);
+      mergedLayouts[handedness].components = components;
+    }
+  });
+
+  return mergedLayouts;
+}
 
 /**
  * Expand 'left-right' into two separate entries and expand 'left-right-none' into three
@@ -26,25 +66,33 @@ function expandLayouts(layouts) {
     }
   });
 
+  if (!expandedLayouts.none && !(expandedLayouts.left && expandedLayouts.right)) {
+    throw new Error(
+      'Profile must have layouts for none, left/right, or left/right/none handedness'
+    );
+  }
+
   return expandedLayouts;
 }
 
 /**
  * Add and populate the gamepadIndices property on all components in each layout
- * @param {object} registryProfile
+ * @param {object} registryJson
  */
-function integrateGamepad(registryLayouts) {
+function integrateGamepadIndices(registryJson) {
+  const registryLayouts = expandLayouts(registryJson.layouts);
+
   // Build a hierarchy that matches layouts.components hierarchy that is filled with gamepadIndices
-  const layouts = {};
+  const integratedLayouts = {};
   Object.keys(registryLayouts).forEach((handedness) => {
-    const { gamepad } = registryLayouts[handedness];
-    const { buttons: buttonsArray, axes: axesArray } = gamepad;
-    const components = {};
+    const registryLayout = registryLayouts[handedness];
+    const { mapping, buttons: buttonsArray, axes: axesArray } = registryLayout.gamepad;
+    const integratedComponents = {};
 
     // Add button indices to components
     buttonsArray.forEach((componentId, index) => {
       if (componentId) {
-        components[componentId] = { gamepadIndices: { button: index } };
+        integratedComponents[componentId] = { gamepadIndices: { button: index } };
       }
     });
 
@@ -52,54 +100,52 @@ function integrateGamepad(registryLayouts) {
     axesArray.forEach((axisDescription, index) => {
       if (axisDescription) {
         const { componentId, axis } = axisDescription;
-        if (components[componentId]) {
-          components[componentId].gamepadIndices[axis] = index;
+        if (integratedComponents[componentId]) {
+          integratedComponents[componentId].gamepadIndices[axis] = index;
         } else {
-          components[componentId] = { gamepadIndices: { [axis]: index } };
+          integratedComponents[componentId] = { gamepadIndices: { [axis]: index } };
         }
       }
     });
 
-    const mergedComponents = merge(registryLayouts[handedness].components, components);
-    layouts[handedness] = { mapping: gamepad.mapping, components: mergedComponents };
+    // Merge the gamepad indices into the original layouts
+    const mergedComponents = mergeComponents(
+      registryLayout.components,
+      integratedComponents
+    );
+    integratedLayouts[handedness] = { mapping, components: mergedComponents };
   });
 
-  // Merge the gamepad indices into the original layouts
-  return layouts;
+  return integratedLayouts;
 }
 
-function mergeProfile(profilePath, assetProfile) {
-  // Get the matching file from the registry
-  const registryFolder = path.join(path.dirname(registryModulePath), 'profiles');
-  const registryProfile = fs.readJsonSync(path.join(registryFolder, profilePath));
-
+function mergeProfile(registryJson, assetJson) {
   // Make sure the files actually match
-  if (assetProfile.profileId !== registryProfile.profileId) {
+  if (assetJson.profileId !== registryJson.profileId) {
     throw new Error(
-      `Profile id mismatch registry=${registryProfile.profileId} asset=${assetProfile.profileId}`
+      `Profile id mismatch registry=${registryJson.profileId} asset=${assetJson.profileId}`
     );
   }
 
-  const { profileId } = assetProfile;
-  const registryLayouts = integrateGamepad(registryProfile.layouts);
-  const layouts = merge(
-    expandLayouts(assetProfile.assets),
-    expandLayouts(registryLayouts),
-    expandLayouts(assetProfile.layouts)
-  );
+  try {
+    const assetPathLayouts = expandLayouts(assetJson.assets);
+    const assetComponentsLayouts = expandLayouts(assetJson.layouts);
+    const assetLayouts = mergeLayouts(assetPathLayouts, assetComponentsLayouts);
 
-  if (!layouts.none && !(layouts.left && layouts.right)) {
-    throw new Error(
-      `${assetProfile.id} must have layouts for none, left/right, or left/right/none handedness`
-    );
+    const registryLayouts = integrateGamepadIndices(registryJson);
+
+    const mergedLayouts = mergeLayouts(registryLayouts, assetLayouts);
+
+    const mergedProfile = {
+      profileId: assetJson.profileId,
+      layouts: mergedLayouts
+    };
+
+    return mergedProfile;
+  } catch (error) {
+    error.message = `${assetJson.profileId} - ${error.message}`;
+    throw error;
   }
-
-  const mergedProfile = {
-    profileId,
-    layouts
-  };
-
-  return mergedProfile;
 }
 
 module.exports = mergeProfile;

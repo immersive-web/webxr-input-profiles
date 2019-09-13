@@ -20,10 +20,6 @@ class MotionController {
       throw new Error('No profile supplied');
     }
 
-    if (!assetUrl) {
-      throw new Error('No asset URL supplied');
-    }
-
     this.xrInputSource = xrInputSource;
     this.assetUrl = assetUrl;
     this.id = profile.profileId;

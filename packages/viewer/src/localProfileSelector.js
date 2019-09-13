@@ -1,5 +1,7 @@
 /* eslint-disable import/no-unresolved */
 import { MotionController } from './motion-controllers.module.js';
+import './ajv/ajv.min.js';
+import mergeProfile from './profilesTools/mergeProfile.js';
 /* eslint-enable */
 
 import MockGamepad from './mocks/mockGamepad.js';
@@ -8,32 +10,86 @@ import ErrorLogging from './errorLogging.js';
 import HandednessSelector from './handednessSelector.js';
 
 /**
+ * Loads selected file from filesystem and sets it as the selected profile
+ * @param {Object} jsonFile
+ */
+function loadLocalJson(jsonFile) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const json = JSON.parse(reader.result);
+      resolve(json);
+    };
+
+    reader.onerror = () => {
+      const errorMessage = `Unable to load JSON from ${jsonFile.name}`;
+      ErrorLogging.logError(errorMessage);
+      reject(errorMessage);
+    };
+
+    reader.readAsText(jsonFile);
+  });
+}
+
+async function buildSchemaValidator() {
+  const schemasPath = 'profilesTools/schemas.json';
+  const response = await fetch(schemasPath);
+  if (!response.ok) {
+    ErrorLogging.throw(response.statusText);
+  }
+
+  // eslint-disable-next-line no-undef
+  const ajv = new Ajv();
+  const schemas = await response.json();
+  schemas.dependencies.forEach((schema) => {
+    ajv.addSchema(schema);
+  });
+
+  return ajv.compile(schemas.mainSchema);
+}
+
+/**
  * Loads a profile from a set of local files
  */
 class LocalProfileSelector {
   constructor() {
     this.element = document.getElementById('localProfile');
-
-    // Gets the file selector and watch for changes
-    this.filesSelector = document.getElementById('localProfilesSelector');
-    this.filesSelector.addEventListener('change', () => { this.onFilesSelected(); });
     this.localFilesListElement = document.getElementById('localFilesList');
+
+    // Get the assets selector and watch for changes
+    this.registryJsonSelector = document.getElementById('localProfileRegistryJsonSelector');
+    this.registryJsonSelector.addEventListener('change', () => { this.onRegistryJsonSelected(); });
+
+    // Get the asset json  selector and watch for changes
+    this.assetJsonSelector = document.getElementById('localProfileAssetJsonSelector');
+    this.assetJsonSelector.addEventListener('change', () => { this.onAssetJsonSelected(); });
+
+    // Get the registry json selector and watch for changes
+    this.assetsSelector = document.getElementById('localProfileAssetsSelector');
+    this.assetsSelector.addEventListener('change', () => { this.onAssetsSelected(); });
 
     // Add a handedness selector and listen for changes
     this.handednessSelector = new HandednessSelector('localProfile');
     this.handednessSelector.element.addEventListener('handednessChange', (event) => { this.onHandednessChange(event); });
     this.element.insertBefore(this.handednessSelector.element, this.localFilesListElement);
 
-    this.assetFiles = {};
-
     this.disabled = true;
+
     this.clearSelectedProfile();
+
+    buildSchemaValidator().then((schemaValidator) => {
+      this.schemaValidator = schemaValidator;
+      // TODO figure out disabled thing
+      this.onRegistryJsonSelected();
+      this.onAssetJsonSelected();
+      this.onAssetsSelected();
+    });
   }
 
   enable() {
     this.element.hidden = false;
     this.disabled = false;
-    this.onFilesSelected();
   }
 
   disable() {
@@ -44,10 +100,27 @@ class LocalProfileSelector {
 
   clearSelectedProfile() {
     ErrorLogging.clearAll();
-    this.selectedProfile = null;
-    this.assetFiles = {};
-    this.element.disabled = true;
+    this.registryJson = null;
+    this.assetJson = null;
+    this.mergedProfile = null;
+    this.assets = [];
     this.handednessSelector.clearSelectedProfile();
+  }
+
+  createMotionController() {
+    let motionController;
+    if (this.handednessSelector.handedness && this.mergedProfile) {
+      const { handedness } = this.handednessSelector;
+      const mockGamepad = new MockGamepad(this.mergedProfile, handedness);
+      const mockXRInputSource = new MockXRInputSource(mockGamepad, handedness);
+
+      const assetName = this.mergedProfile.layouts[handedness].path;
+      const assetUrl = this.assets[assetName];
+      motionController = new MotionController(mockXRInputSource, this.mergedProfile, assetUrl);
+    }
+
+    const changeEvent = new CustomEvent('motionControllerChange', { detail: motionController });
+    this.element.dispatchEvent(changeEvent);
   }
 
   /**
@@ -56,78 +129,69 @@ class LocalProfileSelector {
    * event to signal the change
    * @param {object} event
    */
-  onHandednessChange(event) {
+  onHandednessChange() {
     if (!this.disabled) {
-      let motionController;
-      const handedness = event.detail;
-      if (handedness) {
-        const mockGamepad = new MockGamepad(this.selectedProfile, handedness);
-        const mockXRInputSource = new MockXRInputSource(mockGamepad, handedness);
-
-        const assetName = this.selectedProfile.handedness[handedness].asset;
-        const assetUrl = this.assetFiles[assetName];
-        motionController = new MotionController(mockXRInputSource, this.selectedProfile, assetUrl);
-      }
-
-      const changeEvent = new CustomEvent('motionControllerChange', { detail: motionController });
-      this.element.dispatchEvent(changeEvent);
+      this.createMotionController();
     }
   }
 
-  /**
-   * Loads selected file from filesystem and sets it as the selected profile
-   * @param {Object} profileFile
-   */
-  loadProfile(profileFile) {
-    const reader = new FileReader();
+  async mergeJsonProfiles() {
+    if (this.registryJson && this.assetJson) {
+      try {
+        this.mergedProfile = mergeProfile(this.registryJson, this.assetJson);
+        this.handednessSelector.setSelectedProfile(this.mergedProfile);
+      } catch (error) {
+        ErrorLogging.log(error);
+        throw error;
+      }
+    }
+  }
 
-    reader.onload = () => {
-      this.selectedProfile = JSON.parse(reader.result);
-      this.handednessSelector.setSelectedProfile(this.selectedProfile);
-    };
+  onRegistryJsonSelected() {
+    if (!this.element.disabled) {
+      this.registryJson = null;
+      this.mergedProfile = null;
+      this.handednessSelector.clearSelectedProfile();
+      if (this.registryJsonSelector.files.length > 0) {
+        loadLocalJson(this.registryJsonSelector.files[0]).then((registryJson) => {
+          // TODO validate JSON
+          this.registryJson = registryJson;
+          this.mergeJsonProfiles();
+        });
+      }
+    }
+  }
 
-    reader.onerror = () => {
-      ErrorLogging.logAndThrow('Unable to load profile.json');
-    };
-
-    reader.onloadend = () => {
-      this.disabled = false;
-    };
-
-    reader.readAsText(profileFile);
+  onAssetJsonSelected() {
+    if (!this.element.disabled) {
+      this.assetJson = null;
+      this.mergedProfile = null;
+      this.handednessSelector.clearSelectedProfile();
+      if (this.assetJsonSelector.files.length > 0) {
+        loadLocalJson(this.assetJsonSelector.files[0]).then((assetJson) => {
+          const valid = this.schemaValidator(assetJson);
+          if (!valid) {
+            ErrorLogging.log(this.schemaValidator.error);
+          } else {
+            this.assetJson = assetJson;
+            this.mergeJsonProfiles();
+          }
+        });
+      }
+    }
   }
 
   /**
    * Handles changes to the set of local files selected
    */
-  onFilesSelected() {
-    this.clearSelectedProfile();
-    this.localFilesListElement.innerHTML = '';
-
-    // Get files from local folder
-    const fileList = Array.from(this.filesSelector.files);
-    let profileFile;
-
-    fileList.forEach((file) => {
-      // List the files found
-      this.localFilesListElement.innerHTML += `
-        <li>${file.name}</li>
-      `;
-
-      // Grab the profile.json to load and stash the others as asset URIs
-      if (file.name === 'profile.json') {
-        profileFile = file;
-      } else {
-        this.assetFiles[file.name] = window.URL.createObjectURL(file);
-      }
-    });
-
-    // Load the profile if one has been found
-    if (profileFile) {
-      this.loadProfile(profileFile);
-    } else {
-      this.element.disabled = false;
-      ErrorLogging.log('No profile.json');
+  onAssetsSelected() {
+    if (!this.element.disabled) {
+      const fileList = Array.from(this.assetsSelector.files);
+      this.assets = [];
+      fileList.forEach((file) => {
+        this.assets[file.name] = window.URL.createObjectURL(file);
+      });
+      this.createMotionController();
     }
   }
 }

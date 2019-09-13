@@ -48,18 +48,6 @@ test('No profile', () => {
   }).toThrow();
 });
 
-test('No assetUrl', () => {
-  expect(() => {
-    // eslint-disable-next-line no-unused-vars
-    const motionController = new MotionController(mockXRInputSource, profile, null);
-  }).toThrow();
-
-  expect(() => {
-    // eslint-disable-next-line no-unused-vars
-    const motionController = new MotionController(mockXRInputSource, profile, undefined);
-  }).toThrow();
-});
-
 test('No gamepad', () => {
   const noGamepadXRInputSource = {
     handedness: Constants.Handedness.NONE
