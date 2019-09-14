@@ -1,0 +1,34 @@
+{
+    "profileId" : "generic-trigger",
+    "assets" : {
+        "none" : {
+            "path" : "some-url",
+            "rootNodeName" : "none-controller-node"
+        },
+        "left" : {
+            "path" : "some-url",
+            "rootNodeName" : "left-controller-node"
+        },
+        "right" : {
+            "path" : "some-url",
+            "rootNodeName" : "right-controller-node"
+        }
+    },
+    "layouts": {
+        "left-right-none": {
+            "components" : {
+                "xr-standard-trigger": {
+                    "rootNodeName" : "trigger-node",
+                    "labelAnchorNodeName" : "trigger-label-transform",
+                    "visualResponses" : [
+                        {
+                            "rootNodeName" : "SELECT",
+                            "source" : "button",
+                            "states" : ["default", "touched", "pressed"]
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,85 @@
+{
+    "profileId" : "htc-vive",
+    "assets" : {
+        "none" : {
+            "path" : "none.glb",
+            "rootNodeName" : "none-controller-node"
+        },
+        "left" : {
+            "path" : "left.glb",
+            "rootNodeName" : "left-controller-node"
+        },
+        "right" : {
+            "path" : "right.glb",
+            "rootNodeName" : "right-controller-node"
+        }
+    },
+    "layouts": {
+        "left-right-none": {
+            "components" : {
+                "xr-standard-trigger" : {
+                    "rootNodeName" : "SELECT",
+                    "labelAnchorNodeName" : "trigger-label",
+                    "analogButtonValues": true,
+                    "visualResponses": [
+                        {
+                            "rootNodeName" : "SELECT",
+                            "source" : "button",
+                            "states" : ["default", "touched", "pressed"]
+                        }
+                    ]
+                },
+                "xr-standard-grip": {
+                    "rootNodeName" : "GRASP",
+                    "labelAnchorNodeName" : "grip-label",
+                    "visualResponses": [
+                        {
+                            "rootNodeName" : "GRASP",
+                            "source" : "state",
+                            "states" : ["pressed"]
+                        }
+                    ]
+                },
+                "xr-standard-touchpad": {
+                    "rootNodeName" : "TOUCHPAD_PRESS",
+                    "labelAnchorNodeName" : "grip-label",
+                    "touchPointNodeName" : "TOUCH",
+                    "visualResponses": [
+                        {
+                            "rootNodeName": "TOUCHPAD_PRESS",
+                            "source" : "state",
+                            "states" : ["pressed"]
+                        },
+                        {
+                            "rootNodeName": "TOUCH",
+                            "source" : "state",
+                            "states" : ["touched", "pressed"],
+                            "property": "visibility"
+                        },
+                        {
+                            "rootNodeName": "TOUCHPAD_TOUCH_X",
+                            "source" : "xAxis",
+                            "states" : ["default", "touched", "pressed"]
+                        },
+                        {
+                            "rootNodeName": "TOUCHPAD_TOUCH_Y",
+                            "source" : "yAxis",
+                            "states" : ["default", "touched", "pressed"]
+                        }
+                    ]
+                },
+                "menu": {
+                    "rootNodeName" : "MENU",
+                    "labelAnchorNodeName" : "menu-label",
+                    "visualResponses": [
+                        {
+                            "rootNodeName" : "MENU",
+                            "source" : "state",
+                            "states" : ["pressed"]
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

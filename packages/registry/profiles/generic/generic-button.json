@@ -1,0 +1,19 @@
+{
+    "profileId" : "generic-button",
+    "fallbackProfileIds": [],
+    "layouts" : {
+        "left-right-none" : {
+            "selectSource": "faceButton",
+            "components": {
+                "faceButton": { "type": "button" }
+            },
+            "gamepad": {
+                "mapping": "",
+                "buttons": [ 
+                    "faceButton" 
+                ],
+                "axes":[]
+            }
+        }
+    }
+}

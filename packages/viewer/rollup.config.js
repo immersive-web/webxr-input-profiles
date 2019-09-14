@@ -15,8 +15,10 @@ export default [
       './three/build/three.module.js',
       './three/examples/jsm/loaders/GLTFLoader.js',
       './three/examples/jsm/controls/OrbitControls.js',
+      './ajv/ajv.min.js',
       './motion-controllers.module.js',
-      './motion-controllers-mocks.module.js'
+      '../motion-controllers.module.js',
+      './profilesTools/mergeProfile.js'
     ],
     plugins: [
       copy(
@@ -33,7 +35,19 @@ export default [
       ),
       copy(
         [
-          { files: '../profiles-registry/dist/**', dest: `${DIST_FOLDER}/profiles` }
+          { files: '../assets/dist/profiles/**', dest: `${DIST_FOLDER}/profiles` }
+        ],
+        { verbose: true, watch: process.env.ROLLUP_WATCH }
+      ),
+      copy(
+        [
+          { files: '../assets/dist/profilesTools/**', dest: `${DIST_FOLDER}/profilesTools` }
+        ],
+        { verbose: true, watch: process.env.ROLLUP_WATCH }
+      ),
+      copy(
+        [
+          { files: '../../node_modules/ajv/dist/ajv.min.js*', dest: `${DIST_FOLDER}/ajv` }
         ],
         { verbose: true, watch: process.env.ROLLUP_WATCH }
       ),

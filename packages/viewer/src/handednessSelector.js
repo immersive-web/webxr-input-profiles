@@ -17,10 +17,9 @@ class HandednessSelector {
 
   /**
    * Fires an event notifying that the handedness has changed
-   * @param {string} handedness
    */
-  fireHandednessChange(handedness) {
-    const changeEvent = new CustomEvent('handednessChange', { detail: handedness });
+  fireHandednessChange() {
+    const changeEvent = new CustomEvent('handednessChange', { detail: this.handedness });
     this.element.dispatchEvent(changeEvent);
   }
 
@@ -37,9 +36,9 @@ class HandednessSelector {
    */
   onHandednessSelected() {
     // Create a mock gamepad that matches the profile and handedness
-    const handedness = this.element.value;
-    window.localStorage.setItem(this.handednessStorageKey, handedness);
-    this.fireHandednessChange(handedness);
+    this.handedness = this.element.value;
+    window.localStorage.setItem(this.handednessStorageKey, this.handedness);
+    this.fireHandednessChange();
   }
 
   /**
@@ -57,7 +56,7 @@ class HandednessSelector {
 
     // Populate handedness selector
     this.element.innerHTML = '';
-    Object.keys(this.selectedProfile.handedness).forEach((handedness) => {
+    Object.keys(this.selectedProfile.layouts).forEach((handedness) => {
       this.element.innerHTML += `
         <option value='${handedness}'>${handedness}</option>
       `;
@@ -68,7 +67,7 @@ class HandednessSelector {
     }
 
     // Apply stored handedness if found
-    if (storedHandedness && this.selectedProfile.handedness[storedHandedness]) {
+    if (storedHandedness && this.selectedProfile.layouts[storedHandedness]) {
       this.element.value = storedHandedness;
     }
 

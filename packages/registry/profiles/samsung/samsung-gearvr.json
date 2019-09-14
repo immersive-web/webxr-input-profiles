@@ -1,0 +1,28 @@
+{
+    "profileId": "samsung-gearvr",
+    "fallbackProfileIds": [ "generic-trigger-touchpad"],
+    "layouts" : {
+        "left-right-none" : {
+            "selectSource": "xr-standard-trigger",
+            "components": {
+                "xr-standard-trigger": { "type": "trigger" },
+                "xr-standard-touchpad": { "type": "touchpad" },
+                "menu" : { "type": "button" }
+            },
+            "gamepad": {
+                "mapping": "xr-standard",
+                "buttons": [
+                    "xr-standard-trigger",
+                    null,
+                    "xr-standard-touchpad",
+                    null,
+                    "menu"
+                ],
+                "axes":[
+                    { "componentId": "xr-standard-touchpad", "axis": "xAxis"},
+                    { "componentId": "xr-standard-touchpad", "axis": "yAxis"}
+                ]
+            }
+        }
+    }
+}

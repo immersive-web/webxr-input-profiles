@@ -12,12 +12,13 @@
   ],
   "scripts": {
     "clean": "rm -r dist 2> /dev/null || true",
-    "build": "rollup -c",
+    "build": "rollup -c -m inline",
+    "cleanBuild": "npm run clean && npm run build",
     "watch": "rollup -c -w -m inline",
     "test": "echo \"Run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@webxr-input-profiles/profiles-registry": "0.1.0",
-    "@webxr-input-profiles/motion-controllers": "0.1.0"
+    "@webxr-input-profiles/assets": "^0.1.0",
+    "@webxr-input-profiles/motion-controllers": "^0.1.0"
   }
 }

@@ -1,0 +1,62 @@
+{
+    "profileId" : "oculus-go",
+    "assets" : {
+        "none" : {
+            "path" : "some-url",
+            "rootNodeName" : "none-controller-node"
+        },
+        "left" : {
+            "path" : "some-url",
+            "rootNodeName" : "left-controller-node"
+        },
+        "right" : {
+            "path" : "some-url",
+            "rootNodeName" : "right-controller-node"
+        }
+    },
+    "layouts": {
+        "left-right-none": {
+            "components" : {
+                "xr-standard-trigger": {
+                    "rootNodeName" : "trigger-node",
+                    "labelAnchorNodeName" : "trigger-label-transform",
+                    "visualResponses" : [
+                        {
+                            "rootNodeName" : "SELECT",
+                            "source" : "button",
+                            "states" : ["default", "touched", "pressed"]
+                        }
+                    ]
+                },
+                "xr-standard-touchpad": {
+                    "rootNodeName" : "touchpad-node",
+                    "labelAnchorNodeName" : "touchpad-label-transform",
+                    "touchPointNodeName" : "touchpad-dot",
+                    "visualResponses" : [
+                        {
+                            "rootNodeName": "TOUCHPAD_PRESS",
+                            "source" : "state",
+                            "states" : ["pressed"]
+                        },
+                        {
+                            "rootNodeName": "TOUCH",
+                            "source" : "state",
+                            "states" : ["touched", "pressed"],
+                            "property": "visibility"
+                        },
+                        {
+                            "rootNodeName": "TOUCHPAD_TOUCH_X",
+                            "source" : "xAxis",
+                            "states" : ["default", "touched", "pressed"]
+                        },
+                        {
+                            "rootNodeName": "TOUCHPAD_TOUCH_Y",
+                            "source" : "yAxis",
+                            "states" : ["default", "touched", "pressed"]
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

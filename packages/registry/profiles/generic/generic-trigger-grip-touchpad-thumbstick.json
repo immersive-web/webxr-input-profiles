@@ -1,0 +1,30 @@
+{
+    "profileId": "generic-trigger-grip-touchpad-thumbstick",
+    "fallbackProfileIds": [],
+    "layouts" : {
+        "left-right-none" : {
+            "selectSource": "xr-standard-trigger",
+            "components": {
+                "xr-standard-trigger": { "type": "trigger" },
+                "xr-standard-grip": { "type": "grip" },
+                "xr-standard-touchpad": { "type": "touchpad" },
+                "xr-standard-thumbstick": { "type": "thumbstick" }
+            },
+            "gamepad": {
+                "mapping": "xr-standard",
+                "buttons": [ 
+                    "xr-standard-trigger", 
+                    "xr-standard-grip", 
+                    "xr-standard-touchpad", 
+                    "xr-standard-thumbstick" 
+                ],
+                "axes":[
+                    { "componentId": "xr-standard-touchpad", "axis": "xAxis"},
+                    { "componentId": "xr-standard-touchpad", "axis": "yAxis"},
+                    { "componentId": "xr-standard-thumbstick", "axis": "xAxis"},
+                    { "componentId": "xr-standard-thumbstick", "axis": "yAxis"}
+                ]
+            }
+        }
+    }
+}

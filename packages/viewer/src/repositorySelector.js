@@ -1,18 +1,20 @@
 /* eslint-disable import/no-unresolved */
-import { Profiles, MotionController } from './motion-controllers.module.js';
-import { MockGamepad, MockXRInputSource } from './motion-controllers-mocks.module.js';
+import { fetchProfile, fetchProfilesList, MotionController } from './motion-controllers.module.js';
 /* eslint-enable */
+
+import MockGamepad from './mocks/mockGamepad.js';
+import MockXRInputSource from './mocks/mockXRInputSource.js';
 
 import ErrorLogging from './errorLogging.js';
 import HandednessSelector from './handednessSelector.js';
 
 const profileIdStorageKey = 'repository_profileId';
+const profilesBasePath = './profiles';
 /**
  * Loads profiles from the distribution folder next to the viewer's location
  */
 class RepositorySelector {
   constructor() {
-    this.profiles = new Profiles('./profiles');
     this.element = document.getElementById('repository');
 
     // Get the profile id dropdown and listen for changes
@@ -63,13 +65,25 @@ class RepositorySelector {
         const mockGamepad = new MockGamepad(this.selectedProfile, handedness);
         const mockXRInputSource = new MockXRInputSource(mockGamepad, handedness);
 
-        const assetUrl = this.profiles.getAssetUrl(this.selectedProfile, handedness);
-        motionController = new MotionController(mockXRInputSource, this.selectedProfile, assetUrl);
-      }
+        fetchProfile(mockXRInputSource, profilesBasePath).then(({ profile, assetPath }) => {
+          motionController = new MotionController(
+            mockXRInputSource,
+            profile,
+            assetPath
+          );
 
-      // Signal the change
-      const changeEvent = new CustomEvent('motionControllerChange', { detail: motionController });
-      this.element.dispatchEvent(changeEvent);
+          // Signal the change
+          const changeEvent = new CustomEvent(
+            'motionControllerChange',
+            { detail: motionController }
+          );
+          this.element.dispatchEvent(changeEvent);
+        });
+      } else {
+        // Signal the change
+        const changeEvent = new CustomEvent('motionControllerChange', { detail: null });
+        this.element.dispatchEvent(changeEvent);
+      }
     }
   }
 
@@ -83,7 +97,7 @@ class RepositorySelector {
     window.localStorage.setItem(profileIdStorageKey, profileId);
 
     // Attempt to load the profile
-    this.profiles.fetchProfile([profileId]).then((profile) => {
+    fetchProfile({ profiles: [profileId] }, profilesBasePath, false).then(({ profile }) => {
       this.selectedProfile = profile;
       this.handednessSelector.setSelectedProfile(this.selectedProfile);
     })
@@ -108,9 +122,9 @@ class RepositorySelector {
 
     // Load the list of profiles
     this.profileIdSelectorElement.innerHTML = '<option value="loading">Loading...</option>';
-    this.profiles.fetchSupportedProfilesList().then((profilesList) => {
+    fetchProfilesList(profilesBasePath).then((profilesList) => {
       this.profileIdSelectorElement.innerHTML = '';
-      profilesList.forEach((profileId) => {
+      Object.keys(profilesList).forEach((profileId) => {
         this.profileIdSelectorElement.innerHTML += `
         <option value='${profileId}'>${profileId}</option>
         `;

@@ -1,0 +1,17 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://immersive-web/webxr-input-profiles/assets/0.1.0/asset.schema.json",
+    "type": "object",
+    "additionalProperties": false,
+    "required":["path", "rootNodeName"],
+    "properties": {
+        "path" : {
+            "description": "The URI of the asset associated with the hand",
+            "type": "string"
+        },
+        "rootNodeName" : {
+            "description": "The root node of the hand within the associated asset",
+            "type": "string"
+        }
+    }
+}

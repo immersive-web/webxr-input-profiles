@@ -1,0 +1,10 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://immersive-web/webxr-input-profiles/assets/0.1.0/layout.schema.json",
+    "type": "object",
+    "additionalProperties": false,
+    "required":["components"],
+    "properties": {
+        "components": { "$ref": "common.schema.json#/definitions/components" }
+    }
+}

@@ -1,0 +1,34 @@
+{
+    "profileId": "valve-knuckles",
+    "fallbackProfileIds": [ "generic-trigger-grip-touchpad-thumbstick"],
+    "layouts": {
+        "left-right": {
+            "selectSource": "xr-standard-trigger",
+            "components": {
+                "xr-standard-trigger": { "type": "trigger" },
+                "xr-standard-grip": { "type": "grip" },
+                "xr-standard-touchpad": { "type": "touchpad" },
+                "xr-standard-thumbstick": { "type": "thumbstick" },
+                "a-button" : { "type": "button" },
+                "b-button" : { "type": "button" }
+            },
+            "gamepad": {
+                "mapping": "xr-standard",
+                "buttons": [
+                    "xr-standard-trigger",
+                    "xr-standard-grip",
+                    "xr-standard-touchpad",
+                    "xr-standard-thumbstick",
+                    "a-button",
+                    "b-button"
+                ],
+                "axes":[
+                    { "componentId": "xr-standard-touchpad", "axis": "xAxis"},
+                    { "componentId": "xr-standard-touchpad", "axis": "yAxis"},
+                    { "componentId": "xr-standard-thumbstick", "axis": "xAxis"},
+                    { "componentId": "xr-standard-thumbstick", "axis": "yAxis"}
+                ]
+            }
+        }
+    }
+}
