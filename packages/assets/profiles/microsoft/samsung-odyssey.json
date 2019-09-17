@@ -1,18 +1,18 @@
 {
-    "profileId" : "microsoft-045e-065b",
+    "profileId" : "samsung-odyssey",
     "assets" : {
         "left" : {
-            "path" : "left.glb",
+            "path" : "samsung-odyssey-L.glb",
             "rootNodeName" : "left-controller-node"
         },
         "right" : {
-            "path" : "right.glb",
+            "path" : "samsung-odyssey-R.glb",
             "rootNodeName" : "right-controller-node"
         }
     },
-    "layouts": {
+    "layouts" : {
         "left-right": {
-            "components" : {
+            "components": {
                 "xr-standard-trigger" : {
                     "rootNodeName" : "SELECT",
                     "labelAnchorNodeName" : "trigger-label",

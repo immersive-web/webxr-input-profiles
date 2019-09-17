@@ -1,6 +1,6 @@
 {
-    "profileId": "microsoft-045e-065b",
-    "fallbackProfileIds": [ "generic-trigger-grip-touchpad-thumbstick"],
+    "profileId": "samsung-odyssey",
+    "fallbackProfileIds": [ "microsoft-mixed-reality", "generic-trigger-grip-touchpad-thumbstick"],
     "layouts" : {
         "left-right" : {
             "selectSource": "xr-standard-trigger",
