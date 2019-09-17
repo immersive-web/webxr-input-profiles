@@ -66,12 +66,6 @@ function expandLayouts(layouts) {
     }
   });
 
-  if (!expandedLayouts.none && !(expandedLayouts.left && expandedLayouts.right)) {
-    throw new Error(
-      'Profile must have layouts for none, left/right, or left/right/none handedness'
-    );
-  }
-
   return expandedLayouts;
 }
 

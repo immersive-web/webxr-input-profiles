@@ -18,7 +18,8 @@ export default [
       './ajv/ajv.min.js',
       './motion-controllers.module.js',
       '../motion-controllers.module.js',
-      './profilesTools/mergeProfile.js'
+      './assetTools/mergeProfile.js',
+      './registryTools/validateRegistryProfile.js'
     ],
     plugins: [
       copy(
@@ -41,7 +42,13 @@ export default [
       ),
       copy(
         [
-          { files: '../assets/dist/profilesTools/**', dest: `${DIST_FOLDER}/profilesTools` }
+          { files: '../registry/dist/profilesTools/**', dest: `${DIST_FOLDER}/registryTools` }
+        ],
+        { verbose: true, watch: process.env.ROLLUP_WATCH }
+      ),
+      copy(
+        [
+          { files: '../assets/dist/profilesTools/**', dest: `${DIST_FOLDER}/assetTools` }
         ],
         { verbose: true, watch: process.env.ROLLUP_WATCH }
       ),

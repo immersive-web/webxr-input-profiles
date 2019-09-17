@@ -1,33 +1,3 @@
-const path = require('path');
-const fs = require('fs-extra');
-const Ajv = require('ajv');
-
-/**
- * Validate the profile against the schema
- * @param {object} profileJson - the profile to validate
- */
-function validateAgainstSchema(profileJson) {
-  const ajv = new Ajv();
-  const schemaFolder = path.join(__dirname, '../schemas');
-  const mainSchemaPath = path.join(schemaFolder, 'profile.schema.json');
-
-  const items = fs.readdirSync(schemaFolder);
-  items.forEach((filePath) => {
-    const schemaPath = path.join(schemaFolder, filePath);
-    if (schemaPath !== mainSchemaPath) {
-      const schema = fs.readJsonSync(schemaPath);
-      ajv.addMetaSchema(schema);
-    }
-  });
-
-  const mainSchema = fs.readJsonSync(mainSchemaPath);
-  const validator = ajv.compile(mainSchema);
-  if (!validator(profileJson)) {
-    const errors = JSON.stringify(validator.errors, null, 2);
-    throw new Error(`Failed to validate schema with errors: ${errors}`);
-  }
-}
-
 /**
  * Validate button-related things that cannot be done via schema validation
  * @param {Object} layout - The layout to validate
@@ -155,8 +125,6 @@ function validate(profileJson, profilesListJson) {
   }
 
   try {
-    validateAgainstSchema(profileJson);
-
     Object.keys(profileJson.layouts).forEach((layoutId) => {
       const layout = profileJson.layouts[layoutId];
 
@@ -170,12 +138,14 @@ function validate(profileJson, profilesListJson) {
       validateGamepadAxesIndices(layout, profileJson.mapping);
     });
 
-    // Validate fallbackProfiles are real
-    profileJson.fallbackProfileIds.forEach((profileId) => {
-      if (!profilesListJson[profileId]) {
-        throw new Error(`Fallback profile ${profileId} does not exist`);
-      }
-    });
+    if (profilesListJson) {
+      // Validate fallbackProfiles are real
+      profileJson.fallbackProfileIds.forEach((profileId) => {
+        if (!profilesListJson[profileId]) {
+          throw new Error(`Fallback profile ${profileId} does not exist`);
+        }
+      });
+    }
 
     // TODO validate the fallback profiles match the layout
   } catch (error) {

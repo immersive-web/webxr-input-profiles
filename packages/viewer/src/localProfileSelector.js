@@ -1,7 +1,8 @@
 /* eslint-disable import/no-unresolved */
 import { MotionController } from './motion-controllers.module.js';
 import './ajv/ajv.min.js';
-import mergeProfile from './profilesTools/mergeProfile.js';
+import mergeProfile from './assetTools/mergeProfile.js';
+import validateRegistryProfile from './registryTools/validateRegistryProfile.js';
 /* eslint-enable */
 
 import MockGamepad from './mocks/mockGamepad.js';
@@ -24,7 +25,7 @@ function loadLocalJson(jsonFile) {
 
     reader.onerror = () => {
       const errorMessage = `Unable to load JSON from ${jsonFile.name}`;
-      ErrorLogging.logError(errorMessage);
+      ErrorLogging.log(errorMessage);
       reject(errorMessage);
     };
 
@@ -32,8 +33,7 @@ function loadLocalJson(jsonFile) {
   });
 }
 
-async function buildSchemaValidator() {
-  const schemasPath = 'profilesTools/schemas.json';
+async function buildSchemaValidator(schemasPath) {
   const response = await fetch(schemasPath);
   if (!response.ok) {
     ErrorLogging.throw(response.statusText);
@@ -78,12 +78,15 @@ class LocalProfileSelector {
 
     this.clearSelectedProfile();
 
-    buildSchemaValidator().then((schemaValidator) => {
-      this.schemaValidator = schemaValidator;
-      // TODO figure out disabled thing
-      this.onRegistryJsonSelected();
-      this.onAssetJsonSelected();
-      this.onAssetsSelected();
+    buildSchemaValidator('registryTools/registrySchemas.json').then((registrySchemaValidator) => {
+      this.registrySchemaValidator = registrySchemaValidator;
+      buildSchemaValidator('assetTools/assetSchemas.json').then((assetSchemaValidator) => {
+        this.assetSchemaValidator = assetSchemaValidator;
+        // TODO figure out disabled thing
+        this.onRegistryJsonSelected();
+        this.onAssetJsonSelected();
+        this.onAssetsSelected();
+      });
     });
   }
 
@@ -154,9 +157,19 @@ class LocalProfileSelector {
       this.handednessSelector.clearSelectedProfile();
       if (this.registryJsonSelector.files.length > 0) {
         loadLocalJson(this.registryJsonSelector.files[0]).then((registryJson) => {
-          // TODO validate JSON
-          this.registryJson = registryJson;
-          this.mergeJsonProfiles();
+          const valid = this.registrySchemaValidator(registryJson);
+          if (!valid) {
+            ErrorLogging.log(JSON.stringify(this.registrySchemaValidator.errors, null, 2));
+          } else {
+            try {
+              validateRegistryProfile(registryJson);
+            } catch (error) {
+              ErrorLogging.log(error);
+              throw error;
+            }
+            this.registryJson = registryJson;
+            this.mergeJsonProfiles();
+          }
         });
       }
     }
@@ -169,9 +182,9 @@ class LocalProfileSelector {
       this.handednessSelector.clearSelectedProfile();
       if (this.assetJsonSelector.files.length > 0) {
         loadLocalJson(this.assetJsonSelector.files[0]).then((assetJson) => {
-          const valid = this.schemaValidator(assetJson);
+          const valid = this.assetSchemaValidator(assetJson);
           if (!valid) {
-            ErrorLogging.log(this.schemaValidator.error);
+            ErrorLogging.log(JSON.stringify(this.assetSchemaValidator.errors, null, 2));
           } else {
             this.assetJson = assetJson;
             this.mergeJsonProfiles();

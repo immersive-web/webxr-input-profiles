@@ -60,7 +60,7 @@ function copySchemas() {
   return gulp.src(srcGlob)
     .pipe(replaceCommonSchemaId(commonSchemaFilename))
     .pipe(gulp.dest(taskPaths.schemasDest))
-    .pipe(jsonCombine('schemas.json', combineSchemas))
+    .pipe(jsonCombine(taskPaths.schemasCombinedFilename, combineSchemas))
     .pipe(gulp.dest(taskPaths.toolsDest));
 }
 
