@@ -6,13 +6,13 @@
 This package provides a 3D engine agnostic javascript library for synchronizing the status of an `XRInputSource` object with a 3D model representing that `XRInputSource`. The library consumes JSON files in the format published from the [@webxr-input-profiles/assets](../assets/README.md) package to create `MotionController` objects that enable a simple path for developers to:
 
 1. Find the best matching profile for an `XRInputSource`
-1. Enumerate the component parts (triggers, grips, touchpads, thumbsticks, buttons, etc)
+1. Enumerate the component parts (trigger, squeeze, touchpad, thumbstick, button, etc)
 1. If a 3D asset is available for the matching profile, provide a path to load it
 1. On each render frame, apply precomputed deformations to the 3D asset to reflect the state `XRInputSource`
 1. Optionally attach descriptive explanations to each component that will not overlap the rest of the 3D asset
 
 ### Background
-The state of an XR motion controller's triggers, grips, touchnpads, thumbsticks, and buttons is made available to developers via the `XRInputSource.Gamepad` object. The behavior of this object is described in [WebXR Gamepads Module](https://www.w3.org/TR/webxr-gamepads-module/) and the [Gamepad API](https://www.w3.org/TR/gamepad/). These objects expose detailed state in the `Gamepad.buttons` array and the `Gamepad.axes` array. While this system was adequate for the relatively homogenous console gaming controllers, it is less effective for XR motion controllers as they have not converged on a common form factor. In addition, the `Gamepad` object does not provide any information about the visualization of a `XRInputSource` object which is a requirement to displaying a virtual copy of motion controller on opaque XR headsets.
+The state of an XR motion controller's trigger, squeeze, touchnpad, thumbstick, and button components is made available to developers via the `XRInputSource.Gamepad` object. The behavior of this object is described in [WebXR Gamepads Module](https://www.w3.org/TR/webxr-gamepads-module/) and the [Gamepad API](https://www.w3.org/TR/gamepad/). These objects expose detailed state in the `Gamepad.buttons` array and the `Gamepad.axes` array. While this system was adequate for the relatively homogenous console gaming controllers, it is less effective for XR motion controllers as they have not converged on a common form factor. In addition, the `Gamepad` object does not provide any information about the visualization of a `XRInputSource` object which is a requirement to displaying a virtual copy of motion controller on opaque XR headsets.
 
 ### Licence
 Per the [LICENSE.md](LICENCE.md) file, this package is made available under an MIT license and is copyright Amazon 2019.
@@ -93,10 +93,10 @@ function onAnimationFrameCallback(xrFrame) {
 ```
 
 ## Components
-Once a `MotionController` has been created, developers can access interact with its components such as thumbsticks, touchpads, triggers, grips, and buttons. These components expose their current values through the `Components.values` object.  The `values.state` key will always be present and describes the overall state of the component as being `pressed`, `touched`, or `default`.  In addition to `values.state`, components may optionally also have a `values.button`, `values.xAxis`, or `values.yAxis`.  Each of values are populated slightly differently based on the underlying component type.
+Once a `MotionController` has been created, developers can access interact with its components such as thumbsticks, touchpads, triggers, squeezes, and buttons. These components expose their current values through the `Components.values` object.  The `values.state` key will always be present and describes the overall state of the component as being `pressed`, `touched`, or `default`.  In addition to `values.state`, components may optionally also have a `values.button`, `values.xAxis`, or `values.yAxis`.  Each of values are populated slightly differently based on the underlying component type.
 
-### Trigger, Grip, and Button components
-Much of the behavior of `trigger`, `grip`, and `button` components is identical, though they are often used for different interactions (e.g. grips may often be preferred for picking up objects). The `values.button` is set directly from the associated `GamepadButton.value`.  If the `GamepadButton.pressed` is true or the `GamepadButton.value` is 1, the `values.state` will be set to `pressed`.  Otherwise, if the `GamepadButton.touched` is true or the `GamepadButton.value` is greater than 0, the component's `values.state` will be set to `touched`. Otherwise the `values.state` is set to `default`. 
+### Trigger, Squeeze, and Button components
+Much of the behavior of `trigger`, `squeeze`, and `button` components is identical, though they are often used for different interactions (e.g. a squeeze may often be preferred for picking up objects). The `values.button` is set directly from the associated `GamepadButton.value`.  If the `GamepadButton.pressed` is true or the `GamepadButton.value` is 1, the `values.state` will be set to `pressed`.  Otherwise, if the `GamepadButton.touched` is true or the `GamepadButton.value` is greater than 0, the component's `values.state` will be set to `touched`. Otherwise the `values.state` is set to `default`. 
 
 ```js
 import { Constants } from './webxr-input-profiles.module.js';
@@ -113,9 +113,9 @@ function processTriggerInput(trigger) {
 ### Thumbstick and touchpad components
 Much of the behavior of `thumbstick` and `touchpad` components is identical, though they are often used for different interactions (e.g. thumbsticks may often be preferred for teleportation). These components must have either an `xAxis`, a `yAxis`, or both. The `values.xAxis` and `values.yAxis` are populated from the associated indices in the `Gamepad.axes` array.  The `value.xAxis` is `-1.0` at the far left of its range of motion and `1.0` at the far right. The `value.yAxis` is `-1.0` at the top of its range of motion and `1.0` at the bottom.  
 
-These components may also be clickable, and if so will have a `value.button` which is populated identically to those of `trigger`, `grip`, and `button` components.
+These components may also be clickable, and if so will have a `value.button` which is populated identically to those of `trigger`, `squeeze`, and `button` components.
 
-The `value.state` is set based on a combination of factors.  If clickable, `value.state` will be populated using an identical algorithm as `trigger`, `grip`, and `button` components.  If not clickable, or clickable and set to `default`, `values.state` will be set to `touched` if `values.xAxis` or `values.yAxis` are non-zero.
+The `value.state` is set based on a combination of factors.  If clickable, `value.state` will be populated using an identical algorithm as `trigger`, `squeeze`, and `button` components.  If not clickable, or clickable and set to `default`, `values.state` will be set to `touched` if `values.xAxis` or `values.yAxis` are non-zero.
 
 ```js
 import { Constants } from './webxr-input-profiles.module.js';

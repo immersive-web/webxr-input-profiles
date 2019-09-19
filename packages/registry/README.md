@@ -8,7 +8,7 @@ This package contains information for User Agents ensure they expose consistent 
 * The component responsible for causing `select`, `selectstart`, and `selectend` events to fire
 * The presence of a non-null `XRInputSource.gamepad`. When non-null:
   * The appropriate `Gamepad.mapping` value
-  * The relationship between physical hardware components (e.g. triggers, grips, buttons, touchpads, and thumbsticks) to indices in the `XRInputSource.gamepad.buttons` array.
+  * The relationship between physical hardware components (e.g. trigger, squeeze, button, touchpad, and thumbstick) to indices in the `XRInputSource.gamepad.buttons` array.
   * The relationship between physical touchpads and thumbsticks to indices in the `XRInputSource.gamepad.axes` array.
 
 ## Profile prefixes
@@ -88,7 +88,7 @@ For example:
 }
 ```
 ### Components
-Each layout is required to have a `components` property which contains information about all the individual parts of an `XRInputSource`. Components are comprised of a key which uniquely identifies them and a which describes their behavior. Component keys must not contain spaces at the beginning or end. Currently, the valid types are: `trigger`, `grip`, `touchpad`, `thumbstick`, and `button`
+Each layout is required to have a `components` property which contains information about all the individual parts of an `XRInputSource`. Components are comprised of a key which uniquely identifies them and a which describes their behavior. Component keys must not contain spaces at the beginning or end. Currently, the valid types are: `trigger`, `squeeze`, `touchpad`, `thumbstick`, and `button`
 
 Each layout is also required to have a `selectSource` property which refers to an entry in the `components` object. This component will cause the WebXR `select`, `selectStart`, and `selectEnd` events to fire.
 

@@ -1,5 +1,5 @@
 {
-    "profileId" : "generic-trigger-grip-thumbstick",
+    "profileId" : "generic-trigger-squeeze-thumbstick",
     "assets" : {
         "none" : {
             "path" : "some-url",
@@ -28,9 +28,9 @@
                         }
                     ]
                 },
-                "xr-standard-grip": {
-                    "rootNodeName" : "grip-node",
-                    "labelAnchorNodeName" : "grip-label-transform",
+                "xr-standard-squeeze": {
+                    "rootNodeName" : "squeeze-node",
+                    "labelAnchorNodeName" : "squeeze-label-transform",
                     "visualResponses" : [
                         {
                             "rootNodeName" : "SELECT",
