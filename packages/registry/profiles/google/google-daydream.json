@@ -8,7 +8,7 @@
                 "touchpad": { "type": "touchpad" }
             },
             "gamepad": {
-                "mapping": "xr-standard",
+                "mapping": "",
                 "buttons": [ 
                     null,
                     null,
