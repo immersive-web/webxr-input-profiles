@@ -1,18 +1,18 @@
 {
-    "profileId" : "microsoft-045e-065d",
+    "profileId" : "microsoft-mixed-reality",
     "assets" : {
         "left" : {
-            "path" : "left.glb",
+            "path" : "microsoft-mixed-reality-L.glb",
             "rootNodeName" : "left-controller-node"
         },
         "right" : {
-            "path" : "right.glb",
+            "path" : "microsoft-mixed-reality-R.glb",
             "rootNodeName" : "right-controller-node"
         }
     },
-    "layouts" : {
+    "layouts": {
         "left-right": {
-            "components": {
+            "components" : {
                 "xr-standard-trigger" : {
                     "rootNodeName" : "SELECT",
                     "labelAnchorNodeName" : "trigger-label",
