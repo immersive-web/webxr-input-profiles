@@ -23,7 +23,7 @@
                 },
                 "xr-standard-touchpad": {
                     "rootNodeName" : "TOUCHPAD_PRESS",
-                    "labelAnchorNodeName" : "grip-label",
+                    "labelAnchorNodeName" : "squeeze-label",
                     "touchPointNodeName" : "TOUCH",
                     "visualResponses": [
                         {

@@ -1,12 +1,12 @@
 {
     "profileId": "oculus-touch-s",
-    "fallbackProfileIds": [ "oculus-touch", "generic-trigger-grip-thumbstick"],
+    "fallbackProfileIds": [ "oculus-touch", "generic-trigger-squeeze-thumbstick"],
     "layouts": {
         "left": {
             "selectSource": "xr-standard-trigger",
             "components": {
                 "xr-standard-trigger": { "type": "trigger" },
-                "xr-standard-grip": { "type": "grip" },
+                "xr-standard-squeeze": { "type": "squeeze" },
                 "xr-standard-thumbstick": { "type": "thumbstick" },
                 "a-button" : { "type": "button" },
                 "b-button" : { "type": "button" }
@@ -15,7 +15,7 @@
                 "mapping": "xr-standard",
                 "buttons": [
                     "xr-standard-trigger",
-                    "xr-standard-grip",
+                    "xr-standard-squeeze",
                     null,
                     "xr-standard-thumbstick",
                     "a-button",
@@ -33,7 +33,7 @@
             "selectSource": "xr-standard-trigger",
             "components": {
                 "xr-standard-trigger": { "type": "trigger" },
-                "xr-standard-grip": { "type": "grip" },
+                "xr-standard-squeeze": { "type": "squeeze" },
                 "xr-standard-thumbstick": { "type": "thumbstick" },
                 "x-button" : { "type": "button" },
                 "y-button" : { "type": "button" }
@@ -42,7 +42,7 @@
                 "mapping": "xr-standard",
                 "buttons": [
                     "xr-standard-trigger",
-                    "xr-standard-grip",
+                    "xr-standard-squeeze",
                     null,
                     "xr-standard-thumbstick",
                     "x-button",

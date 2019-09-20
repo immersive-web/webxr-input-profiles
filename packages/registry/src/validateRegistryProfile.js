@@ -34,7 +34,7 @@ function validateGamepadButtonIndices({ id, components, gamepad: { buttons } }, 
     // component types as described in the WebXR Gamepads Module
     const xrStandardMapping = 'xr-standard';
     if (mapping === xrStandardMapping && index < 4) {
-      const xrStandardMappingButtonTypes = ['trigger', 'grip', 'touchpad', 'thumbstick'];
+      const xrStandardMappingButtonTypes = ['trigger', 'squeeze', 'touchpad', 'thumbstick'];
       const requiredComponentType = xrStandardMappingButtonTypes[index];
       if (component.type !== requiredComponentType) {
         throw new Error(

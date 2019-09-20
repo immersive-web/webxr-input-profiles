@@ -27,9 +27,9 @@
                         }
                     ]
                 },
-                "xr-standard-grip": {
+                "xr-standard-squeeze": {
                     "rootNodeName" : "GRASP",
-                    "labelAnchorNodeName" : "grip-label",
+                    "labelAnchorNodeName" : "squeeze-label",
                     "visualResponses": [
                         {
                             "rootNodeName" : "GRASP",
@@ -103,9 +103,9 @@
                         }
                     ]
                 },
-                "xr-standard-grip": {
+                "xr-standard-squeeze": {
                     "rootNodeName" : "GRASP",
-                    "labelAnchorNodeName" : "grip-label",
+                    "labelAnchorNodeName" : "squeeze-label",
                     "visualResponses": [
                         {
                             "rootNodeName" : "GRASP",

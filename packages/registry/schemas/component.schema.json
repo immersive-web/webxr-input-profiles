@@ -6,7 +6,7 @@
     "properties": {
         "type": { 
             "type": "string",
-            "enum": [ "trigger", "grip", "touchpad", "thumbstick", "button"]
+            "enum": [ "trigger", "squeeze", "touchpad", "thumbstick", "button"]
         }
     },
     "required": [ "type" ]

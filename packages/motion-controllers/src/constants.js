@@ -13,7 +13,7 @@ const Constants = {
 
   ComponentType: Object.freeze({
     TRIGGER: 'trigger',
-    GRIP: 'grip',
+    SQUEEZE: 'squeeze',
     TOUCHPAD: 'touchpad',
     THUMBSTICK: 'thumbstick',
     BUTTON: 'button'
