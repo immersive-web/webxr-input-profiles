@@ -1,5 +1,5 @@
 {
-    "profileId": "valve-knuckles",
+    "profileId": "valve-index",
     "fallbackProfileIds": [ "generic-trigger-squeeze-touchpad-thumbstick"],
     "layouts": {
         "left-right": {
