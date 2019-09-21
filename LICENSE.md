@@ -1,1 +1,3 @@
-TODO Figure out what licence should be here
+Unless otherwise specified in individual packages, all documents in this Repository are licensed by contributors
+under the 
+[W3C Software and Document License](https://www.w3.org/Consortium/Legal/copyright-software).
