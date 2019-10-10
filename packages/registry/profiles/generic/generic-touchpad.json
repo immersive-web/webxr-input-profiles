@@ -3,7 +3,7 @@
     "fallbackProfileIds": [],
     "layouts" : {
         "left-right-none" : {
-            "selectSource": "touchpad",
+            "selectComponentId": "touchpad",
             "components": {
                 "touchpad": { "type": "touchpad" }
             },

@@ -129,8 +129,8 @@ function validate(profileJson, profilesListJson) {
       const layout = profileJson.layouts[layoutId];
 
       // Validate select source points to a valid component
-      if (!layout.components[layout.selectSource]) {
-        throw new Error(`selectionSource ${layout.selectSource} is not a known component`);
+      if (!layout.components[layout.selectComponentId]) {
+        throw new Error(`selectComponentId ${layout.selectComponentId} does not match a known component`);
       }
 
       // Validate gamepad arrays match components

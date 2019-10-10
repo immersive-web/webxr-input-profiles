@@ -3,7 +3,7 @@
     "fallbackProfileIds": [],
     "layouts" : {
         "left-right-none" : {
-            "selectSource": "xr-standard-trigger",
+            "selectComponentId": "xr-standard-trigger",
             "components": {
                 "xr-standard-trigger": { "type": "trigger" },
                 "xr-standard-thumbstick": { "type": "thumbstick" }

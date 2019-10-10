@@ -3,7 +3,7 @@
     "fallbackProfileIds": [ "oculus-touch", "generic-trigger-squeeze-thumbstick"],
     "layouts": {
         "left": {
-            "selectSource": "xr-standard-trigger",
+            "selectComponentId": "xr-standard-trigger",
             "components": {
                 "xr-standard-trigger": { "type": "trigger" },
                 "xr-standard-squeeze": { "type": "squeeze" },
@@ -30,7 +30,7 @@
             }
         },
         "right": {
-            "selectSource": "xr-standard-trigger",
+            "selectComponentId": "xr-standard-trigger",
             "components": {
                 "xr-standard-trigger": { "type": "trigger" },
                 "xr-standard-squeeze": { "type": "squeeze" },

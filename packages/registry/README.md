@@ -88,14 +88,14 @@ For example:
 ### Components
 Each layout is required to have a `components` property which contains information about all the individual parts of an `XRInputSource`. Components are comprised of a key which uniquely identifies them and a which describes their behavior. Component keys must not contain spaces at the beginning or end. Currently, the valid types are: `trigger`, `squeeze`, `touchpad`, `thumbstick`, and `button`
 
-Each layout is also required to have a `selectSource` property which refers to an entry in the `components` object. This component will cause the WebXR `select`, `selectStart`, and `selectEnd` events to fire.
+Each layout is also required to have a `selectComponentId` property which refers to an entry in the `components` object. This component will cause the WebXR `select`, `selectStart`, and `selectEnd` events to fire.
 
 For example:
 ```json
 {
     "layouts": {
         "left-right": {
-            "selectSource": "my-hardware-trigger-name",
+            "selectComponentId": "my-hardware-trigger-name",
             "components": {
                 "my-hardware-trigger-name": { "type": "trigger" },
                 "my-hardware-touchpad-name": { "type": "touchpad" }
