@@ -138,16 +138,22 @@ function validate(profileJson, profilesListJson) {
       validateGamepadAxesIndices(layout, profileJson.mapping);
     });
 
+    const fallbackIds = profileJson.fallbackProfileIds;
     if (profilesListJson) {
       // Validate fallbackProfiles are real
-      profileJson.fallbackProfileIds.forEach((profileId) => {
+      fallbackIds.forEach((profileId) => {
         if (!profilesListJson[profileId]) {
           throw new Error(`Fallback profile ${profileId} does not exist`);
         }
       });
     }
 
-    // TODO validate the fallback profiles match the layout
+    if (!profileJson.profileId.startsWith('generic-')) {
+      const lastFallbackId = fallbackIds[fallbackIds.length - 1];
+      if (!lastFallbackId.startsWith('generic-')) {
+        throw new Error('Final fallback profile id must be for a generic profile');
+      }
+    }
   } catch (error) {
     error.message = `${profileJson.profileId} - ${error.message}`;
     throw error;
