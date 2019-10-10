@@ -23,7 +23,7 @@
                     "visualResponses" : [
                         {
                             "rootNodeName" : "SELECT",
-                            "source" : "button",
+                            "dataSource" : "button",
                             "states" : ["default", "touched", "pressed"]
                         }
                     ]
@@ -34,7 +34,7 @@
                     "visualResponses" : [
                         {
                             "rootNodeName" : "SELECT",
-                            "source" : "button",
+                            "dataSource" : "button",
                             "states" : ["pressed"]
                         }
                     ]

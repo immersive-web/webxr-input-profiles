@@ -23,7 +23,7 @@
                     "visualResponses" : [
                         {
                             "rootNodeName" : "SELECT",
-                            "source" : "button",
+                            "dataSource" : "button",
                             "states" : ["default", "touched", "pressed"]
                         }
                     ]
@@ -34,7 +34,7 @@
                     "visualResponses" : [
                         {
                             "rootNodeName" : "SELECT",
-                            "source" : "button",
+                            "dataSource" : "button",
                             "states" : ["pressed"]
                         }
                     ]
@@ -46,23 +46,23 @@
                     "visualResponses" : [
                         {
                             "rootNodeName": "TOUCHPAD_PRESS",
-                            "source" : "state",
+                            "dataSource" : "state",
                             "states" : ["pressed"]
                         },
                         {
                             "rootNodeName": "TOUCH",
-                            "source" : "state",
+                            "dataSource" : "state",
                             "states" : ["touched", "pressed"],
                             "property": "visibility"
                         },
                         {
                             "rootNodeName": "TOUCHPAD_TOUCH_X",
-                            "source" : "xAxis",
+                            "dataSource" : "xAxis",
                             "states" : ["default", "touched", "pressed"]
                         },
                         {
                             "rootNodeName": "TOUCHPAD_TOUCH_Y",
-                            "source" : "yAxis",
+                            "dataSource" : "yAxis",
                             "states" : ["default", "touched", "pressed"]
                         }
                     ]
@@ -73,17 +73,17 @@
                     "visualResponses": [
                         {
                             "rootNodeName": "THUMBSTICK_PRESS",
-                            "source" : "state",
+                            "dataSource" : "state",
                             "states" : ["pressed"]
                         },
                         {
                             "rootNodeName": "THUMBSTICK_X",
-                            "source" : "xAxis",
+                            "dataSource" : "xAxis",
                             "states" : ["default", "touched", "pressed"]
                         },
                         {
                             "rootNodeName": "THUMBSTICK_Y",
-                            "source" : "yAxis",
+                            "dataSource" : "yAxis",
                             "states" : ["default", "touched", "pressed"]
                         }
                     ]

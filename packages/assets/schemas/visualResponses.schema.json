@@ -8,14 +8,14 @@
     "uniqueItems": true,
     "items": {
         "type": "object",
-        "required": ["rootNodeName", "source", "states"],
+        "required": ["rootNodeName", "dataSource", "states"],
         "additionalProperties": false,
         "properties": {
             "rootNodeName" : {
                 "description": "The node in the asset containing the nodes of this visualization",
                 "type": "string"
             },
-            "source": {
+            "dataSource": {
                 "description": "The property name driving this visualization",
                 "type": "string",
                 "enum": ["xAxis", "yAxis", "button", "state"]
@@ -48,7 +48,7 @@
         },
         "if": {
             "properties": {
-                "source": { "enum":["state"] }
+                "dataSource": { "enum":["state"] }
             }
         },
         "then": {

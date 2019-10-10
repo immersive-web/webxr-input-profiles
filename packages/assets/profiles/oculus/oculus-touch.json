@@ -20,7 +20,7 @@
                     "visualResponses": [
                         {
                             "rootNodeName" : "SELECT",
-                            "source" : "button",
+                            "dataSource" : "button",
                             "states" : ["default", "touched", "pressed"],
                             "minNodeName": "UNPRESSED",
                             "maxNodeName": "PRESSED"
@@ -33,7 +33,7 @@
                     "visualResponses": [
                         {
                             "rootNodeName" : "GRASP",
-                            "source" : "state",
+                            "dataSource" : "state",
                             "states" : ["pressed"],
                             "minNodeName": "UNPRESSED",
                             "maxNodeName": "PRESSED"
@@ -46,19 +46,19 @@
                     "visualResponses": [
                         {
                             "rootNodeName": "THUMBSTICK_PRESS",
-                            "source" : "state",
+                            "dataSource" : "state",
                             "states" : ["pressed"],
                             "minNodeName": "UNPRESSED",
                             "maxNodeName": "PRESSED"
                         },
                         {
                             "rootNodeName": "THUMBSTICK_X",
-                            "source" : "xAxis",
+                            "dataSource" : "xAxis",
                             "states" : ["default", "touched", "pressed"]
                         },
                         {
                             "rootNodeName": "THUMBSTICK_Y",
-                            "source" : "yAxis",
+                            "dataSource" : "yAxis",
                             "states" : ["default", "touched", "pressed"]
                         }
                     ]
@@ -69,7 +69,7 @@
                     "visualResponses": [
                         {
                             "rootNodeName" : "A-BUTTON",
-                            "source" : "state",
+                            "dataSource" : "state",
                             "states" : ["pressed"]
                         }
                     ]
@@ -80,7 +80,7 @@
                     "visualResponses": [
                         {
                             "rootNodeName" : "B-BUTTON",
-                            "source" : "state",
+                            "dataSource" : "state",
                             "states" : ["pressed"]
                         }
                     ]
@@ -91,7 +91,7 @@
                     "visualResponses": [
                         {
                             "rootNodeName" : "THUMBREST",
-                            "source" : "state",
+                            "dataSource" : "state",
                             "states" : ["touched", "pressed"],
                             "property" : "visibility"
                         }
@@ -108,7 +108,7 @@
                     "visualResponses": [
                         {
                             "rootNodeName" : "SELECT",
-                            "source" : "button",
+                            "dataSource" : "button",
                             "states" : ["default", "touched", "pressed"],
                             "minNodeName": "UNPRESSED",
                             "maxNodeName": "PRESSED"
@@ -121,7 +121,7 @@
                     "visualResponses": [
                         {
                             "rootNodeName" : "GRASP",
-                            "source" : "state",
+                            "dataSource" : "state",
                             "states" : ["pressed"],
                             "minNodeName": "UNPRESSED",
                             "maxNodeName": "PRESSED"
@@ -134,19 +134,19 @@
                     "visualResponses": [
                         {
                             "rootNodeName": "THUMBSTICK_PRESS",
-                            "source" : "state",
+                            "dataSource" : "state",
                             "states" : ["pressed"],
                             "minNodeName": "UNPRESSED",
                             "maxNodeName": "PRESSED"
                         },
                         {
                             "rootNodeName": "THUMBSTICK_X",
-                            "source" : "xAxis",
+                            "dataSource" : "xAxis",
                             "states" : ["default", "touched", "pressed"]
                         },
                         {
                             "rootNodeName": "THUMBSTICK_Y",
-                            "source" : "yAxis",
+                            "dataSource" : "yAxis",
                             "states" : ["default", "touched", "pressed"]
                         }
                     ]
@@ -157,7 +157,7 @@
                     "visualResponses": [
                         {
                             "rootNodeName" : "X-BUTTON",
-                            "source" : "state",
+                            "dataSource" : "state",
                             "states" : ["pressed"]
                         }
                     ]
@@ -168,7 +168,7 @@
                     "visualResponses": [
                         {
                             "rootNodeName" : "Y-BUTTON",
-                            "source" : "state",
+                            "dataSource" : "state",
                             "states" : ["pressed"]
                         }
                     ]
@@ -179,7 +179,7 @@
                     "visualResponses": [
                         {
                             "rootNodeName" : "THUMBREST",
-                            "source" : "state",
+                            "dataSource" : "state",
                             "states" : ["touched", "pressed"],
                             "property" : "visibility"
                         }
