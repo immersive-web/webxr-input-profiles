@@ -55,7 +55,7 @@ Fill in the steps for filing a pull request https://github.com/immersive-web/web
 ## Schema
 
 ### Profile id and fallback profile ids
-Profiles are required to have a `profileId` that uniquely identifies the profile and must conform to the format specified by the [WebXR Device API](http://www.w3.org/tr/webxr). A `profileId` cannot be changed once added to the registry; if changes are necessary a new `profileId` must be defined. Profiles are also required to have a `fallbackProfileIds` array containing profile ids defined in the registry that are considered acceptable fallback substitutes for profile. Profiles with the `generic` prefix may have this array empty.  All other profiles must have at least one fallback profile id, and the the last entry in the array must have the `generic` vendor prefix. 
+Profiles are required to have a `profileId` that uniquely identifies the profile and must conform to the format specified by the [WebXR Device API](http://www.w3.org/tr/webxr). A `profileId` cannot be changed once added to the registry; if changes are necessary a new `profileId` must be defined.Profiles are also required to have a `fallbackProfileIds` array containing profile ids defined in the registry that are considered acceptable fallback substitutes for profile. The contents of this array may be modified after the profile has been added to the repository, however changes should be avoided if at all possible due to the potential for conformance mismatches.  Profiles with the `generic` prefix may leave the `fallbackProfileIds` array empty.  All other profiles must have at least one fallback profile id, and the the last entry in the array must have the `generic` vendor prefix. 
 
 For example
 ```json
