@@ -54,8 +54,6 @@ Fill in the steps for filing a pull request https://github.com/immersive-web/web
 
 ## Schema
 
-![Diagram of top-level schema parts](./figures/Concepts.png)
-
 ### Profile id and fallback profile ids
 Profiles are required to have a `profileId` that uniquely identifies the profile and must conform to the format specified by the [WebXR Device API](http://www.w3.org/tr/webxr). Profiles are also required to have a `fallbackProfileIds` array containing profile ids that are considered acceptable substitutes for profile. This array may be empty, but, if it is not, the ids it contains must match another existing profile detailed in this repository. 
 
