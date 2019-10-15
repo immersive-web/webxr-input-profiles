@@ -23,7 +23,7 @@
                     "visualResponses" : [
                         {
                             "rootNodeName" : "SELECT",
-                            "dataSource" : "button",
+                            "componentProperty" : "button",
                             "states" : ["default", "touched", "pressed"]
                         }
                     ]
@@ -34,7 +34,7 @@
                     "visualResponses" : [
                         {
                             "rootNodeName" : "SELECT",
-                            "dataSource" : "button",
+                            "componentProperty" : "button",
                             "states" : ["pressed"]
                         }
                     ]
@@ -46,23 +46,23 @@
                     "visualResponses" : [
                         {
                             "rootNodeName": "TOUCHPAD_PRESS",
-                            "dataSource" : "state",
+                            "componentProperty" : "state",
                             "states" : ["pressed"]
                         },
                         {
                             "rootNodeName": "TOUCH",
-                            "dataSource" : "state",
+                            "componentProperty" : "state",
                             "states" : ["touched", "pressed"],
                             "property": "visibility"
                         },
                         {
                             "rootNodeName": "TOUCHPAD_TOUCH_X",
-                            "dataSource" : "xAxis",
+                            "componentProperty" : "xAxis",
                             "states" : ["default", "touched", "pressed"]
                         },
                         {
                             "rootNodeName": "TOUCHPAD_TOUCH_Y",
-                            "dataSource" : "yAxis",
+                            "componentProperty" : "yAxis",
                             "states" : ["default", "touched", "pressed"]
                         }
                     ]

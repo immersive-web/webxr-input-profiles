@@ -83,7 +83,7 @@ class VisualResponse {
     xAxis, yAxis, button, state
   }) {
     const { normalizedXAxis, normalizedYAxis } = normalizeAxes(xAxis, yAxis);
-    switch (this.description.dataSource) {
+    switch (this.description.componentProperty) {
       case 'xAxis':
         this.value = (this.description.states.includes(state)) ? normalizedXAxis : 0.5;
         break;

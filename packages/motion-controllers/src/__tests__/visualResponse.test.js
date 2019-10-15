@@ -20,10 +20,10 @@ describe('Construction tests', () => {
   });
   test.each([
     ['button', 'state', 'xAxis', 'yAxis']
-  ])('Create with %s dataSource and no additional properties', (dataSource) => {
+  ])('Create with %s componentProperty and no additional properties', (componentProperty) => {
     const responseDescription = {
       rootNodeName: 'ROOT',
-      dataSource,
+      componentProperty,
       states: [Constants.ComponentState.DEFAULT]
     };
 
@@ -42,7 +42,7 @@ describe('Construction tests', () => {
   test('Create with explicit properties', () => {
     const responseDescription = {
       rootNodeName: 'ROOT',
-      dataSource: 'button',
+      componentProperty: 'button',
       states: [Constants.ComponentState.DEFAULT],
       targetNodeName: 'TARGET',
       minNodeName: 'MY MIN NODE',
@@ -64,7 +64,7 @@ describe('Weighting tests', () => {
     };
 
     const responseDescription = {
-      dataSource: 'button',
+      componentProperty: 'button',
       states: [Constants.ComponentState.DEFAULT],
       property: 'transform'
     };
@@ -87,13 +87,13 @@ describe('Weighting tests', () => {
     };
 
     const xAxisResponseDescription = {
-      dataSource: 'xAxis',
+      componentProperty: 'xAxis',
       states: [Constants.ComponentState.DEFAULT],
       property: 'transform'
     };
 
     const yAxisResponseDescription = {
-      dataSource: 'yAxis',
+      componentProperty: 'yAxis',
       states: [Constants.ComponentState.DEFAULT],
       property: 'transform'
     };
@@ -133,13 +133,13 @@ describe('Weighting tests', () => {
     };
 
     const xAxisResponseDescription = {
-      dataSource: 'xAxis',
+      componentProperty: 'xAxis',
       states: [Constants.ComponentState.DEFAULT],
       property: 'transform'
     };
 
     const yAxisResponseDescription = {
-      dataSource: 'yAxis',
+      componentProperty: 'yAxis',
       states: [Constants.ComponentState.DEFAULT],
       property: 'transform'
     };
@@ -161,7 +161,7 @@ describe('Weighting tests', () => {
     };
 
     const responseDescription = {
-      dataSource: 'state',
+      componentProperty: 'state',
       states: [Constants.ComponentState.DEFAULT],
       property: 'visibility'
     };
@@ -181,7 +181,7 @@ describe('Weighting tests', () => {
     };
 
     const responseDescription = {
-      dataSource: 'state',
+      componentProperty: 'state',
       states: [Constants.ComponentState.DEFAULT]
     };
 

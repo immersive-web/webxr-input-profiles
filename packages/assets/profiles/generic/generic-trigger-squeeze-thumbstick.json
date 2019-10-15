@@ -23,7 +23,7 @@
                     "visualResponses" : [
                         {
                             "rootNodeName" : "SELECT",
-                            "dataSource" : "button",
+                            "componentProperty" : "button",
                             "states" : ["default", "touched", "pressed"]
                         }
                     ]
@@ -34,7 +34,7 @@
                     "visualResponses" : [
                         {
                             "rootNodeName" : "SELECT",
-                            "dataSource" : "button",
+                            "componentProperty" : "button",
                             "states" : ["pressed"]
                         }
                     ]
@@ -45,17 +45,17 @@
                     "visualResponses": [
                         {
                             "rootNodeName": "THUMBSTICK_PRESS",
-                            "dataSource" : "state",
+                            "componentProperty" : "state",
                             "states" : ["pressed"]
                         },
                         {
                             "rootNodeName": "THUMBSTICK_X",
-                            "dataSource" : "xAxis",
+                            "componentProperty" : "xAxis",
                             "states" : ["default", "touched", "pressed"]
                         },
                         {
                             "rootNodeName": "THUMBSTICK_Y",
-                            "dataSource" : "yAxis",
+                            "componentProperty" : "yAxis",
                             "states" : ["default", "touched", "pressed"]
                         }
                     ]
