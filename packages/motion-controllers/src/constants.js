@@ -11,6 +11,13 @@ const Constants = {
     PRESSED: 'pressed'
   }),
 
+  ComponentProperty: Object.freeze({
+    BUTTON: 'button',
+    X_AXIS: 'x-axis',
+    Y_AXIS: 'y-axis',
+    STATE: 'state'
+  }),
+
   ComponentType: Object.freeze({
     TRIGGER: 'trigger',
     SQUEEZE: 'squeeze',

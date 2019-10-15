@@ -18,7 +18,7 @@
             "componentProperty": {
                 "description": "The property name driving this visualization",
                 "type": "string",
-                "enum": ["xAxis", "yAxis", "button", "state"]
+                "enum": ["x-axis", "y-axis", "button", "state"]
             },
             "states": {
                 "description": "The states the visualization applies to",

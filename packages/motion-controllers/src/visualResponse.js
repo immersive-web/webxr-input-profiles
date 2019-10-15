@@ -84,16 +84,16 @@ class VisualResponse {
   }) {
     const { normalizedXAxis, normalizedYAxis } = normalizeAxes(xAxis, yAxis);
     switch (this.description.componentProperty) {
-      case 'xAxis':
+      case Constants.ComponentProperty.X_AXIS:
         this.value = (this.description.states.includes(state)) ? normalizedXAxis : 0.5;
         break;
-      case 'yAxis':
+      case Constants.ComponentProperty.Y_AXIS:
         this.value = (this.description.states.includes(state)) ? normalizedYAxis : 0.5;
         break;
-      case 'button':
+      case Constants.ComponentProperty.BUTTON:
         this.value = (this.description.states.includes(state)) ? button : 0;
         break;
-      case 'state':
+      case Constants.ComponentProperty.STATE:
         if (this.description.property === 'visibility') {
           this.value = (this.description.states.includes(state));
         } else {

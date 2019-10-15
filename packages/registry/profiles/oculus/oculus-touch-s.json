@@ -24,8 +24,8 @@
                 "axes":[
                     null,
                     null,
-                    { "componentId": "xr-standard-thumbstick", "axis": "xAxis"},
-                    { "componentId": "xr-standard-thumbstick", "axis": "yAxis"}
+                    { "componentId": "xr-standard-thumbstick", "axis": "x-axis"},
+                    { "componentId": "xr-standard-thumbstick", "axis": "y-axis"}
                 ]
             }
         },
@@ -51,8 +51,8 @@
                 "axes":[
                     null,
                     null,
-                    { "componentId": "xr-standard-thumbstick", "axis": "xAxis"},
-                    { "componentId": "xr-standard-thumbstick", "axis": "yAxis"}
+                    { "componentId": "xr-standard-thumbstick", "axis": "x-axis"},
+                    { "componentId": "xr-standard-thumbstick", "axis": "y-axis"}
                 ]
             }
         }

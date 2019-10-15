@@ -43,7 +43,7 @@
                                     "componentId": { "$ref": "common.schema.json#/definitions/componentId" },
                                     "axis": {
                                         "type": "string",
-                                        "enum": [ "xAxis", "yAxis"]
+                                        "enum": [ "x-axis", "y-axis"]
                                     }
                                 }
                             }

@@ -17,7 +17,7 @@
     "layouts" : {
         "left-right-none": {
             "components": {
-                "faceButton": {
+                "face-button": {
                     "rootNodeName" : "button-node",
                     "labelAnchorNodeName" : "button-label-transform",
                     "visualResponses" : [

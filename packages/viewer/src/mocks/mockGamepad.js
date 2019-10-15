@@ -1,3 +1,5 @@
+import Constants from '../../../motion-controllers/src/constants.js';
+
 /**
  * A false gamepad to be used in tests
  */
@@ -25,16 +27,22 @@ class MockGamepad {
     const layout = profileDescription.layouts[handedness];
     this.mapping = layout.mapping;
     Object.values(layout.components).forEach(({ gamepadIndices }) => {
-      if (gamepadIndices.button !== undefined && gamepadIndices.button > maxButtonIndex) {
-        maxButtonIndex = gamepadIndices.button;
+      const {
+        [Constants.ComponentProperty.BUTTON]: buttonIndex,
+        [Constants.ComponentProperty.X_AXIS]: xAxisIndex,
+        [Constants.ComponentProperty.Y_AXIS]: yAxisIndex
+      } = gamepadIndices;
+
+      if (buttonIndex !== undefined && buttonIndex > maxButtonIndex) {
+        maxButtonIndex = buttonIndex;
       }
 
-      if (gamepadIndices.xAxis !== undefined && (gamepadIndices.xAxis > maxAxisIndex)) {
-        maxAxisIndex = gamepadIndices.xAxis;
+      if (xAxisIndex !== undefined && (xAxisIndex > maxAxisIndex)) {
+        maxAxisIndex = xAxisIndex;
       }
 
-      if (gamepadIndices.yAxis !== undefined && (gamepadIndices.yAxis > maxAxisIndex)) {
-        maxAxisIndex = gamepadIndices.yAxis;
+      if (yAxisIndex !== undefined && (yAxisIndex > maxAxisIndex)) {
+        maxAxisIndex = yAxisIndex;
       }
     });
 

@@ -50,12 +50,12 @@
                         },
                         {
                             "rootNodeName": "THUMBSTICK_X",
-                            "componentProperty" : "xAxis",
+                            "componentProperty" : "x-axis",
                             "states" : ["default", "touched", "pressed"]
                         },
                         {
                             "rootNodeName": "THUMBSTICK_Y",
-                            "componentProperty" : "yAxis",
+                            "componentProperty" : "y-axis",
                             "states" : ["default", "touched", "pressed"]
                         }
                     ]

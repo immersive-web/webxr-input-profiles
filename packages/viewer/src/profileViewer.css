@@ -22,6 +22,16 @@ section {
   margin-top: .25em;
   margin-bottom: .25em;
   padding: .5em;
+  display: grid;
+}
+
+.component h4, div {
+  grid-column: 1;
+}
+
+.component pre {
+  grid-column: 2;
+  grid-row: 1 / 4;
 }
 
 #errors {
