@@ -108,7 +108,7 @@ For example:
 ### Gamepads
 If an `XRInputSource` will have a non-null `XRInputSource.gamepad`, the profile must contain information which allows all User Agents to report identical data in `Gamepad.mapping`, `Gamepad.buttons`, and `Gamepad.axes`.  These details are enumerated in the layout's `gamepad` property.
 
-The `gamepad.mapping` string must follow the rules laid out in the [WebXR Gamepads Module](https://www.w3.org/tr/webxr-gamepads-module). The `gamepad.buttons` propety is an array which matches index-for-index with the web platform's `Gamepad.buttons` array. Each index contains either null or the id of the component from which the data must be populated. The `gamepad.axes` property is an array which matches index-for-index with the web platform's `Gamepad.axes` array. Each index contains either null or the combination of component id and axis from which the data must be populated.
+The `gamepad.mapping` string must follow the rules laid out in the [WebXR Gamepads Module](https://www.w3.org/tr/webxr-gamepads-module). The `gamepad.buttons` property is an array which matches index-for-index with the web platform's `Gamepad.buttons` array. Each index contains either null or the id of the component from which the data must be populated. The `gamepad.axes` property is an array which matches index-for-index with the web platform's `Gamepad.axes` array. Each index contains either null or the combination of component id and axis from which the data must be populated.
 
 For example:
 ```json
