@@ -115,14 +115,14 @@ For example
 ### Visual responses
 The visual representation of a motion controller in a VR must respond to reflect its physical state in the real-world.  For example, when a physical thumbstick is moved to the left, the virtual thumbstick should also move to the left.  The `visualResponses` array contains descriptions of all visual changes that can occur when a controller part is interacted with.
 
-Each element in this array must contain a `rootNodeName` property which references the node containing the rest of the nodes needed for the visualization. It must also contain a `source` property set to one of four values: `button`, `xAxis`, `yAxis`, or `state`.  This indicates which component property will be used to drive the visualization.  Lastly, the element must contains a `states` array which indicates the component states for which the visualization will apply.
+Each element in this array must contain a `rootNodeName` property which references the node containing the rest of the nodes needed for the visualization. It must also contain a `componentProperty` property set to one of four values: `button`, `xAxis`, `yAxis`, or `state`.  This indicates which component property will be used to drive the visualization.  Lastly, the element must contains a `states` array which indicates the component states for which the visualization will apply.
 
 ```json
 {
     "visualResponses" : [
         {
             "rootNodeName": "THUMBSTICK_X",
-            "source": "xAxis",
+            "componentProperty": "xAxis",
             "states": ["default", "touched", "pressed"]
         }
     ]
@@ -136,7 +136,7 @@ By default the visualization will use `"VALUE"` for the name of the target node,
     "visualResponses" : [
         {
             "rootNodeName": "THUMBSTICK_X",
-            "source": "xAxis",
+            "componentProperty": "xAxis",
             "states": ["default", "touched", "pressed"],
             "targetNodeName": "TARGET"
         }
@@ -151,7 +151,7 @@ By default, all visualizations will use `"MIN"` and `"MAX"` the names of the nod
     "visualResponses" : [
         {
             "rootNodeName": "THUMBSTICK_X",
-            "source": "xAxis",
+            "componentProperty": "xAxis",
             "states": ["default", "touched", "pressed"],
             "minNodeName": "LEFT",
             "maxNodeName": "RIGHT"
@@ -160,14 +160,14 @@ By default, all visualizations will use `"MIN"` and `"MAX"` the names of the nod
 }
 ```
 
-When a visualization is toggling a node's visibility, the `source` must be set to `state` and the additional `property` property set to `visibility`.
+When a visualization is toggling a node's visibility, the `componentProperty` must be set to `state` and the additional `property` property set to `visibility`.
 
 ```json
 {
     "visualResponses" : [
         {
             "rootNodeName": "TOUCH_DOT",
-            "source": "state",
+            "componentProperty": "state",
             "states": ["touched", "pressed"],
             "property": "visibility"
         }
@@ -182,17 +182,17 @@ Commonly, the visual responses for a thumbstick will be as follows:
     "visualResponses": [
         {
             "rootNodeName": "THUMBSTICK_PRESS",
-            "source" : "state",
+            "componentProperty" : "state",
             "states" : ["pressed"]
         },
         {
             "rootNodeName": "THUMBSTICK_X",
-            "source" : "xAxis",
+            "componentProperty" : "xAxis",
             "states" : ["default", "touched", "pressed"]
         },
         {
             "rootNodeName": "THUMBSTICK_Y",
-            "source" : "yAxis",
+            "componentProperty" : "yAxis",
             "states" : ["default", "touched", "pressed"]
         }
     ]
@@ -206,23 +206,23 @@ Commonly, the visual responses for a touchpad will be as follows:
     "visualResponses": [
         {
             "rootNodeName": "TOUCHPAD_PRESS",
-            "source" : "state",
+            "componentProperty" : "state",
             "states" : ["pressed"]
         },
         {
             "rootNodeName": "TOUCH",
-            "source" : "state",
+            "componentProperty" : "state",
             "states" : ["touched", "pressed"],
             "property": "visibility"
         },
         {
             "rootNodeName": "TOUCHPAD_TOUCH_X",
-            "source" : "xAxis",
+            "componentProperty" : "xAxis",
             "states" : ["default", "touched", "pressed"]
         },
         {
             "rootNodeName": "TOUCHPAD_TOUCH_Y",
-            "source" : "yAxis",
+            "componentProperty" : "yAxis",
             "states" : ["default", "touched", "pressed"]
         }
     ]
@@ -235,7 +235,7 @@ Commonly, the visual response for an analog button, such as a trigger, will be a
     "visualResponses": [
         {
             "rootNodeName" : "SELECT",
-            "source" : "button",
+            "componentProperty" : "button",
             "states" : ["default", "touched", "pressed"]
         }
     ]
@@ -248,7 +248,7 @@ Alternatively, digital buttons may be better represented like this example:
     "visualResponses": [
         {
             "rootNodeName" : "MENU",
-            "source" : "state",
+            "componentProperty" : "state",
             "states" : ["pressed"]
         }
     ]

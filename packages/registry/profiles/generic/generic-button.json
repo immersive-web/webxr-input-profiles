@@ -3,7 +3,7 @@
     "fallbackProfileIds": [],
     "layouts" : {
         "left-right-none" : {
-            "selectSource": "faceButton",
+            "selectComponentId": "faceButton",
             "components": {
                 "faceButton": { "type": "button" }
             },

@@ -24,23 +24,23 @@
                     "visualResponses" : [
                         {
                             "rootNodeName": "TOUCHPAD_PRESS",
-                            "source" : "state",
+                            "componentProperty" : "state",
                             "states" : ["pressed"]
                         },
                         {
                             "rootNodeName": "TOUCH",
-                            "source" : "state",
+                            "componentProperty" : "state",
                             "states" : ["touched", "pressed"],
                             "property": "visibility"
                         },
                         {
                             "rootNodeName": "TOUCHPAD_TOUCH_X",
-                            "source" : "xAxis",
+                            "componentProperty" : "xAxis",
                             "states" : ["default", "touched", "pressed"]
                         },
                         {
                             "rootNodeName": "TOUCHPAD_TOUCH_Y",
-                            "source" : "yAxis",
+                            "componentProperty" : "yAxis",
                             "states" : ["default", "touched", "pressed"]
                         }
                     ]

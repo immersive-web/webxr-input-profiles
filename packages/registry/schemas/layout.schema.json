@@ -4,9 +4,9 @@
     "type": "object",
     "description": "A layout",
     "additionalProperties": false,
-    "required": [ "components", "selectSource" ],
+    "required": [ "components", "selectComponentId" ],
     "properties": {
-        "selectSource": { "$ref": "common.schema.json#/definitions/componentId" },
+        "selectComponentId": { "$ref": "common.schema.json#/definitions/componentId" },
         "components": { "$ref": "common.schema.json#/definitions/components" },
         "gamepad": {
             "type": "object",

@@ -88,14 +88,14 @@ For example:
 ### Components
 Each layout is required to have a `components` property which contains information about all the individual parts of an `XRInputSource`. Components are comprised of a key which uniquely identifies them and a which describes their behavior. Component keys must not contain spaces at the beginning or end. Currently, the valid types are: `trigger`, `squeeze`, `touchpad`, `thumbstick`, and `button`
 
-Each layout is also required to have a `selectSource` property which refers to an entry in the `components` object. This component will cause the WebXR `select`, `selectStart`, and `selectEnd` events to fire.
+Each layout is also required to have a `selectComponentId` property which refers to an entry in the `components` object. This component will cause the WebXR `select`, `selectStart`, and `selectEnd` events to fire.
 
 For example:
 ```json
 {
     "layouts": {
         "left-right": {
-            "selectSource": "my-hardware-trigger-name",
+            "selectComponentId": "my-hardware-trigger-name",
             "components": {
                 "my-hardware-trigger-name": { "type": "trigger" },
                 "my-hardware-touchpad-name": { "type": "touchpad" }
@@ -108,7 +108,7 @@ For example:
 ### Gamepads
 If an `XRInputSource` will have a non-null `XRInputSource.gamepad`, the profile must contain information which allows all User Agents to report identical data in `Gamepad.mapping`, `Gamepad.buttons`, and `Gamepad.axes`.  These details are enumerated in the layout's `gamepad` property.
 
-The `gamepad.mapping` string must follow the rules laid out in the [WebXR Gamepads Module](https://www.w3.org/tr/webxr-gamepads-module). The `gamepad.buttons` propety is an array which matches index-for-index with the web platform's `Gamepad.buttons` array. Each index contains either null or the id of the component from which the data must be populated. The `gamepad.axes` property is an array which matches index-for-index with the web platform's `Gamepad.axes` array. Each index contains either null or the combination of component id and axis from which the data must be populated.
+The `gamepad.mapping` string must follow the rules laid out in the [WebXR Gamepads Module](https://www.w3.org/tr/webxr-gamepads-module). The `gamepad.buttons` property is an array which matches index-for-index with the web platform's `Gamepad.buttons` array. Each index contains either null or the id of the component from which the data must be populated. The `gamepad.axes` property is an array which matches index-for-index with the web platform's `Gamepad.axes` array. Each index contains either null or the combination of component id and axis from which the data must be populated.
 
 For example:
 ```json

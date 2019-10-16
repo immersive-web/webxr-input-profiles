@@ -20,7 +20,7 @@
                     "visualResponses": [
                         {
                             "rootNodeName" : "SELECT",
-                            "source" : "button",
+                            "componentProperty" : "button",
                             "states" : ["default", "touched", "pressed"],
                             "minNodeName": "UNPRESSED",
                             "maxNodeName": "PRESSED"
@@ -33,7 +33,7 @@
                     "visualResponses": [
                         {
                             "rootNodeName" : "GRASP",
-                            "source" : "state",
+                            "componentProperty" : "state",
                             "states" : ["pressed"],
                             "minNodeName": "UNPRESSED",
                             "maxNodeName": "PRESSED"
@@ -47,25 +47,25 @@
                     "visualResponses": [
                         {
                             "rootNodeName": "TOUCHPAD_PRESS",
-                            "source" : "state",
+                            "componentProperty" : "state",
                             "states" : ["pressed"],
                             "minNodeName": "UNPRESSED",
                             "maxNodeName": "PRESSED"
                         },
                         {
                             "rootNodeName": "TOUCH",
-                            "source" : "state",
+                            "componentProperty" : "state",
                             "states" : ["touched", "pressed"],
                             "property": "visibility"
                         },
                         {
                             "rootNodeName": "TOUCHPAD_TOUCH_X",
-                            "source" : "xAxis",
+                            "componentProperty" : "xAxis",
                             "states" : ["default", "touched", "pressed"]
                         },
                         {
                             "rootNodeName": "TOUCHPAD_TOUCH_Y",
-                            "source" : "yAxis",
+                            "componentProperty" : "yAxis",
                             "states" : ["default", "touched", "pressed"]
                         }
                     ]
@@ -76,19 +76,19 @@
                     "visualResponses": [
                         {
                             "rootNodeName": "THUMBSTICK_PRESS",
-                            "source" : "state",
+                            "componentProperty" : "state",
                             "states" : ["pressed"],
                             "minNodeName": "UNPRESSED",
                             "maxNodeName": "PRESSED"
                         },
                         {
                             "rootNodeName": "THUMBSTICK_X",
-                            "source" : "xAxis",
+                            "componentProperty" : "xAxis",
                             "states" : ["default", "touched", "pressed"]
                         },
                         {
                             "rootNodeName": "THUMBSTICK_Y",
-                            "source" : "yAxis",
+                            "componentProperty" : "yAxis",
                             "states" : ["default", "touched", "pressed"]
                         }
                     ]
@@ -99,7 +99,7 @@
                     "visualResponses": [
                         {
                             "rootNodeName" : "MENU",
-                            "source" : "state",
+                            "componentProperty" : "state",
                             "states" : ["pressed"],
                             "minNodeName": "UNPRESSED",
                             "maxNodeName": "PRESSED"
