@@ -21,7 +21,7 @@
         "componentId": {
             "description": "A well-formatted component id",
             "type": "string",
-            "pattern": "^[^\\s]+.+[^\\s]$"
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
         },
         "components": {
             "description": "The collection of components in the layout",

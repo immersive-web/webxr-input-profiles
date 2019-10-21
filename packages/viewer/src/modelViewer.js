@@ -112,11 +112,6 @@ function clear() {
   if (activeModel) {
     // Remove any existing model from the scene
     three.scene.remove(activeModel.rootNode);
-
-    // Set the page element with controller data for debugging
-    const dataElement = document.getElementById('data');
-    dataElement.innerHTML = '';
-
     activeModel = null;
   }
 
@@ -143,10 +138,6 @@ function animationFrameCallback() {
   if (activeModel) {
     // Cause the MotionController to poll the Gamepad for data
     activeModel.motionController.updateFromGamepad();
-
-    // Set the page element with controller data for debugging
-    const dataElement = document.getElementById('data');
-    dataElement.innerHTML = JSON.stringify(activeModel.motionController.data, null, 2);
 
     // Update the 3D model to reflect the button, thumbstick, and touchpad state
     Object.values(activeModel.motionController.components).forEach((component) => {

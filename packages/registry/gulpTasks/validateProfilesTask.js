@@ -28,7 +28,7 @@ function validate(schemaValidator) {
     // Validate the supplied profile conforms to schema
     if (!schemaValidator(profileJson)) {
       const errors = JSON.stringify(schemaValidator.errors, null, 2);
-      throw new Error(`${profileJson.id} Failed to validate schema with errors: ${errors}`);
+      throw new Error(`${profileJson.profileId} Failed to validate schema with errors: ${errors}`);
     }
 
     validateProfile(profileJson);

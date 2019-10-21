@@ -18,9 +18,10 @@ describe('Construction tests', () => {
       const visualResponses = new VisualResponse({});
     }).toThrow();
   });
-  test.each([
-    ['button', 'state', 'xAxis', 'yAxis']
-  ])('Create with %s componentProperty and no additional properties', (componentProperty) => {
+
+  test.each(
+    Object.values(Constants.ComponentProperty)
+  )('Create with %s componentProperty and no additional properties', (componentProperty) => {
     const responseDescription = {
       rootNodeName: 'ROOT',
       componentProperty,
@@ -42,7 +43,7 @@ describe('Construction tests', () => {
   test('Create with explicit properties', () => {
     const responseDescription = {
       rootNodeName: 'ROOT',
-      componentProperty: 'button',
+      componentProperty: Constants.ComponentProperty.BUTTON,
       states: [Constants.ComponentState.DEFAULT],
       targetNodeName: 'TARGET',
       minNodeName: 'MY MIN NODE',
@@ -64,7 +65,7 @@ describe('Weighting tests', () => {
     };
 
     const responseDescription = {
-      componentProperty: 'button',
+      componentProperty: Constants.ComponentProperty.BUTTON,
       states: [Constants.ComponentState.DEFAULT],
       property: 'transform'
     };
@@ -87,13 +88,13 @@ describe('Weighting tests', () => {
     };
 
     const xAxisResponseDescription = {
-      componentProperty: 'xAxis',
+      componentProperty: Constants.ComponentProperty.X_AXIS,
       states: [Constants.ComponentState.DEFAULT],
       property: 'transform'
     };
 
     const yAxisResponseDescription = {
-      componentProperty: 'yAxis',
+      componentProperty: Constants.ComponentProperty.Y_AXIS,
       states: [Constants.ComponentState.DEFAULT],
       property: 'transform'
     };
@@ -133,13 +134,13 @@ describe('Weighting tests', () => {
     };
 
     const xAxisResponseDescription = {
-      componentProperty: 'xAxis',
+      componentProperty: Constants.ComponentProperty.X_AXIS,
       states: [Constants.ComponentState.DEFAULT],
       property: 'transform'
     };
 
     const yAxisResponseDescription = {
-      componentProperty: 'yAxis',
+      componentProperty: Constants.ComponentProperty.Y_AXIS,
       states: [Constants.ComponentState.DEFAULT],
       property: 'transform'
     };
@@ -161,7 +162,7 @@ describe('Weighting tests', () => {
     };
 
     const responseDescription = {
-      componentProperty: 'state',
+      componentProperty: Constants.ComponentProperty.STATE,
       states: [Constants.ComponentState.DEFAULT],
       property: 'visibility'
     };
@@ -181,7 +182,7 @@ describe('Weighting tests', () => {
     };
 
     const responseDescription = {
-      componentProperty: 'state',
+      componentProperty: Constants.ComponentProperty.STATE,
       states: [Constants.ComponentState.DEFAULT]
     };
 

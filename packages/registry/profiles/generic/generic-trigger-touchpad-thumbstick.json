@@ -18,10 +18,10 @@
                     "xr-standard-thumbstick" 
                 ],
                 "axes":[
-                    { "componentId": "xr-standard-touchpad", "axis": "xAxis"},
-                    { "componentId": "xr-standard-touchpad", "axis": "yAxis"},
-                    { "componentId": "xr-standard-thumbstick", "axis": "xAxis"},
-                    { "componentId": "xr-standard-thumbstick", "axis": "yAxis"}
+                    { "componentId": "xr-standard-touchpad", "axis": "x-axis"},
+                    { "componentId": "xr-standard-touchpad", "axis": "y-axis"},
+                    { "componentId": "xr-standard-thumbstick", "axis": "x-axis"},
+                    { "componentId": "xr-standard-thumbstick", "axis": "y-axis"}
                 ]
             }
         }

@@ -5,7 +5,9 @@ const buttonComponent = {
   id: 'buttonComponent',
   description: {
     visualResponses: [],
-    gamepadIndices: { button: 0 }
+    gamepadIndices: {
+      [Constants.ComponentProperty.BUTTON]: 0
+    }
   }
 };
 
@@ -13,7 +15,10 @@ const axesComponent = {
   id: 'axesComponent',
   description: {
     visualResponses: [],
-    gamepadIndices: { xAxis: 0, yAxis: 0 }
+    gamepadIndices: {
+      [Constants.ComponentProperty.X_AXIS]: 0,
+      [Constants.ComponentProperty.Y_AXIS]: 0
+    }
   }
 };
 
@@ -21,7 +26,11 @@ const axesButtonComponent = {
   id: 'axesButtonComponent',
   description: {
     visualResponses: [],
-    gamepadIndices: { button: 0, xAxis: 0, yAxis: 0 }
+    gamepadIndices: {
+      [Constants.ComponentProperty.BUTTON]: 0,
+      [Constants.ComponentProperty.X_AXIS]: 0,
+      [Constants.ComponentProperty.Y_AXIS]: 0
+    }
   }
 };
 
@@ -29,7 +38,9 @@ const oneAxisComponent = {
   id: 'oneAxisComponent',
   description: {
     visualResponses: [],
-    gamepadIndices: { yAxis: 0 }
+    gamepadIndices: {
+      [Constants.ComponentProperty.Y_AXIS]: 0
+    }
   }
 };
 

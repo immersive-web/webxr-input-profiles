@@ -3,14 +3,14 @@
     "fallbackProfileIds": [],
     "layouts" : {
         "left-right-none" : {
-            "selectComponentId": "faceButton",
+            "selectComponentId": "face-button",
             "components": {
-                "faceButton": { "type": "button" }
+                "face-button": { "type": "button" }
             },
             "gamepad": {
                 "mapping": "",
                 "buttons": [ 
-                    "faceButton" 
+                    "face-button" 
                 ],
                 "axes":[]
             }

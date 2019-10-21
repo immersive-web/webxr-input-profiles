@@ -15,8 +15,8 @@
                     "touchpad"
                 ],
                 "axes":[
-                    { "componentId": "touchpad", "axis": "xAxis"},
-                    { "componentId": "touchpad", "axis": "yAxis"}
+                    { "componentId": "touchpad", "axis": "x-axis"},
+                    { "componentId": "touchpad", "axis": "y-axis"}
                 ]
             }
         }

@@ -25,10 +25,11 @@ class HandednessSelector {
 
   clearSelectedProfile() {
     this.selectedProfile = null;
+    this.handedness = null;
     this.handednessStorageKey = null;
     this.element.disabled = true;
     this.element.innerHTML = '<option value="loading">Loading...</option>';
-    this.fireHandednessChange(null);
+    this.fireHandednessChange();
   }
 
   /**

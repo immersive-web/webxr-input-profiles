@@ -58,12 +58,12 @@
                         },
                         {
                             "rootNodeName": "TOUCHPAD_TOUCH_X",
-                            "componentProperty" : "xAxis",
+                            "componentProperty" : "x-axis",
                             "states" : ["default", "touched", "pressed"]
                         },
                         {
                             "rootNodeName": "TOUCHPAD_TOUCH_Y",
-                            "componentProperty" : "yAxis",
+                            "componentProperty" : "y-axis",
                             "states" : ["default", "touched", "pressed"]
                         }
                     ]

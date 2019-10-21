@@ -20,8 +20,8 @@
                     "menu"
                 ],
                 "axes":[
-                    { "componentId": "xr-standard-touchpad", "axis": "xAxis"},
-                    { "componentId": "xr-standard-touchpad", "axis": "yAxis"}
+                    { "componentId": "xr-standard-touchpad", "axis": "x-axis"},
+                    { "componentId": "xr-standard-touchpad", "axis": "y-axis"}
                 ]
             }
         }
