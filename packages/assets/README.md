@@ -3,25 +3,16 @@
 [![Build Status](https://travis-ci.com/immersive-web/webxr-input-profiles.svg?branch=master)](https://travis-ci.org/immersive-web/webxr-input-profiles)
 
 ## Overview
-This package provides 3D assets and JSON descriptions of how to relate those assets to the `XRInputSource` objects with matching profile ids. This package can be used on its own, but may be easier to use with the javascript library in the [@webxr-input-source/motion-controllers](../assets/README.md) package also published by this repository. Assets are available under MIT license in .glTF, or .glb formats.
-
-### Getting started
-To install this package:
-```
-npm install @webxr-input-profiles/assets
-```
-
-### Licence
-Per the [LICENSE.md](LICENSE.md) file, this repository is made available under an MIT license and is copyright Amazon 2019.
+This package provides 3D assets and JSON descriptions of how to relate those assets to the `XRInputSource` objects with matching profile ids. This package can be used on its own, but may be easier to use with the javascript library in the [@webxr-input-source/motion-controllers](../motion-controllers) package also published by this repository. Assets are available under MIT license in .glTF, or .glb formats.
 
 ## Contributing
-All profiles are located under the './profiles' folder in a subfolder for each vendor prefix. These profiles are merged with the matching profiles from the [registry](../packages/registry/README.md) package during this package's build step. The output format is a combination of the information in both source profile JSON files.
+All profiles are located under the './profiles' folder in subfolders for vendor prefixes. At build time, these profiles are combined with the matching profiles from the [registry](../packages/registry/README.md) package and a merged JSON profile is output for each match.
+
+### Adding an asset
+New assets must match a profile a profiles id in the [registry](../registry) package. To add an asset, save a JSON file that conforms with the [schema](#schema) in `./profiles/[vendor prefix]/[profile id]`. In the same `./profiles/[vendor prefix]` folder, place the `.glB` or `.glTF` and dependent files.  Ensure that the JSON file points to the correct relative path of the 3D files. The package must [build](#development) successfully before submitting a pull request.
 
 ### Filing a bug
-Fill in the steps for filing a bug https://github.com/immersive-web/webxr-input-profiles/issues/52
-
-### Adding a profile
-The new profile JSON file must match an existing hardware profile in the [registry](../registry/README.md) repository and be conformant with the schema in this package's './schemas' folder.  It must also pass the verification steps performed as part of the package build. Once ready, submit a pull request using the [this](https://github.com/immersive-web/webxr-input-profiles/issues/52) template.
+To file bugs on existing assets, use this [issue template](https://github.com/immersive-web/webxr-input-profiles/issues/new?assignees=&labels=assets&template=asset-bug-report.md&title=)
 
 ### Development
 In general, this package should be built and tested from the root of the repository using the following command:
@@ -29,6 +20,19 @@ In general, this package should be built and tested from the root of the reposit
 
 To build just this package without running tests, invoke the following command from the root of the repository:
 > npm run build -- --scope @webxr-input-profiles/assets
+
+To visually validate the asset looks and behaves as expected, follow the [viewer](../viewer) instructions.
+
+### Licence
+See the [LICENSE.md](LICENSE.md).
+
+## Usage
+
+### Getting started
+To install this package:
+```
+npm install @webxr-input-profiles/assets
+```
 
 ## Schema
 

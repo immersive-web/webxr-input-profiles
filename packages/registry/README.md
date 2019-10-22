@@ -11,13 +11,43 @@ This package contains information for User Agents ensure they expose consistent 
   * The relationship between physical hardware components (e.g. trigger, squeeze, button, touchpad, and thumbstick) to indices in the `XRInputSource.gamepad.buttons` array.
   * The relationship between physical touchpads and thumbsticks to indices in the `XRInputSource.gamepad.axes` array.
 
+## Contributing
+
+### Adding a vendor prefix
+To reserve a new vendor prefix, submit a pull request that adds the vendor to the list in the in the [vendor prefixes](#vendor-prefixes) section of this document.
+
+### Adding a profile
+First ensure that the desired vendor prefix has been [reserved](#adding-a-vendor-prefix), and then add a profile JSON file that represents the new device in the prefix's subfolder. This file must conform with the [schema](#schema) and the package must [build](#development) successfully before submitting a pull request. If adding an associated 3D asset in the same pull request, please also follow the instructions in the [asset package](../assets).
+
+### Filing a bug
+Bugs with existing profiles can be filed using this [issue template](https://github.com/immersive-web/webxr-input-profiles/issues/new?assignees=&labels=registry&template=registry-change-request.md&title=).  New profiles should added via [pull requests](#adding-a-profile) to ensure the fastest turnaround.
+
+### Development
+In general, this package should be built and tested from the root of the repository using the following command:
+> npm run test
+
+To build just this package without running tests, invoke the following command from the root of the repository:
+> npm run build -- --scope @webxr-input-profiles/registry
+
+### Licence
+See the [LICENSE.md](LICENSE.md).
+
+## Usage
+
+### Getting started
+In most cases is it not necessary to install this package. It is only intended for use by User Agents and as an input to the [assets](../assets) package build. However, when necessary, the package can be installed from npm by the following command.
+
+```
+npm install @webxr-input-profiles/registry.
+```
+
 ## Profile prefixes
-Each profile id is required to start with a vendor prefix as stated in the [WebXR Device API](https://www.w3.org/tr/webxr).
+Each profile has a [unique id](#profile-id-and-fallback-profile-ids) that must begin with a generic or vendor prefix as described in the [WebXR Device API](https://www.w3.org/tr/webxr). Profile JSON files are found in './profiles/[prefix] folders.
 
 ### Generic prefix
 The "*generic*" prefix is reserved for all profiles not associated with a specific vendor
 
-### Vendor prefixes
+### Reserved vendor prefixes
 The following prefixes are reserved for companies with XR hardware
 * *google* - [Google](https://www.google.com)
 * *htc* - [HTC](https://www.htc.com/)
@@ -26,31 +56,6 @@ The following prefixes are reserved for companies with XR hardware
 * *oculus* - [Oculus Corp](https://www.oculus.com/)
 * *samsung* - [Samsung](https://www.samsung.com)
 * *valve* - [Valve Corporation](https://www.valvesoftware.com/en/)
-
-### Reserving a prefix
-To reserve a new vendor prefix, file a pull request with the following template:
-https://github.com/immersive-web/webxr-input-profiles/issues/51
-
-## Profiles
-All profiles are located under the './profiles' folder in a subfolder for each vendor prefix. These profiles are bundled during as part of the package build step, but are not modified.
-
-### Adding a profile
-Ensure that the desired profile prefix has been reserved by following the [instructions](#reserving-a-prefix) for doing so.
-
-The new profile JSON file must be conformant with the schema in the './schemas' folder.  It must also pass the verification steps performed as part of the package build.
-
-### Building
-In general, this package should be built and tested from the root of the repository using the following command:
-> npm run test
-
-To build just this package without running tests, invoke the following command from the root of the repository:
-> npm run build -- --scope @webxr-input-profiles/registry
-
-### Filing a bug
-Bugs with existing profiles can be filed using this [issue template](https://github.com/immersive-web/webxr-input-profiles/issues/new?assignees=&labels=registry&template=registry-change-request.md&title=).  New profiles should proposed via [pull requests](#filing-a-pull-request) to ensure the fastest turnaround.
-
-### Filing a pull request
-To file a pull request, ensure that your repository builds correctly by following the instructions in (#building). If adding an associated 3D asset in the same pull request, please follow the instructions in the Asset package [README.md](https://github.com/immersive-web/webxr-input-profiles/tree/master/packages/assets).
 
 ## Schema
 
