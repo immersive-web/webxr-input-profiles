@@ -47,10 +47,10 @@ To build just this package without running tests, invoke the following command f
 > npm run build -- --scope @webxr-input-profiles/registry
 
 ### Filing a bug
-Fill in the steps for filing a bug https://github.com/immersive-web/webxr-input-profiles/issues/52
+Bugs with existing profiles can be filed using this [issue template](https://github.com/immersive-web/webxr-input-profiles/issues/new?assignees=&labels=registry&template=registry-change-request.md&title=).  New profiles should proposed via [pull requests](#filing-a-pull-request) to ensure the fastest turnaround.
 
 ### Filing a pull request
-Fill in the steps for filing a pull request https://github.com/immersive-web/webxr-input-profiles/issues/52
+To file a pull request, ensure that your repository builds correctly by following the instructions in (#building). If adding an associated 3D asset in the same pull request, please follow the instructions in the Asset package [README.md](https://github.com/immersive-web/webxr-input-profiles/tree/master/packages/assets).
 
 ## Schema
 
