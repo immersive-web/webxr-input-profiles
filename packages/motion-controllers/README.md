@@ -11,13 +11,12 @@ This package provides a 3D engine agnostic javascript library for synchronizing 
 1. On each render frame, apply precomputed deformations to the 3D asset to reflect the state `XRInputSource`
 1. Optionally attach descriptive explanations to each component that will not overlap the rest of the 3D asset
 
-### Background
 The state of an XR motion controller's trigger, squeeze, touchnpad, thumbstick, and button components is made available to developers via the `XRInputSource.Gamepad` object. The behavior of this object is described in [WebXR Gamepads Module](https://www.w3.org/TR/webxr-gamepads-module/) and the [Gamepad API](https://www.w3.org/TR/gamepad/). These objects expose detailed state in the `Gamepad.buttons` array and the `Gamepad.axes` array. While this system was adequate for the relatively homogenous console gaming controllers, it is less effective for XR motion controllers as they have not converged on a common form factor. In addition, the `Gamepad` object does not provide any information about the visualization of a `XRInputSource` object which is a requirement to displaying a virtual copy of motion controller on opaque XR headsets.
 
-### Licence
-Per the [LICENSE.md](LICENCE.md) file, this package is made available under an MIT license and is copyright Amazon 2019.
-
 ## Contributing
+
+### Filing a bug
+To file bugs, use this [issue template](https://github.com/immersive-web/webxr-input-profiles/issues/new?assignees=&labels=motion-controller&template=motioncontroller-library-bug-report.md&title=)
 
 ### Development
 In general, this package should be built and tested from the root of the repository using the following command:
@@ -29,14 +28,10 @@ To build just this package without running tests, invoke the following command f
 To test just this package without building anything, invoke the following command from the root of the repository:
 > npm run testOnly -- motion-controllers
 
-### Filing a bug
-Fill in the steps for filing a bug https://github.com/immersive-web/webxr-input-profiles/issues/52
+To visually validate the library behaves as expected, follow the [viewer](../viewer) instructions.
 
-### Filing a pull request
-Fill in the steps for filing a pull request https://github.com/immersive-web/webxr-input-profiles/issues/52
-
-### Profile Viewer
-Visual validation of this package combined with the [assets](../assets/README.md) package can be done using the [viewer](../viewer/README.md) package.
+### Licence
+See the [LICENSE.md](LICENSE.md).
 
 # Usage
 This repo provides a javascript library for managing known motion controller profiles, loading the most ideal known profile for a supplied input source, and creating a MotionController object that binds them together.  Developers can use this library to interact with the conceptual components of an input source, rather than each individual button or axis.
