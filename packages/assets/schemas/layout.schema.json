@@ -5,6 +5,36 @@
     "additionalProperties": false,
     "required":["components"],
     "properties": {
-        "components": { "$ref": "common.schema.json#/definitions/components" }
+        "components": {
+            "description": "The collection of components in the layout",
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": false,
+            "patternProperties": {
+                "^[a-z0-9]+(-[a-z0-9]+)*$": {
+                    "type": "object",
+                    "description": "Component description",
+                    "additionalProperties": false,
+                    "properties": {
+                        "rootNodeName": { 
+                            "description": "TODO",
+                            "type": "string"
+                        },
+                        "labelAnchorNodeName": { 
+                            "description": "TODO",
+                            "type": "string"
+                        },
+                        "touchPointNodeName" : {
+                            "type": "string"
+                        },
+                        "analogButtonValues" : {
+                            "type":"boolean"
+                        },
+                        "visualResponses": { "$ref": "visualResponses.schema.json"}
+                    },
+                    "required": [ "rootNodeName", "labelAnchorNodeName", "visualResponses" ]
+                }
+            }
+        }
     }
 }

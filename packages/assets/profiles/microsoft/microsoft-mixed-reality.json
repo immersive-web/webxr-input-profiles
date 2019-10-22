@@ -92,19 +92,6 @@
                             "states" : ["default", "touched", "pressed"]
                         }
                     ]
-                },
-                "menu": {
-                    "rootNodeName" : "MENU",
-                    "labelAnchorNodeName" : "menu-label",
-                    "visualResponses": [
-                        {
-                            "rootNodeName" : "MENU",
-                            "componentProperty" : "state",
-                            "states" : ["pressed"],
-                            "minNodeName": "UNPRESSED",
-                            "maxNodeName": "PRESSED"
-                        }
-                    ]
                 }
             }
         }

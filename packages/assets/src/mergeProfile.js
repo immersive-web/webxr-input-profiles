@@ -9,7 +9,7 @@ function validateKeyMatch(obj1, obj2) {
 
 function mergeComponents(components1, components2) {
   if (!validateKeyMatch(components1, components2)) {
-    throw new Error('Layout handedness keys do not match');
+    throw new Error('Component keys do not match');
   }
 
   const mergedComponents = {};
@@ -102,9 +102,17 @@ function integrateGamepadIndices(registryJson) {
       }
     });
 
+    const unreservedComponents = {};
+    Object.keys(registryLayout.components).forEach((componentId) => {
+      const component = registryLayout.components[componentId];
+      if (component.reserved !== true) {
+        unreservedComponents[componentId] = component;
+      }
+    });
+
     // Merge the gamepad indices into the original layouts
     const mergedComponents = mergeComponents(
-      registryLayout.components,
+      unreservedComponents,
       integratedComponents
     );
     integratedLayouts[handedness] = { mapping, components: mergedComponents };
