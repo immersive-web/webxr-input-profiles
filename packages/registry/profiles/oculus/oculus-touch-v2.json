@@ -1,5 +1,5 @@
 {
-    "profileId": "oculus-quest",
+    "profileId": "oculus-touch-v2",
     "fallbackProfileIds": [ "oculus-touch", "generic-trigger-squeeze-thumbstick"],
     "layouts": {
         "left": {

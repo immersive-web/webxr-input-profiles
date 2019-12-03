@@ -1,5 +1,5 @@
 {
-    "profileId" : "oculus-touch-s",
+    "profileId" : "oculus-touch-v2",
     "assets" : {
         "left" : {
             "path" : "left.glb",
@@ -58,7 +58,7 @@
                         },
                         {
                             "rootNodeName": "THUMBSTICK_Y",
-                            "componentProperty" : "x-axis",
+                            "componentProperty" : "y-axis",
                             "states" : ["default", "touched", "pressed"]
                         }
                     ]
