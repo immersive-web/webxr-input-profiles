@@ -1,12 +1,11 @@
 {
     "profileId": "htc-vive-focus",
-    "fallbackProfileIds": [ "generic-trigger-squeeze-touchpad"],
+    "fallbackProfileIds": [ "generic-trigger-touchpad"],
     "layouts" : {
         "left-right-none" : {
             "selectComponentId": "xr-standard-trigger",
             "components": {
                 "xr-standard-trigger": { "type": "trigger" },
-                "xr-standard-squeeze": { "type": "squeeze" },
                 "xr-standard-touchpad": { "type": "touchpad" },
                 "menu" : { "type": "button" }
             },
@@ -14,7 +13,7 @@
                 "mapping": "xr-standard",
                 "buttons": [
                     "xr-standard-trigger",
-                    "xr-standard-squeeze",
+                    null,
                     "xr-standard-touchpad",
                     null,
                     "menu"
