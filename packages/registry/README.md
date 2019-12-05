@@ -53,7 +53,7 @@ The following prefixes are reserved for companies with XR hardware
 * *htc* - [HTC](https://www.htc.com/)
 * *magicleap* - [Magic Leap](https://www.magicleap.com/)
 * *microsoft* - [Microsoft Corp](https://www.microsoft.com/)
-* *oculus* - [Oculus Corp](https://www.oculus.com/)
+* *oculus* - [Oculus](https://www.oculus.com/)
 * *samsung* - [Samsung](https://www.samsung.com)
 * *valve* - [Valve Corporation](https://www.valvesoftware.com/en/)
 
