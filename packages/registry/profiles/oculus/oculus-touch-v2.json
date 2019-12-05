@@ -9,7 +9,8 @@
                 "xr-standard-squeeze": { "type": "squeeze" },
                 "xr-standard-thumbstick": { "type": "thumbstick" },
                 "a-button" : { "type": "button" },
-                "b-button" : { "type": "button" }
+                "b-button" : { "type": "button" },
+                "thumbrest" : { "type": "button" }
             },
             "gamepad": {
                 "mapping": "xr-standard",
@@ -19,7 +20,8 @@
                     null,
                     "xr-standard-thumbstick",
                     "a-button",
-                    "b-button"
+                    "b-button",
+                    "thumbrest"
                 ],
                 "axes":[
                     null,
@@ -36,7 +38,8 @@
                 "xr-standard-squeeze": { "type": "squeeze" },
                 "xr-standard-thumbstick": { "type": "thumbstick" },
                 "x-button" : { "type": "button" },
-                "y-button" : { "type": "button" }
+                "y-button" : { "type": "button" },
+                "thumbrest" : { "type": "button" }
             },
             "gamepad": {
                 "mapping": "xr-standard",
@@ -46,7 +49,8 @@
                     null,
                     "xr-standard-thumbstick",
                     "x-button",
-                    "y-button"
+                    "y-button",
+                    "thumbrest"
                 ],
                 "axes":[
                     null,
