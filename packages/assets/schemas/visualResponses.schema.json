@@ -3,7 +3,7 @@
     "$id": "https://immersive-web/webxr-input-profiles/assets/0.1.0/visualResponses.schema.json",
     "type": "array",
     "description": "The responses array",
-    "minItems": 1,
+    "minItems": 0,
     "additionalItems": false,
     "uniqueItems": true,
     "items": {

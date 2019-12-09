@@ -84,6 +84,11 @@
                             "states" : ["pressed"]
                         }
                     ]
+                },
+                "thumbrest": {
+                    "rootNodeName" : "THUMBREST",
+                    "labelAnchorNodeName" : "THUMBREST-label",
+                    "visualResponses": []
                 }
             }
         },
@@ -160,6 +165,11 @@
                             "states" : ["pressed"]
                         }
                     ]
+                },
+                "thumbrest": {
+                    "rootNodeName" : "THUMBREST",
+                    "labelAnchorNodeName" : "THUMBREST-label",
+                    "visualResponses": []
                 }
             }
         }
