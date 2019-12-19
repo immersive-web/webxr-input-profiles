@@ -22,15 +22,6 @@
             "description": "A well-formatted component id",
             "type": "string",
             "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
-        },
-        "components": {
-            "description": "The collection of components in the layout",
-            "type": "object",
-            "minProperties": 1,
-            "additionalProperties": false,
-            "patternProperties": {
-                "^[^\\s]+.+[^\\s]$": { "$ref": "component.schema.json" }
-            }
         }
     }
 }

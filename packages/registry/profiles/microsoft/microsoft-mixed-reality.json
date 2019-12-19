@@ -9,7 +9,7 @@
                 "xr-standard-squeeze": { "type": "squeeze" },
                 "xr-standard-touchpad": { "type": "touchpad" },
                 "xr-standard-thumbstick": { "type": "thumbstick" },
-                "menu" : { "type": "button" }
+                "menu" : { "type": "button", "reserved": true }
             },
             "gamepad" : {
                 "mapping": "xr-standard",
@@ -17,8 +17,7 @@
                     "xr-standard-trigger",
                     "xr-standard-squeeze",
                     "xr-standard-touchpad",
-                    "xr-standard-thumbstick",
-                    "menu"
+                    "xr-standard-thumbstick"
                 ],
                 "axes":[
                     { "componentId": "xr-standard-touchpad", "axis": "x-axis"},
