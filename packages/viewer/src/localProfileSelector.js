@@ -56,26 +56,17 @@ async function buildSchemaValidator(schemasPath) {
 class LocalProfileSelector {
   constructor() {
     this.element = document.getElementById('localProfile');
-    this.localFilesListElement = document.getElementById('localFilesList');
-
-    // Get the assets selector and watch for changes
-    this.registryJsonSelector = document.getElementById('localProfileRegistryJsonSelector');
-    this.registryJsonSelector.addEventListener('change', () => { this.onRegistryJsonSelected(); });
-
-    // Get the asset json  selector and watch for changes
-    this.assetJsonSelector = document.getElementById('localProfileAssetJsonSelector');
-    this.assetJsonSelector.addEventListener('change', () => { this.onAssetJsonSelected(); });
+    this.localFilesListElement = document.getElementById('localProfileFilesList');
+    this.disabled = true;
 
     // Get the registry json selector and watch for changes
-    this.assetsSelector = document.getElementById('localProfileAssetsSelector');
-    this.assetsSelector.addEventListener('change', () => { this.onAssetsSelected(); });
+    this.filesSelector = document.getElementById('localProfileSelector');
+    this.filesSelector.addEventListener('change', () => { this.onFilesSelected(); });
 
     // Add a handedness selector and listen for changes
     this.handednessSelector = new HandednessSelector('localProfile');
     this.handednessSelector.element.addEventListener('handednessChange', (event) => { this.onHandednessChange(event); });
     this.element.insertBefore(this.handednessSelector.element, this.localFilesListElement);
-
-    this.disabled = true;
 
     this.clearSelectedProfile();
 
@@ -83,10 +74,7 @@ class LocalProfileSelector {
       this.registrySchemaValidator = registrySchemaValidator;
       buildSchemaValidator('assetTools/assetSchemas.json').then((assetSchemaValidator) => {
         this.assetSchemaValidator = assetSchemaValidator;
-        // TODO figure out disabled thing
-        this.onRegistryJsonSelected();
-        this.onAssetJsonSelected();
-        this.onAssetsSelected();
+        this.onFilesSelected();
       });
     });
   }
@@ -94,6 +82,7 @@ class LocalProfileSelector {
   enable() {
     this.element.hidden = false;
     this.disabled = false;
+    this.onFilesSelected();
   }
 
   disable() {
@@ -111,22 +100,6 @@ class LocalProfileSelector {
     this.handednessSelector.clearSelectedProfile();
   }
 
-  createMotionController() {
-    let motionController;
-    if (this.handednessSelector.handedness && this.mergedProfile) {
-      const { handedness } = this.handednessSelector;
-      const mockGamepad = new MockGamepad(this.mergedProfile, handedness);
-      const mockXRInputSource = new MockXRInputSource(mockGamepad, handedness);
-
-      const assetName = this.mergedProfile.layouts[handedness].assetPath;
-      const assetUrl = this.assets[assetName];
-      motionController = new MotionController(mockXRInputSource, this.mergedProfile, assetUrl);
-    }
-
-    const changeEvent = new CustomEvent('motionControllerChange', { detail: motionController });
-    this.element.dispatchEvent(changeEvent);
-  }
-
   /**
    * Responds to changes in selected handedness.
    * Creates a new motion controller for the combination of profile and handedness, and fires an
@@ -135,7 +108,19 @@ class LocalProfileSelector {
    */
   onHandednessChange() {
     if (!this.disabled) {
-      this.createMotionController();
+      let motionController;
+      if (this.handednessSelector.handedness && this.mergedProfile) {
+        const { handedness } = this.handednessSelector;
+        const mockGamepad = new MockGamepad(this.mergedProfile, handedness);
+        const mockXRInputSource = new MockXRInputSource(mockGamepad, handedness);
+
+        const assetName = this.mergedProfile.layouts[handedness].assetPath;
+        const assetUrl = this.assets[assetName];
+        motionController = new MotionController(mockXRInputSource, this.mergedProfile, assetUrl);
+      }
+
+      const changeEvent = new CustomEvent('motionControllerChange', { detail: motionController });
+      this.element.dispatchEvent(changeEvent);
     }
   }
 
@@ -152,61 +137,62 @@ class LocalProfileSelector {
     }
   }
 
-  onRegistryJsonSelected() {
-    if (!this.element.disabled) {
-      this.registryJson = null;
-      this.mergedProfile = null;
+  onFilesSelected() {
+    if (!this.disabled && this.registrySchemaValidator && this.assetSchemaValidator) {
       this.handednessSelector.clearSelectedProfile();
-      if (this.registryJsonSelector.files.length > 0) {
-        loadLocalJson(this.registryJsonSelector.files[0]).then((registryJson) => {
-          const valid = this.registrySchemaValidator(registryJson);
-          if (!valid) {
-            ErrorLogging.log(JSON.stringify(this.registrySchemaValidator.errors, null, 2));
-          } else {
-            try {
-              validateRegistryProfile(registryJson);
-            } catch (error) {
-              ErrorLogging.log(error);
-              throw error;
-            }
-            this.registryJson = registryJson;
-            this.mergeJsonProfiles();
-          }
-        });
-      }
-    }
-  }
+      const filesList = Array.from(this.filesSelector.files);
+      let assetProfileFile;
+      let registryProfileFile;
+      filesList.forEach((file) => {
+        if (file.name.endsWith('.glb')) {
+          this.assets[file.name] = window.URL.createObjectURL(file);
+        } else if (file.name === 'profile.json') {
+          assetProfileFile = file;
+        } else if (file.name.endsWith('.json')) {
+          registryProfileFile = file;
+        }
 
-  onAssetJsonSelected() {
-    if (!this.element.disabled) {
-      this.assetJson = null;
-      this.mergedProfile = null;
-      this.handednessSelector.clearSelectedProfile();
-      if (this.assetJsonSelector.files.length > 0) {
-        loadLocalJson(this.assetJsonSelector.files[0]).then((assetJson) => {
-          const valid = this.assetSchemaValidator(assetJson);
-          if (!valid) {
-            ErrorLogging.log(JSON.stringify(this.assetSchemaValidator.errors, null, 2));
-          } else {
-            this.assetJson = assetJson;
-            this.mergeJsonProfiles();
-          }
-        });
-      }
-    }
-  }
-
-  /**
-   * Handles changes to the set of local files selected
-   */
-  onAssetsSelected() {
-    if (!this.element.disabled) {
-      const fileList = Array.from(this.assetsSelector.files);
-      this.assets = [];
-      fileList.forEach((file) => {
-        this.assets[file.name] = window.URL.createObjectURL(file);
+        // List the files found
+        this.localFilesListElement.innerHTML += `
+          <li>${file.name}</li>
+        `;
       });
-      this.createMotionController();
+
+      if (!registryProfileFile) {
+        ErrorLogging.log('No registry profile selected');
+        return;
+      }
+
+      loadLocalJson(registryProfileFile).then((registryJson) => {
+        const isRegistryJsonValid = this.registrySchemaValidator(registryJson);
+        if (!isRegistryJsonValid) {
+          ErrorLogging.log(JSON.stringify(this.registrySchemaValidator.errors, null, 2));
+          return;
+        }
+
+        try {
+          validateRegistryProfile(registryJson);
+        } catch (error) {
+          ErrorLogging.log(error);
+          throw error;
+        }
+        this.registryJson = registryJson;
+
+        if (!assetProfileFile) {
+          this.assetJson = { profileId: this.registryJson.profileId, overrides: {} };
+          this.mergeJsonProfiles();
+        } else {
+          loadLocalJson(assetProfileFile).then((assetJson) => {
+            const isAssetJsonValid = this.assetSchemaValidator(assetJson);
+            if (!isAssetJsonValid) {
+              ErrorLogging.log(JSON.stringify(this.assetSchemaValidator.errors, null, 2));
+            } else {
+              this.assetJson = assetJson;
+              this.mergeJsonProfiles();
+            }
+          });
+        }
+      });
     }
   }
 }

@@ -24,15 +24,9 @@
                         <select id="repositoryProfileIdSelector"></select>
                     </div>
                     <div id="localProfile" hidden="true" disabled=true>
-                        <label for="localProfileRegistryJsonSelector">Select repository JSON file</label>
-                        <input id="localProfileRegistryJsonSelector" type="file">
-                        <br>
-                        <label for="localProfileAssetJsonSelector">Select asset JSON file</label>
-                        <input id="localProfileAssetJsonSelector" type="file">
-                        <br>
-                        <label for="localProfileAssetsSelector">Select 3D asset files</label>
-                        <input id="localProfileAssetsSelector" type="file" multiple>
-                        <br>
+                        <label for="localProfileSelector">Select local files</label>
+                        <input id="localProfileSelector" type="file" multiple>
+                        <ul id="localProfileFilesList"></ul>
                     </div>
                 </section>
                 <section id="errors" hidden="true">
