@@ -20,9 +20,9 @@ class Component {
 
     // Build all the visual responses for this component
     this.visualResponses = {};
-    this.description.visualResponses.forEach((visualResponseDescription) => {
-      const visualResponse = new VisualResponse(visualResponseDescription);
-      this.visualResponses[visualResponseDescription.rootNodeName] = visualResponse;
+    Object.keys(this.description.visualResponses).forEach((responseName) => {
+      const visualResponse = new VisualResponse(this.description.visualResponses[responseName]);
+      this.visualResponses[responseName] = visualResponse;
     });
 
     // Set default values

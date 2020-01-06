@@ -18,43 +18,6 @@ describe('Construction tests', () => {
       const visualResponses = new VisualResponse({});
     }).toThrow();
   });
-
-  test.each(
-    Object.values(Constants.ComponentProperty)
-  )('Create with %s componentProperty and no additional properties', (componentProperty) => {
-    const responseDescription = {
-      rootNodeName: 'ROOT',
-      componentProperty,
-      states: [Constants.ComponentState.DEFAULT]
-    };
-
-    const expectedResponse = Object.assign(responseDescription, {
-      targetNodeName: 'ROOT',
-      minNodeName: 'MIN',
-      maxNodeName: 'MAX',
-      property: 'transform'
-    });
-
-    const visualResponse = new VisualResponse(responseDescription);
-    expect(visualResponse).toBeDefined();
-    expect(visualResponse.description).toEqual(expectedResponse);
-  });
-
-  test('Create with explicit properties', () => {
-    const responseDescription = {
-      rootNodeName: 'ROOT',
-      componentProperty: Constants.ComponentProperty.BUTTON,
-      states: [Constants.ComponentState.DEFAULT],
-      targetNodeName: 'TARGET',
-      minNodeName: 'MY MIN NODE',
-      maxNodeName: 'MY MAX NODE',
-      property: 'visibility'
-    };
-
-    const visualResponse = new VisualResponse(responseDescription);
-    expect(visualResponse).toBeDefined();
-    expect(visualResponse.description).toMatchObject(responseDescription);
-  });
 });
 
 describe('Weighting tests', () => {
@@ -67,7 +30,7 @@ describe('Weighting tests', () => {
     const responseDescription = {
       componentProperty: Constants.ComponentProperty.BUTTON,
       states: [Constants.ComponentState.DEFAULT],
-      property: 'transform'
+      valueNodeProperty: Constants.VisualResponseProperty.TRANSFORM
     };
 
     const visualResponse = new VisualResponse(responseDescription);
@@ -90,13 +53,13 @@ describe('Weighting tests', () => {
     const xAxisResponseDescription = {
       componentProperty: Constants.ComponentProperty.X_AXIS,
       states: [Constants.ComponentState.DEFAULT],
-      property: 'transform'
+      valueNodeProperty: Constants.VisualResponseProperty.TRANSFORM
     };
 
     const yAxisResponseDescription = {
       componentProperty: Constants.ComponentProperty.Y_AXIS,
       states: [Constants.ComponentState.DEFAULT],
-      property: 'transform'
+      valueNodeProperty: Constants.VisualResponseProperty.TRANSFORM
     };
 
     const xAxisResponse = new VisualResponse(xAxisResponseDescription);
@@ -136,13 +99,13 @@ describe('Weighting tests', () => {
     const xAxisResponseDescription = {
       componentProperty: Constants.ComponentProperty.X_AXIS,
       states: [Constants.ComponentState.DEFAULT],
-      property: 'transform'
+      valueNodeProperty: Constants.VisualResponseProperty.TRANSFORM
     };
 
     const yAxisResponseDescription = {
       componentProperty: Constants.ComponentProperty.Y_AXIS,
       states: [Constants.ComponentState.DEFAULT],
-      property: 'transform'
+      valueNodeProperty: Constants.VisualResponseProperty.TRANSFORM
     };
 
     const xAxisResponse = new VisualResponse(xAxisResponseDescription);
@@ -164,7 +127,7 @@ describe('Weighting tests', () => {
     const responseDescription = {
       componentProperty: Constants.ComponentProperty.STATE,
       states: [Constants.ComponentState.DEFAULT],
-      property: 'visibility'
+      valueNodeProperty: Constants.VisualResponseProperty.VISIBILITY
     };
 
     const response = new VisualResponse(responseDescription);
@@ -183,7 +146,8 @@ describe('Weighting tests', () => {
 
     const responseDescription = {
       componentProperty: Constants.ComponentProperty.STATE,
-      states: [Constants.ComponentState.DEFAULT]
+      states: [Constants.ComponentState.DEFAULT],
+      valueNodeProperty: Constants.VisualResponseProperty.TRANSFORM
     };
 
     const response = new VisualResponse(responseDescription);

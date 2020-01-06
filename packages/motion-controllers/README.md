@@ -139,15 +139,13 @@ async function addMotionControllerToScene(motionController) {
 ```
 
 ### Touch point dot
-Touchpads have an additional property that enables visualizing the point at which they are touched. To use this property, attach your visualization to the `Touchpad.touchDotNodeName` when the asset is loaded.  This sample uses THREE.js, but can be applied to any 3D engine.
+Touchpads have an additional property that enables visualizing the point at which they are touched. To use this property, attach your visualization to the `Touchpad.touchPointNodeName` when the asset is loaded.  This sample uses THREE.js, but can be applied to any 3D engine.
 
 ```js
 function addTouchPointDots(motionController, asset) {
   Object.values(motionController.components).forEach((component) => {
     if (component.touchPointNodeName) {
-      const motionControllerRoot = MyEngine.scene.getChildByName(motionController.root);
-      const componentRoot = motionControllerRoot.getChildByName(component.rootNodeName, true);
-      const touchPointRoot = componentRoot.getChildByName(component.touchPointNodeName, true);
+      const touchPointRoot = asset.getChildByName(component.touchPointNodeName, true);
       
       const sphereGeometry = new THREE.SphereGeometry(0.001);
       const material = new THREE.MeshBasicMaterial({ color: 0x0000FF });
@@ -178,22 +176,29 @@ function updateMotionControllerModel(motionController) {
   // Update the 3D model to reflect the button, thumbstick, and touchpad state
   const motionControllerRoot = MyEngine.scene.getChildByName(motionController.rootNodeName);
   Object.values(motionController.components).forEach((component) => {
-    const componentRoot = motionControllerRoot.getChildByName(component.rootNodeName);
-    component.visualResponses.weightedNodes.forEach((weightedNode) => {
+    component.visualResponses.forEach((visualResponse) => {
       // Find the topmost node in the visualization
-      let visualResponseRoot = motionControllerRoot.getChildByName(weightedNode.rootNodeName, true);
-      const targetNode = visualResponseRoot.getChildByName(weightedNode.targetNodeName);
+      const valueNode = motionControllerRoot.getChildByName(visualResponse.valueNodeName);
 
       // Calculate the new properties based on the weight supplied
-      if (weightedNode.property === 'visibility') {
-        targetNode.visible = weightedNode.value;
-      } else if (weightedNode.property === 'transform') {
-        const minNode = visualResponseRoot.getObjectByName(weightedNode.minNodeName);
-        const maxNode = visualResponseRoot.getObjectByName(weightedNode.maxNodeName);
-        targetNode.transform = MyEngine.interpolateTransform(
-          minNode, 
-          maxNode, 
-          weightedNode.value);
+      if (visualResponse.valueNodeProperty === 'visibility') {
+        valueNode.visible = visualResponse.value;
+      } else if (visualResponse.valueNodeProperty === 'transform') {
+        const minNode = motionControllerRoot.getObjectByName(visualResponse.minNodeName);
+        const maxNode = motionControllerRoot.getObjectByName(visualResponse.maxNodeName);
+
+        THREE.Quaternion.slerp(
+          minNode.quaternion,
+          maxNode.quaternion,
+          valueNode.quaternion,
+          visualResponse.value
+        );
+
+        valueNode.position.lerpVectors(
+          minNode.position,
+          maxNode.position,
+          visualResponse.value
+        );
       }
     });
   });

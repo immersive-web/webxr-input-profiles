@@ -28,7 +28,12 @@ const Constants = {
 
   ButtonTouchThreshold: 0.05,
 
-  AxisTouchThreshold: 0.1
+  AxisTouchThreshold: 0.1,
+
+  VisualResponseProperty: Object.freeze({
+    TRANSFORM: 'transform',
+    VISIBILITY: 'visibility'
+  })
 };
 
 export default Constants;

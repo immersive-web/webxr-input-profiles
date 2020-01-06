@@ -1,8 +1,9 @@
 /* eslint-disable import/no-unresolved */
 import { MotionController } from './motion-controllers.module.js';
 import './ajv/ajv.min.js';
-import mergeProfile from './assetTools/mergeProfile.js';
 import validateRegistryProfile from './registryTools/validateRegistryProfile.js';
+import expandRegistryProfile from './assetTools/expandRegistryProfile.js';
+import buildAssetProfile from './assetTools/buildAssetProfile.js';
 /* eslint-enable */
 
 import MockGamepad from './mocks/mockGamepad.js';
@@ -117,7 +118,7 @@ class LocalProfileSelector {
       const mockGamepad = new MockGamepad(this.mergedProfile, handedness);
       const mockXRInputSource = new MockXRInputSource(mockGamepad, handedness);
 
-      const assetName = this.mergedProfile.layouts[handedness].path;
+      const assetName = this.mergedProfile.layouts[handedness].assetPath;
       const assetUrl = this.assets[assetName];
       motionController = new MotionController(mockXRInputSource, this.mergedProfile, assetUrl);
     }
@@ -141,7 +142,8 @@ class LocalProfileSelector {
   async mergeJsonProfiles() {
     if (this.registryJson && this.assetJson) {
       try {
-        this.mergedProfile = mergeProfile(this.registryJson, this.assetJson);
+        const expandedRegistryProfile = expandRegistryProfile(this.registryJson);
+        this.mergedProfile = buildAssetProfile(this.assetJson, expandedRegistryProfile);
         this.handednessSelector.setSelectedProfile(this.mergedProfile);
       } catch (error) {
         ErrorLogging.log(error);

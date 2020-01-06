@@ -3,36 +3,38 @@
     "$id": "https://immersive-web/webxr-input-profiles/assets/0.1.0/layout.schema.json",
     "type": "object",
     "additionalProperties": false,
-    "required":["components"],
+    "minProperties": 1,
     "properties": {
+        "rootNodeName": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "assetPath": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*\\.glb$"
+        },
         "components": {
             "description": "The collection of components in the layout",
             "type": "object",
-            "minProperties": 1,
             "additionalProperties": false,
+            "minProperties": 1,
             "patternProperties": {
                 "^[a-z0-9]+(-[a-z0-9]+)*$": {
                     "type": "object",
                     "description": "Component description",
                     "additionalProperties": false,
+                    "minProperties": 1,
                     "properties": {
-                        "rootNodeName": { 
-                            "description": "TODO",
-                            "type": "string"
+                        "rootNodeName": {
+                            "type": "string",
+                            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
                         },
-                        "labelAnchorNodeName": { 
-                            "description": "TODO",
-                            "type": "string"
-                        },
-                        "touchPointNodeName" : {
-                            "type": "string"
-                        },
-                        "analogButtonValues" : {
-                            "type":"boolean"
+                        "touchPointNodeName": {
+                            "type": "string",
+                            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
                         },
                         "visualResponses": { "$ref": "visualResponses.schema.json"}
-                    },
-                    "required": [ "rootNodeName", "labelAnchorNodeName", "visualResponses" ]
+                    }
                 }
             }
         }

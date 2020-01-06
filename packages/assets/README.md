@@ -9,7 +9,7 @@ This package provides 3D assets and JSON descriptions of how to relate those ass
 All profiles are located under the './profiles' folder in subfolders for vendor prefixes. At build time, these profiles are combined with the matching profiles from the [registry](../packages/registry/README.md) package and a merged JSON profile is output for each match.
 
 ### Adding an asset
-New assets must match a profile a profiles id in the [registry](../registry) package. To add an asset, save a JSON file that conforms with the [schema](#schema) in `./profiles/[vendor prefix]/[profile id]`. In the same `./profiles/[vendor prefix]` folder, place the `.glB` or `.glTF` and dependent files.  Ensure that the JSON file points to the correct relative path of the 3D files. The package must [build](#development) successfully before submitting a pull request.
+New assets must match a profile a profiles id in the [registry](../registry) package. To add an asset, save a JSON file that conforms with the [schema](#schema) in `./profiles/[profile id]/`. In the same `./profiles/[profile id]/` folder, place the `.glb` files for each supported handedness.  The package must [build](#development) successfully before submitting a pull request.
 
 ### Filing a bug
 To file bugs on existing assets, use this [issue template](https://github.com/immersive-web/webxr-input-profiles/issues/new?assignees=&labels=assets&template=asset-bug-report.md&title=)
@@ -45,11 +45,11 @@ Profiles are required to have a `profileId` that uniquely identifies the profile
 }
 ```
 
-### Layout and asset enumeration
-Profiles are required to have a `layouts` property which contains the layouts for each supported `handedness`. Profiles are also required to have a `assets` property which contains the paths of assets for each supported `handedness`.  Both the `layouts` property and the `assets` properties must each have one, and only one, of the following arrangements of keys to be considered valid.
-* `none`
-* `left` and `right`
-* `left` and `right` and `none`
+### Overrides
+By default the asset profile is dynamically generated based on the registry profile during the asset package build step.  These values can be overriden through the `overrides` property in the asset configuraiton file.
+
+When supplied, the `overrides` property is required to have a `layouts` child property which contains overrides for a specific `handedness` values. The `layouts` property must each have one, and only one, of the following arrangements of keys to be considered valid.
+* At least one of: `none`, `left`, or `right`
 * `left-right`
 * `left-right` and `none`
 * `left-right-none`
@@ -57,204 +57,72 @@ Profiles are required to have a `layouts` property which contains the layouts fo
 For example:
 ```json
 {
-    "assets": {
-        "none": {},
-        "left": {},
-        "right": {}
+    "overrides": {
+        "layouts": {
+            "left": {}
+        }
     },
-    "layouts": {
-        "none" : {},
-        "left-right": {}
-    }
 }
 ```
-
-The keys in `layouts` and `assets` do not need to match, however expanded form of supported `handedness` values must match. For example, the following is **invalid**:
+Or:
 ```json
 {
-    "assets": {
-        "left": {},
-        "right": {}
-    },
-    "layouts": {
-        "left-right-none" : {},
-    }
-}
-```
-
-#### Assets
-The value of each key in the `assets` object must contain two properties: `path` and `rootNodeName`. The `path` is a relative path to the asset for that `handedness`. The `rootNodeName` is the name of the node within the 3D asset file that represents the top of the hierarchy of the 3D model for the `XRInputSource` with that `handedness`.
-
-```json
-{
-    "assets": {
-        "none": {
-            "path": "path to asset",
-            "rootNodeName": "motionControllerRoot"
+    "overrides": {
+        "layouts": {
+            "none" : {},
+            "left-right": {}
         }
     }
 }
 ```
 
+All specified handedness values must be present in the associated registry profile.  For example, if the registry has a defined `left-right` layout, the asset json can override `left` but not `none`.
+
+### Layouts
+Within each layout, there must be a `rootNodeName`, `assetPath`, and/or a `components` property. The `rootNodeName` is the top node in the 3D asset hierarchy representing the motion controller, and is set to `<profile id>-<handedness>` by default. The `assetPath` is the relative path to the asset for the layout, and is set to `<handedness>.glb` by default.  The `components` property is explained further in the [components](#components) section.
+```json
+{
+    "left" : {
+        "rootNodeName": "generic-trigger-left",
+        "assetPath": "left.glb",
+        "components": {}
+    }
+}
+```
+
 ### Components
-The each key in the `layouts` object must point to an object which contains a `components` property which, itself, contains keys for every component id in the associated registry profile.  Each component id key must point to an object which contains three properties: `rootNodeName`, `labelAnchorNodeName`, and `visualResponses`.  The `rootNodeName` of a component is the top node in the 3D asset hierarchy representing the component.  The `labelAnchorNodeName` is the name of a node at which is it safe to place an 3D object with the explananation of a component's purpose.  This node must be underneath the `rootNodeName` at a location that will not intersect the 3D model's geometry.  The `visualResponses` property is an array of [visual changes](#visual-responses) the component can apply in response to state changes in the backing `XRInputSource`.
+The `components` property may only contain keys for components defined in the associated registry profile.  When present, a component id key must point to an object which contains `rootNodeName`, `touchPointNodeName`, and/or `visualResponses`. The `rootNodeName` of a component is the top node in the 3D asset hierarchy representing the component, and is set to `<component id>` by default. The `touchPointNodeName` is the name of the node in the asset which will be updated to match the user's finger location on a touchpad. This node is named `<component id>-axes-touched-value` by default and is where developers may attach geometry to indicate a touch point. The `visualResponses` property contains the collection of [visual changes](#visual-responses) the component can apply in response to state changes in the backing `XRInputSource`.
 
 For example
 ```json
 {
-    "layouts": {
-        "none": {
-            "components": {
-                "myHardwareTrigger": {
-                    "rootNodeName" : "SELECT",
-                    "labelAnchorNodeName" : "trigger-label",
-                    "visualResponses": []
-                }
-            }
+    "components": {
+        "xr-standard-touchpad": {
+            "rootNodeName" : "xr-standard-trigger",
+            "touchPointNodeName": "xr-standard-touchpad-axes-touched-value",
+            "visualResponses": {}
         }
     }
 }
 ```
 
 ### Visual responses
-The visual representation of a motion controller in a VR must respond to reflect its physical state in the real-world.  For example, when a physical thumbstick is moved to the left, the virtual thumbstick should also move to the left.  The `visualResponses` array contains descriptions of all visual changes that can occur when a controller part is interacted with.
+The visual representation of a motion controller in a VR must respond to reflect its physical state in the real-world.  For example, when a physical thumbstick is moved to the left, the virtual thumbstick should also move to the left.  The `visualResponses` object contains descriptions of all visual changes that will be applied when the associated controller component is interacted with.
 
-Each element in this array must contain a `rootNodeName` property which references the node containing the rest of the nodes needed for the visualization. It must also contain a `componentProperty` property set to one of four values: `button`, `xAxis`, `yAxis`, or `state`.  This indicates which component property will be used to drive the visualization.  Lastly, the element must contains a `states` array which indicates the component states for which the visualization will apply.
+The `visualResponses` object contains children that each uniquely describe a single visual response to be applied to the asset and the key name should reflect that purpose.  The children of `visualResponses` may be null, in which case the key name must match a default visual reponse to be removed from the generate profile.  When non-null, the object contain `componentProperty`, `states`, and `valueNodeProperty` children.
 
-```json
-{
-    "visualResponses" : [
-        {
-            "rootNodeName": "THUMBSTICK_X",
-            "componentProperty": "xAxis",
-            "states": ["default", "touched", "pressed"]
-        }
-    ]
-}
-```
-
-By default the visualization will use `"VALUE"` for the name of the target node, though this can be overridden by supplying the `targetNodeName` property.
+The `componentProperty` property must be set to one of four values: `button`, `xAxis`, `yAxis`, or `state`.  This indicates which component property will be used to drive the visualization.  The `states` array indicates the component states for which the visualization will apply and must contain at least one of the following values: `default`, `touched`, `pressed`.  The `valueNodeProperty` indicates which property of the asset's node will be modified in response the XRInputSource changes.  It must either be set to `transform` or `visibility`.  When set to `visibility`, `componentProperty` must be set to `state`.
 
 ```json
 {
-    "visualResponses" : [
-        {
-            "rootNodeName": "THUMBSTICK_X",
-            "componentProperty": "xAxis",
-            "states": ["default", "touched", "pressed"],
-            "targetNodeName": "TARGET"
-        }
-    ]
-}
-```
-
-By default, all visualizations will use `"MIN"` and `"MAX"` the names of the nodes representing the extents of motion. To override these node names supply an alternative `minNodeName` and `maxNodeName` respectively.
-
-```json
-{
-    "visualResponses" : [
-        {
-            "rootNodeName": "THUMBSTICK_X",
-            "componentProperty": "xAxis",
-            "states": ["default", "touched", "pressed"],
-            "minNodeName": "LEFT",
-            "maxNodeName": "RIGHT"
-        }
-    ]
-}
-```
-
-When a visualization is toggling a node's visibility, the `componentProperty` must be set to `state` and the additional `property` property set to `visibility`.
-
-```json
-{
-    "visualResponses" : [
-        {
-            "rootNodeName": "TOUCH_DOT",
-            "componentProperty": "state",
+    "visualResponses" : {
+        "pressed": {
+            "componentProperty": "button",
             "states": ["touched", "pressed"],
-            "property": "visibility"
+            "valueNodeProperty": "transform"
         }
-    ]
+    }
 }
 ```
 
-#### Thumbstick visual response example
-Commonly, the visual responses for a thumbstick will be as follows:
-```json
-{
-    "visualResponses": [
-        {
-            "rootNodeName": "THUMBSTICK_PRESS",
-            "componentProperty" : "state",
-            "states" : ["pressed"]
-        },
-        {
-            "rootNodeName": "THUMBSTICK_X",
-            "componentProperty" : "xAxis",
-            "states" : ["default", "touched", "pressed"]
-        },
-        {
-            "rootNodeName": "THUMBSTICK_Y",
-            "componentProperty" : "yAxis",
-            "states" : ["default", "touched", "pressed"]
-        }
-    ]
-}
-```
-
-#### Touchpad visual response values
-Commonly, the visual responses for a touchpad will be as follows:
-```json
-{
-    "visualResponses": [
-        {
-            "rootNodeName": "TOUCHPAD_PRESS",
-            "componentProperty" : "state",
-            "states" : ["pressed"]
-        },
-        {
-            "rootNodeName": "TOUCH",
-            "componentProperty" : "state",
-            "states" : ["touched", "pressed"],
-            "property": "visibility"
-        },
-        {
-            "rootNodeName": "TOUCHPAD_TOUCH_X",
-            "componentProperty" : "xAxis",
-            "states" : ["default", "touched", "pressed"]
-        },
-        {
-            "rootNodeName": "TOUCHPAD_TOUCH_Y",
-            "componentProperty" : "yAxis",
-            "states" : ["default", "touched", "pressed"]
-        }
-    ]
-}
-```
-#### Button visual response values
-Commonly, the visual response for an analog button, such as a trigger, will be as follows:
-```json
-{
-    "visualResponses": [
-        {
-            "rootNodeName" : "SELECT",
-            "componentProperty" : "button",
-            "states" : ["default", "touched", "pressed"]
-        }
-    ]
-}
-```
-
-Alternatively, digital buttons may be better represented like this example:
-```json
-{
-    "visualResponses": [
-        {
-            "rootNodeName" : "MENU",
-            "componentProperty" : "state",
-            "states" : ["pressed"]
-        }
-    ]
-}
-```
+In order for `visualResponses` to function, the associated 3D asset must contain a node named `<component id>-<visual response name>-value` whose `valueNodeProperty` will be modified in response to changes in the XRInputSource.  When the `valueNodeProperty` is a `transform`, the transform value will be interpolated between the transforms of the two nodes named `<component id>-<visual response name>-min` and `<component id>-<visual response name>-max`.

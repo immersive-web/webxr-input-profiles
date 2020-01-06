@@ -16,16 +16,6 @@ function animationFrameCallback() {
   }
 }
 
-function onButtonTouched(event) {
-  const { index } = event.target.dataset;
-  mockGamepad.buttons[index].touched = event.target.checked;
-}
-
-function onButtonPressed(event) {
-  const { index } = event.target.dataset;
-  mockGamepad.buttons[index].pressed = event.target.checked;
-}
-
 function onButtonValueChange(event) {
   const { index } = event.target.dataset;
   mockGamepad.buttons[index].value = Number(event.target.value);
@@ -53,19 +43,11 @@ function addButtonControls(componentControlsElement, buttonIndex) {
   buttonControlsElement.innerHTML += `
   <label>buttonValue</label>
   <input id="buttons[${buttonIndex}].value" data-index="${buttonIndex}" type="range" min="0" max="1" step="0.01" value="0">
-  
-  <label>touched</label>
-  <input id="buttons[${buttonIndex}].touched" data-index="${buttonIndex}" type="checkbox">
-
-  <label>pressed</label>
-  <input id="buttons[${buttonIndex}].pressed" data-index="${buttonIndex}" type="checkbox">
   `;
 
   componentControlsElement.appendChild(buttonControlsElement);
 
   document.getElementById(`buttons[${buttonIndex}].value`).addEventListener('input', onButtonValueChange);
-  document.getElementById(`buttons[${buttonIndex}].touched`).addEventListener('click', onButtonTouched);
-  document.getElementById(`buttons[${buttonIndex}].pressed`).addEventListener('click', onButtonPressed);
 }
 
 function addAxisControls(componentControlsElement, axisName, axisIndex) {

@@ -4,7 +4,7 @@ import Component from '../components';
 const buttonComponent = {
   id: 'buttonComponent',
   description: {
-    visualResponses: [],
+    visualResponses: {},
     gamepadIndices: {
       [Constants.ComponentProperty.BUTTON]: 0
     }
@@ -14,7 +14,7 @@ const buttonComponent = {
 const axesComponent = {
   id: 'axesComponent',
   description: {
-    visualResponses: [],
+    visualResponses: {},
     gamepadIndices: {
       [Constants.ComponentProperty.X_AXIS]: 0,
       [Constants.ComponentProperty.Y_AXIS]: 0
@@ -25,7 +25,7 @@ const axesComponent = {
 const axesButtonComponent = {
   id: 'axesButtonComponent',
   description: {
-    visualResponses: [],
+    visualResponses: {},
     gamepadIndices: {
       [Constants.ComponentProperty.BUTTON]: 0,
       [Constants.ComponentProperty.X_AXIS]: 0,
@@ -37,7 +37,7 @@ const axesButtonComponent = {
 const oneAxisComponent = {
   id: 'oneAxisComponent',
   description: {
-    visualResponses: [],
+    visualResponses: {},
     gamepadIndices: {
       [Constants.ComponentProperty.Y_AXIS]: 0
     }
