@@ -99,7 +99,7 @@ For example
     "components": {
         "xr-standard-touchpad": {
             "rootNodeName" : "xr-standard-trigger",
-            "touchPointNodeName": "xr-standard-touchpad-axes-touched-value",
+            "touchPointNodeName": "xr-standard-touchpad_axes_touched_value",
             "visualResponses": {}
         }
     }
@@ -133,12 +133,12 @@ Components have the following visual responses by default:
 | Trigger    | `pressed`       | button value       | Unpressed             | Pressed             |
 | Squeeze    | `pressed`       | button value       | Unpressed             | Pressed             |
 | Thumbstick | `pressed`       | button value       | Unpressed             | Pressed             |
-|            | `xaxis-pressed` | x axis value       | Tipped left           | Tipped right        |
-|            | `yaxis-pressed` | y axis value       | Tipped up             | Tipped down         |
+|            | `xaxis_pressed` | x axis value       | Tipped left           | Tipped right        |
+|            | `yaxis_pressed` | y axis value       | Tipped up             | Tipped down         |
 | Touchpad   | `pressed`       | button value       | Unpressed             | Pressed             |
-|            | `xaxis-pressed` | x axis value       | Tipped left           | Tipped right        |
-|            | `yaxis-pressed` | y axis value       | Tipped up             | Tipped down         |
-|            | `xaxis-touched` | x axis value       | Touch point left      | Touch point right   |
-|            | `yaxis-touched` | y axis value       | Touch point up        | Touch point down    |
-|            | `axes-touched`  | button touched     | Touch point invisible | Touch point visible |
+|            | `xaxis_pressed` | x axis value       | Tipped left           | Tipped right        |
+|            | `yaxis_pressed` | y axis value       | Tipped up             | Tipped down         |
+|            | `xaxis_touched` | x axis value       | Touch point left      | Touch point right   |
+|            | `yaxis_touched` | y axis value       | Touch point up        | Touch point down    |
+|            | `axes_touched`  | button touched     | Touch point invisible | Touch point visible |
 | Button     | `pressed`       | button value       | Unpressed             | Pressed             |
