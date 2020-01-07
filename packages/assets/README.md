@@ -126,3 +126,19 @@ The `componentProperty` property must be set to one of four values: `button`, `x
 ```
 
 In order for `visualResponses` to function, the associated 3D asset must contain a node named `<component id>-<visual response name>-value` whose `valueNodeProperty` will be modified in response to changes in the XRInputSource.  When the `valueNodeProperty` is a `transform`, the transform value will be interpolated between the transforms of the two nodes named `<component id>-<visual response name>-min` and `<component id>-<visual response name>-max`.
+
+Components have the following visual responses by default:
+| Type       | Responses       | Component Property | Min                   | Max                 |
+| ---------- | --------------- | ------------------ | --------------------- | ------------------- |
+| Trigger    | `pressed`       | button value       | Unpressed             | Pressed             |
+| Squeeze    | `pressed`       | button value       | Unpressed             | Pressed             |
+| Thumbstick | `pressed`       | button value       | Unpressed             | Pressed             |
+|            | `xaxis-pressed` | x axis value       | Tipped left           | Tipped right        |
+|            | `yaxis-pressed` | y axis value       | Tipped up             | Tipped down         |
+| Touchpad   | `pressed`       | button value       | Unpressed             | Pressed             |
+|            | `xaxis-pressed` | x axis value       | Tipped left           | Tipped right        |
+|            | `yaxis-pressed` | y axis value       | Tipped up             | Tipped down         |
+|            | `xaxis-touched` | x axis value       | Touch point left      | Touch point right   |
+|            | `yaxis-touched` | y axis value       | Touch point up        | Touch point down    |
+|            | `axes-touched`  | button touched     | Touch point invisible | Touch point visible |
+| Button     | `pressed`       | button value       | Unpressed             | Pressed             |
