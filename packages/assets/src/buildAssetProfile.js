@@ -4,27 +4,27 @@ const STANDARD_VISUAL_RESPONSES = {
     states: ['default', 'touched', 'pressed'],
     valueNodeProperty: 'transform'
   },
-  'xaxis-pressed': {
+  xaxis_pressed: {
     componentProperty: 'x-axis',
     states: ['default', 'touched', 'pressed'],
     valueNodeProperty: 'transform'
   },
-  'yaxis-pressed': {
+  yaxis_pressed: {
     componentProperty: 'y-axis',
     states: ['default', 'touched', 'pressed'],
     valueNodeProperty: 'transform'
   },
-  'xaxis-touched': {
+  xaxis_touched: {
     componentProperty: 'x-axis',
     states: ['default', 'touched', 'pressed'],
     valueNodeProperty: 'transform'
   },
-  'yaxis-touched': {
+  yaxis_touched: {
     componentProperty: 'y-axis',
     states: ['default', 'touched', 'pressed'],
     valueNodeProperty: 'transform'
   },
-  'axes-touched': {
+  axes_touched: {
     componentProperty: 'state',
     states: ['touched', 'pressed'],
     valueNodeProperty: 'visibility'
@@ -34,8 +34,8 @@ const STANDARD_VISUAL_RESPONSES = {
 const DEFAULT_COMPONENT_VISUAL_RESPONSES = {
   trigger: ['pressed'],
   squeeze: ['pressed'],
-  touchpad: ['pressed', 'xaxis-pressed', 'yaxis-pressed', 'xaxis-touched', 'yaxis-touched', 'axes-touched'],
-  thumbstick: ['pressed', 'xaxis-pressed', 'yaxis-pressed'],
+  touchpad: ['pressed', 'xaxis_pressed', 'yaxis_pressed', 'xaxis_touched', 'yaxis_touched', 'axes_touched'],
+  thumbstick: ['pressed', 'xaxis_pressed', 'yaxis_pressed'],
   button: ['pressed']
 };
 
@@ -64,11 +64,11 @@ function buildDefaultVisualResponses(componentId, componentType) {
   componentTypeDefault.forEach((responseId) => {
     // Copy the default response definition and add the node names
     const visualResponse = JSON.parse(JSON.stringify(STANDARD_VISUAL_RESPONSES[responseId]));
-    const visualResponseName = `${componentId}-${responseId}`;
-    visualResponse.valueNodeName = `${visualResponseName}-value`;
+    const visualResponseName = `${componentId}_${responseId}`;
+    visualResponse.valueNodeName = `${visualResponseName}_value`;
     if (visualResponse.valueNodeProperty === 'transform') {
-      visualResponse.minNodeName = `${visualResponseName}-min`;
-      visualResponse.maxNodeName = `${visualResponseName}-max`;
+      visualResponse.minNodeName = `${visualResponseName}_min`;
+      visualResponse.maxNodeName = `${visualResponseName}_max`;
     }
 
     visualResponses[visualResponseName] = visualResponse;
@@ -125,7 +125,7 @@ function applyAssetOverrides(profile, assetInfo) {
             component.visualResponses = component.visualResponses || {};
 
             Object.keys(visualResponseOverrides).forEach((shortResponseName) => {
-              const fullResponseName = `${componentId}-${shortResponseName}`;
+              const fullResponseName = `${componentId}_${shortResponseName}`;
 
               // If the overridden response is null, remove it the profile.  Otherwise, update its
               // properties based on the override
@@ -174,7 +174,7 @@ function buildAssetProfile(assetInfo, expandedRegistryProfile) {
   // Add default asset-specific properties
   Object.keys(profile.layouts).forEach((handedness) => {
     const layout = profile.layouts[handedness];
-    layout.rootNodeName = `${profile.profileId}-${handedness}`;
+    layout.rootNodeName = `${profile.profileId}_${handedness}`;
     layout.assetPath = `${handedness}.glb`;
 
     // Add the default node names and visual responses for the components based on their type
@@ -183,13 +183,16 @@ function buildAssetProfile(assetInfo, expandedRegistryProfile) {
       component.rootNodeName = componentId;
       component.visualResponses = buildDefaultVisualResponses(componentId, component.type);
       if (component.type === 'touchpad') {
-        component.touchPointNodeName = `${componentId}-axes-touched-value`;
+        component.touchPointNodeName = `${componentId}_axes_touched_value`;
       }
     });
   });
 
   // Override any properties enumerated in the asset description file
   applyAssetOverrides(profile, assetInfo);
+
+  // Replace all the "-" in component and asset names with the Maya compatible "_"
+  profile.layouts = JSON.parse(JSON.stringify(profile.layouts).replace(/-/g, '_'));
 
   return profile;
 }
