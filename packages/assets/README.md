@@ -79,11 +79,11 @@ Or:
 All specified handedness values must be present in the associated registry profile.  For example, if the registry has a defined `left-right` layout, the asset json can override `left` but not `none`.
 
 ### Layouts
-Within each layout, there must be a `rootNodeName`, `assetPath`, and/or a `components` property. The `rootNodeName` is the top node in the 3D asset hierarchy representing the motion controller, and is set to `<profile id>-<handedness>` by default. The `assetPath` is the relative path to the asset for the layout, and is set to `<handedness>.glb` by default.  The `components` property is explained further in the [components](#components) section.
+Within each layout, there must be a `rootNodeName`, `assetPath`, and/or a `components` property. The `rootNodeName` describes the top node in the 3D asset hierarchy representing the motion controller. As Maya files cannot name nodes with "-" characters, the default value for this node name is `<profile id>_<handedness>` with all "-" in the profile id changed to "_". The `assetPath` is the relative path to the asset for the layout, and is set to `<handedness>.glb` by default.  The `components` property is explained further in the [components](#components) section.
 ```json
 {
     "left" : {
-        "rootNodeName": "generic-trigger-left",
+        "rootNodeName": "generic_trigger_left",
         "assetPath": "left.glb",
         "components": {}
     }
@@ -91,15 +91,15 @@ Within each layout, there must be a `rootNodeName`, `assetPath`, and/or a `compo
 ```
 
 ### Components
-The `components` property may only contain keys for components defined in the associated registry profile.  When present, a component id key must point to an object which contains `rootNodeName`, `touchPointNodeName`, and/or `visualResponses`. The `rootNodeName` of a component is the top node in the 3D asset hierarchy representing the component, and is set to `<component id>` by default. The `touchPointNodeName` is the name of the node in the asset which will be updated to match the user's finger location on a touchpad. This node is named `<component id>-axes-touched-value` by default and is where developers may attach geometry to indicate a touch point. The `visualResponses` property contains the collection of [visual changes](#visual-responses) the component can apply in response to state changes in the backing `XRInputSource`.
+The `components` property may only contain keys for components defined in the associated registry profile.  When present, a component id key must point to an object which contains `rootNodeName`, `touchPointNodeName`, and/or `visualResponses`. The `rootNodeName` of a component describes the top node of a component within the 3D asset hierarchy. As Maya files cannot name nodes with "-" characters, the default value for this node name is `<component id>` with all "-" in the id changed to "_". The `touchPointNodeName` is the name of the node in the asset which will be updated to match the user's finger location on a touchpad. This node is named `<rootNodeName>-axes-touched-value` by default and is where developers may attach geometry to indicate a touch point. The `visualResponses` property contains the collection of [visual changes](#visual-responses) the component can apply in response to state changes in the backing `XRInputSource`.
 
 For example
 ```json
 {
     "components": {
         "xr-standard-touchpad": {
-            "rootNodeName" : "xr-standard-trigger",
-            "touchPointNodeName": "xr-standard-touchpad_axes_touched_value",
+            "rootNodeName" : "xr_standard_trigger",
+            "touchPointNodeName": "xr_standard_touchpad_axes_touched_value",
             "visualResponses": {}
         }
     }
@@ -125,7 +125,7 @@ The `componentProperty` property must be set to one of four values: `button`, `x
 }
 ```
 
-In order for `visualResponses` to function, the associated 3D asset must contain a node named `<component id>-<visual response name>-value` whose `valueNodeProperty` will be modified in response to changes in the XRInputSource.  When the `valueNodeProperty` is a `transform`, the transform value will be interpolated between the transforms of the two nodes named `<component id>-<visual response name>-min` and `<component id>-<visual response name>-max`.
+In order for `visualResponses` to function, the associated 3D asset must contain a node named `<rootNodeName>_<visual response name>_value` whose `valueNodeProperty` will be modified in response to changes in the XRInputSource.  When the `valueNodeProperty` is a `transform`, the transform value will be interpolated between the transforms of the two nodes named `<rootNodeName>_<visual response name>_min` and `<rootNodeName>_<visual response name>_max`.
 
 Components have the following visual responses by default:
 | Type       | Responses       | Component Property | Min                   | Max                 |

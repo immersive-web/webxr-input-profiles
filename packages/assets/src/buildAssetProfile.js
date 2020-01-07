@@ -5,22 +5,22 @@ const STANDARD_VISUAL_RESPONSES = {
     valueNodeProperty: 'transform'
   },
   xaxis_pressed: {
-    componentProperty: 'x-axis',
+    componentProperty: 'x_axis',
     states: ['default', 'touched', 'pressed'],
     valueNodeProperty: 'transform'
   },
   yaxis_pressed: {
-    componentProperty: 'y-axis',
+    componentProperty: 'y_axis',
     states: ['default', 'touched', 'pressed'],
     valueNodeProperty: 'transform'
   },
   xaxis_touched: {
-    componentProperty: 'x-axis',
+    componentProperty: 'x_axis',
     states: ['default', 'touched', 'pressed'],
     valueNodeProperty: 'transform'
   },
   yaxis_touched: {
-    componentProperty: 'y-axis',
+    componentProperty: 'y_axis',
     states: ['default', 'touched', 'pressed'],
     valueNodeProperty: 'transform'
   },
@@ -55,16 +55,16 @@ class AssetProfileError extends Error {
 /**
  * Build the set of default visual responses for a given component type.  Node names are based
  * on the component's id and the name of the response.
- * @param {string} componentId
+ * @param {string} rootNodeName
  * @param {string} componentType
  */
-function buildDefaultVisualResponses(componentId, componentType) {
+function buildDefaultVisualResponses(rootNodeName, componentType) {
   const visualResponses = {};
   const componentTypeDefault = DEFAULT_COMPONENT_VISUAL_RESPONSES[componentType];
   componentTypeDefault.forEach((responseId) => {
     // Copy the default response definition and add the node names
     const visualResponse = JSON.parse(JSON.stringify(STANDARD_VISUAL_RESPONSES[responseId]));
-    const visualResponseName = `${componentId}_${responseId}`;
+    const visualResponseName = `${rootNodeName}_${responseId}`;
     visualResponse.valueNodeName = `${visualResponseName}_value`;
     if (visualResponse.valueNodeProperty === 'transform') {
       visualResponse.minNodeName = `${visualResponseName}_min`;
@@ -125,7 +125,7 @@ function applyAssetOverrides(profile, assetInfo) {
             component.visualResponses = component.visualResponses || {};
 
             Object.keys(visualResponseOverrides).forEach((shortResponseName) => {
-              const fullResponseName = `${componentId}_${shortResponseName}`;
+              const fullResponseName = `${componentId}-${shortResponseName}`;
 
               // If the overridden response is null, remove it the profile.  Otherwise, update its
               // properties based on the override
@@ -174,25 +174,23 @@ function buildAssetProfile(assetInfo, expandedRegistryProfile) {
   // Add default asset-specific properties
   Object.keys(profile.layouts).forEach((handedness) => {
     const layout = profile.layouts[handedness];
-    layout.rootNodeName = `${profile.profileId}_${handedness}`;
+    layout.rootNodeName = `${profile.profileId}-${handedness}`;
     layout.assetPath = `${handedness}.glb`;
 
     // Add the default node names and visual responses for the components based on their type
     Object.keys(layout.components).forEach((componentId) => {
       const component = layout.components[componentId];
-      component.rootNodeName = componentId;
-      component.visualResponses = buildDefaultVisualResponses(componentId, component.type);
+      const rootNodeName = componentId.replace(/-/g, '_');
+      component.rootNodeName = rootNodeName;
+      component.visualResponses = buildDefaultVisualResponses(rootNodeName, component.type);
       if (component.type === 'touchpad') {
-        component.touchPointNodeName = `${componentId}_axes_touched_value`;
+        component.touchPointNodeName = `${rootNodeName}_axes_touched_value`;
       }
     });
   });
 
   // Override any properties enumerated in the asset description file
   applyAssetOverrides(profile, assetInfo);
-
-  // Replace all the "-" in component and asset names with the Maya compatible "_"
-  profile.layouts = JSON.parse(JSON.stringify(profile.layouts).replace(/-/g, '_'));
 
   return profile;
 }
