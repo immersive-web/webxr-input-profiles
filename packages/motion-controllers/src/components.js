@@ -16,44 +16,26 @@ class Component {
     }
 
     this.id = componentId;
-    this.description = componentDescription;
+    this.type = componentDescription.type;
+    this.rootNodeName = componentDescription.rootNodeName;
+    this.touchPointNodeName = componentDescription.touchPointNodeName;
 
     // Build all the visual responses for this component
     this.visualResponses = {};
-    Object.keys(this.description.visualResponses).forEach((responseName) => {
-      const visualResponse = new VisualResponse(this.description.visualResponses[responseName]);
+    Object.keys(componentDescription.visualResponses).forEach((responseName) => {
+      const visualResponse = new VisualResponse(componentDescription.visualResponses[responseName]);
       this.visualResponses[responseName] = visualResponse;
     });
 
     // Set default values
-    const {
-      [Constants.ComponentProperty.BUTTON]: buttonIndex,
-      [Constants.ComponentProperty.X_AXIS]: xAxisIndex,
-      [Constants.ComponentProperty.Y_AXIS]: yAxisIndex
-    } = this.description.gamepadIndices;
+    this.gamepadIndices = Object.assign({}, componentDescription.gamepadIndices);
 
     this.values = {
       state: Constants.ComponentState.DEFAULT,
-      button: (buttonIndex !== undefined) ? 0 : undefined,
-      xAxis: (xAxisIndex !== undefined) ? 0 : undefined,
-      yAxis: (yAxisIndex !== undefined) ? 0 : undefined
+      button: (this.gamepadIndices.button !== undefined) ? 0 : undefined,
+      xAxis: (this.gamepadIndices.xAxis !== undefined) ? 0 : undefined,
+      yAxis: (this.gamepadIndices.yAxis !== undefined) ? 0 : undefined
     };
-  }
-
-  get type() {
-    return this.description.type;
-  }
-
-  get rootNodeName() {
-    return this.description.rootNodeName;
-  }
-
-  get labelAnchorNodeName() {
-    return this.description.labelAnchorNodeName;
-  }
-
-  get touchPointNodeName() {
-    return this.description.touchPointNodeName;
   }
 
   get data() {
@@ -66,18 +48,12 @@ class Component {
    * @param {Object} gamepad - The gamepad object from which the component data should be polled
    */
   updateFromGamepad(gamepad) {
-    const {
-      [Constants.ComponentProperty.BUTTON]: buttonIndex,
-      [Constants.ComponentProperty.X_AXIS]: xAxisIndex,
-      [Constants.ComponentProperty.Y_AXIS]: yAxisIndex
-    } = this.description.gamepadIndices;
-
     // Set the state to default before processing other data sources
     this.values.state = Constants.ComponentState.DEFAULT;
 
     // Get and normalize button
-    if (buttonIndex !== undefined) {
-      const gamepadButton = gamepad.buttons[buttonIndex];
+    if (this.gamepadIndices.button !== undefined) {
+      const gamepadButton = gamepad.buttons[this.gamepadIndices.button];
       this.values.button = gamepadButton.value;
       this.values.button = (this.values.button < 0) ? 0 : this.values.button;
       this.values.button = (this.values.button > 1) ? 1 : this.values.button;
@@ -91,8 +67,8 @@ class Component {
     }
 
     // Get and normalize x axis value
-    if (xAxisIndex !== undefined) {
-      this.values.xAxis = gamepad.axes[xAxisIndex];
+    if (this.gamepadIndices.xAxis !== undefined) {
+      this.values.xAxis = gamepad.axes[this.gamepadIndices.xAxis];
       this.values.xAxis = (this.values.xAxis < -1) ? -1 : this.values.xAxis;
       this.values.xAxis = (this.values.xAxis > 1) ? 1 : this.values.xAxis;
 
@@ -104,8 +80,8 @@ class Component {
     }
 
     // Get and normalize Y axis value
-    if (yAxisIndex !== undefined) {
-      this.values.yAxis = gamepad.axes[yAxisIndex];
+    if (this.gamepadIndices.yAxis !== undefined) {
+      this.values.yAxis = gamepad.axes[this.gamepadIndices.yAxis];
       this.values.yAxis = (this.values.yAxis < -1) ? -1 : this.values.yAxis;
       this.values.yAxis = (this.values.yAxis > 1) ? 1 : this.values.yAxis;
 
