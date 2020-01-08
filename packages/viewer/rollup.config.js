@@ -4,11 +4,11 @@ const DIST_FOLDER = 'dist';
 
 export default [
   {
-    input: ['src/index.js'],
+    input: ['src/modelViewer.js'],
     output: [
       {
         format: 'es',
-        file: `${DIST_FOLDER}/index.js`
+        file: `${DIST_FOLDER}/modelViewer.js`
       }
     ],
     external: [
@@ -16,6 +16,7 @@ export default [
       './three/examples/jsm/loaders/GLTFLoader.js',
       './three/examples/jsm/loaders/FBXLoader.js',
       './three/examples/jsm/controls/OrbitControls.js',
+      './three/examples/jsm/webxr/VRButton.js',
       './ajv/ajv.min.js',
       './motion-controllers.module.js',
       '../motion-controllers.module.js',

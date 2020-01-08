@@ -2,13 +2,12 @@ let motionController;
 let mockGamepad;
 let controlsListElement;
 
-function animationFrameCallback() {
+function updateText() {
   if (motionController) {
     Object.values(motionController.components).forEach((component) => {
       const dataElement = document.getElementById(`${component.id}_data`);
       dataElement.innerHTML = JSON.stringify(component.data, null, 2);
     });
-    window.requestAnimationFrame(animationFrameCallback);
   }
 }
 
@@ -91,9 +90,7 @@ function build(sourceMotionController) {
     const dataElement = document.createElement('pre');
     dataElement.id = `${component.id}_data`;
     componentControlsElement.appendChild(dataElement);
-
-    window.requestAnimationFrame(animationFrameCallback);
   });
 }
 
-export default { clear, build };
+export default { clear, build, updateText };
