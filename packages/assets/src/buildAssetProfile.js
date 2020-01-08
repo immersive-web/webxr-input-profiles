@@ -4,6 +4,11 @@ const STANDARD_VISUAL_RESPONSES = {
     states: ['default', 'touched', 'pressed'],
     valueNodeProperty: 'transform'
   },
+  pressed_mirror: {
+    componentProperty: 'button',
+    states: ['default', 'touched', 'pressed'],
+    valueNodeProperty: 'transform'
+  },
   xaxis_pressed: {
     componentProperty: 'xAxis',
     states: ['default', 'touched', 'pressed'],
@@ -32,11 +37,27 @@ const STANDARD_VISUAL_RESPONSES = {
 };
 
 const DEFAULT_COMPONENT_VISUAL_RESPONSES = {
-  trigger: ['pressed'],
-  squeeze: ['pressed'],
-  touchpad: ['pressed', 'xaxis_pressed', 'yaxis_pressed', 'xaxis_touched', 'yaxis_touched', 'axes_touched'],
-  thumbstick: ['pressed', 'xaxis_pressed', 'yaxis_pressed'],
-  button: ['pressed']
+  left: {
+    trigger: ['pressed'],
+    squeeze: ['pressed'],
+    touchpad: ['pressed', 'xaxis_pressed', 'yaxis_pressed', 'xaxis_touched', 'yaxis_touched', 'axes_touched'],
+    thumbstick: ['pressed', 'xaxis_pressed', 'yaxis_pressed'],
+    button: ['pressed']
+  },
+  right: {
+    trigger: ['pressed'],
+    squeeze: ['pressed'],
+    touchpad: ['pressed', 'xaxis_pressed', 'yaxis_pressed', 'xaxis_touched', 'yaxis_touched', 'axes_touched'],
+    thumbstick: ['pressed', 'xaxis_pressed', 'yaxis_pressed'],
+    button: ['pressed']
+  },
+  none: {
+    trigger: ['pressed'],
+    squeeze: ['pressed', 'pressed_mirror'],
+    touchpad: ['pressed', 'xaxis_pressed', 'yaxis_pressed', 'xaxis_touched', 'yaxis_touched', 'axes_touched'],
+    thumbstick: ['pressed', 'xaxis_pressed', 'yaxis_pressed'],
+    button: ['pressed']
+  }
 };
 
 class AssetProfileError extends Error {
@@ -55,12 +76,14 @@ class AssetProfileError extends Error {
 /**
  * Build the set of default visual responses for a given component type.  Node names are based
  * on the component's id and the name of the response.
- * @param {string} rootNodeName
- * @param {string} componentType
+ * @param {Object} component
+ * @param {string} component.rootNodeName
+ * @param {string} component.type
+ * @param {string} handedness
  */
-function buildDefaultVisualResponses(rootNodeName, componentType) {
+function buildDefaultVisualResponses({ rootNodeName, type }, handedness) {
   const visualResponses = {};
-  const componentTypeDefault = DEFAULT_COMPONENT_VISUAL_RESPONSES[componentType];
+  const componentTypeDefault = DEFAULT_COMPONENT_VISUAL_RESPONSES[handedness][type];
   componentTypeDefault.forEach((responseId) => {
     // Copy the default response definition and add the node names
     const visualResponse = JSON.parse(JSON.stringify(STANDARD_VISUAL_RESPONSES[responseId]));
@@ -182,7 +205,7 @@ function buildAssetProfile(assetInfo, expandedRegistryProfile) {
       const component = layout.components[componentId];
       const rootNodeName = componentId.replace(/-/g, '_');
       component.rootNodeName = rootNodeName;
-      component.visualResponses = buildDefaultVisualResponses(rootNodeName, component.type);
+      component.visualResponses = buildDefaultVisualResponses(component, handedness);
       if (component.type === 'touchpad') {
         component.touchPointNodeName = `${rootNodeName}_axes_touched_value`;
       }
