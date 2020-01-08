@@ -13,8 +13,8 @@ const Constants = {
 
   ComponentProperty: Object.freeze({
     BUTTON: 'button',
-    X_AXIS: 'x-axis',
-    Y_AXIS: 'y-axis',
+    X_AXIS: 'x_axis',
+    Y_AXIS: 'y_axis',
     STATE: 'state'
   }),
 
