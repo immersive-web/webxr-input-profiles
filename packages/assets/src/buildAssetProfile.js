@@ -5,22 +5,22 @@ const STANDARD_VISUAL_RESPONSES = {
     valueNodeProperty: 'transform'
   },
   xaxis_pressed: {
-    componentProperty: 'x_axis',
+    componentProperty: 'xAxis',
     states: ['default', 'touched', 'pressed'],
     valueNodeProperty: 'transform'
   },
   yaxis_pressed: {
-    componentProperty: 'y_axis',
+    componentProperty: 'yAxis',
     states: ['default', 'touched', 'pressed'],
     valueNodeProperty: 'transform'
   },
   xaxis_touched: {
-    componentProperty: 'x_axis',
+    componentProperty: 'xAxis',
     states: ['default', 'touched', 'pressed'],
     valueNodeProperty: 'transform'
   },
   yaxis_touched: {
-    componentProperty: 'y_axis',
+    componentProperty: 'yAxis',
     states: ['default', 'touched', 'pressed'],
     valueNodeProperty: 'transform'
   },

@@ -1,7 +1,3 @@
-/* eslint-disable import/no-unresolved */
-import { Constants } from './motion-controllers.module.js';
-/* eslint-enable */
-
 let motionController;
 let mockGamepad;
 let controlsListElement;
@@ -72,12 +68,6 @@ function build(sourceMotionController) {
   mockGamepad = motionController.xrInputSource.gamepad;
 
   Object.values(motionController.components).forEach((component) => {
-    const {
-      [Constants.ComponentProperty.BUTTON]: buttonIndex,
-      [Constants.ComponentProperty.X_AXIS]: xAxisIndex,
-      [Constants.ComponentProperty.Y_AXIS]: yAxisIndex
-    } = component.description.gamepadIndices;
-
     const componentControlsElement = document.createElement('li');
     componentControlsElement.setAttribute('class', 'component');
     controlsListElement.appendChild(componentControlsElement);
@@ -86,16 +76,16 @@ function build(sourceMotionController) {
     headingElement.innerText = `${component.id}`;
     componentControlsElement.appendChild(headingElement);
 
-    if (buttonIndex !== undefined) {
-      addButtonControls(componentControlsElement, buttonIndex);
+    if (component.gamepadIndices.button !== undefined) {
+      addButtonControls(componentControlsElement, component.gamepadIndices.button);
     }
 
-    if (xAxisIndex !== undefined) {
-      addAxisControls(componentControlsElement, 'xAxis', xAxisIndex);
+    if (component.gamepadIndices.xAxis !== undefined) {
+      addAxisControls(componentControlsElement, 'xAxis', component.gamepadIndices.xAxis);
     }
 
-    if (yAxisIndex !== undefined) {
-      addAxisControls(componentControlsElement, 'yAxis', yAxisIndex);
+    if (component.gamepadIndices.yAxis !== undefined) {
+      addAxisControls(componentControlsElement, 'yAxis', component.gamepadIndices.yAxis);
     }
 
     const dataElement = document.createElement('pre');

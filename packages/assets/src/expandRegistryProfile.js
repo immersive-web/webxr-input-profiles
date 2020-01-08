@@ -35,7 +35,13 @@ function expandRegistryProfile(registryProfile) {
           // Add axes indices to component
           layoutInfo.gamepad.axes.forEach((axisInfo, index) => {
             if (axisInfo !== null && axisInfo.componentId === componentId) {
-              component.gamepadIndices[axisInfo.axis] = index;
+              const axisIndexName = {
+                'x-axis': 'xAxis',
+                'y-axis': 'yAxis',
+                'z-axis': 'zAxis'
+              }[axisInfo.axis];
+
+              component.gamepadIndices[axisIndexName] = index;
             }
           });
 
