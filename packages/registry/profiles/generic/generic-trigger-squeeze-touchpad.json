@@ -1,14 +1,14 @@
 {
     "profileId": "generic-trigger-squeeze-touchpad",
-    "openxrId" : "/interaction_profiles/khr/simple_controller",
+    "openxrInteractionPath" : "/interaction_profiles/khr/simple_controller",
     "fallbackProfileIds": [],
     "layouts" : {
         "left-right-none" : {
             "selectComponentId": "xr-standard-trigger",
             "components": {
-                "xr-standard-trigger": { "type": "trigger", "openxrInteractionPath": "user/hand/*/trigger"},
-                "xr-standard-squeeze": { "type": "squeeze", "openxrInteractionPath": "user/hand/*/squeeze" },
-                "xr-standard-touchpad": { "type": "touchpad", "openxrInteractionPath": "user/hand/*/trackpad" }
+                "xr-standard-trigger": { "type": "trigger", "openxrComponentPath": "user/hand/*/input/trigger"},
+                "xr-standard-squeeze": { "type": "squeeze", "openxrComponentPath": "user/hand/*/input/squeeze" },
+                "xr-standard-touchpad": { "type": "touchpad", "openxrComponentPath": "user/hand/*/input/trackpad" }
             },
             "gamepad": {
                 "mapping": "xr-standard",
