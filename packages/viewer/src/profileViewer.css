@@ -3,17 +3,54 @@
   margin: 0;
 }
 
-h1 {
-  padding-bottom: .5em;
-}
-
 .leftSide {
   width: calc(50% - 2em);
   padding: 1em;
 }
 
+.rightSide {
+  height: 100vh;
+  position: absolute;
+  width: 50%;
+  right: 0;
+  top: 0;
+}
+
 section {
   margin-bottom: 1em;
+}
+
+.instructions {
+  padding-bottom: .7em;
+}
+
+.instructions summary {
+    font-weight: bold;
+    list-style-type: none;
+}
+
+.instructions #title {
+  text-decoration: underline;
+}
+
+.instructions #title::before {
+  content: "Show "
+}
+
+.instructions details[open] #title::before {
+  content: "Hide "
+}
+
+.instructions p {
+  padding-top: .4em;
+  padding-left: .5em;
+  padding-right: .5em;
+}
+
+#localFilesList {
+  margin-top: .5em;
+  margin-left: .5em;
+  list-style: inside;
 }
 
 .component {
@@ -45,21 +82,4 @@ section {
 #errors ul {
   margin: 0.5em;
   list-style-position: inside;
-}
-
-#modelViewer {
-  height: 100vh;
-  position: absolute;
-  width: 50%;
-  right: 0;
-  top: 0;
-}
-
-#localProfile {
-  margin-top: .5em;
-}
-
-#localProfile ul {
-  margin-left: .5em;
-  list-style: inside;
 }
