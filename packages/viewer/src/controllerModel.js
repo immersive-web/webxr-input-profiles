@@ -12,9 +12,10 @@ class ControllerModel extends THREE.Object3D {
   constructor() {
     super();
     this.xrInputSource = null;
-    this.rootNode = null;
-    this.nodes = [];
     this.motionController = null;
+    this.asset = null;
+    this.rootNode = null;
+    this.nodes = {};
     this.loaded = false;
   }
 
