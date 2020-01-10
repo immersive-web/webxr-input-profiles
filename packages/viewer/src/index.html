@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <title>WebXR Input Profile Viewer</title>
-        <script type="module" src="./index.js"></script>
+        <script type="module" src="./modelViewer.js"></script>
         <link rel="stylesheet" type="text/css" href="./profileViewer.css" />
     </head>
     <body>
@@ -11,25 +11,15 @@
             <div class="leftSide">
                 <h1>WebXR Input Profile Viewer</h1>
                 <section id="selectors">
-                    <div id="profileSourceType">
-                        <label>Select profiles source</label>
-                        <br>
-                        <label for="repositoryRadioButton">Repository</label>
-                        <input id="repositoryRadioButton" value="repository" checked="true" type="radio" name="sourceSelector">
-                        <label for="localProfileRadioButton">Local Profile</label>
-                        <input id="localProfileRadioButton" value="localProfile" type="radio" name="sourceSelector">
-                    </div>
-                    <div id="repository" hidden=true disabled=true>
-                        <label for="repositoryProfileIdSelector">Select profile</label>
-                        <select id="repositoryProfileIdSelector"></select>
-                    </div>
-                    <div id="localProfile" hidden="true" disabled=true>
-                        <label for="localProfileSelector">Select local files</label>
-                        <input id="localProfileSelector" type="file" multiple>
-                        <ul id="localProfileFilesList"></ul>
-                    </div>
+                    <label for="profileIdSelector">Select profile</label>
+                    <select id="profileIdSelector"></select>
+                    <select id="handednessSelector"></select>
+                    <label for="localFilesSelector">Select local files</label>
+                    <input id="localFilesSelector" type="file" multiple>
+                    <ul id="localFilesList"></ul>
                 </section>
                 <section id="errors" hidden="true">
+                    <ul id="errorsList"></ul>
                 </section>
                 <section id="controls">
                     <ul id="controlsList">
