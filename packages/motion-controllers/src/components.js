@@ -52,8 +52,8 @@ class Component {
     this.values.state = Constants.ComponentState.DEFAULT;
 
     // Get and normalize button
-    if (this.gamepadIndices.button !== undefined &&
-        gamepad.buttons.length > this.gamepadIndices.button) {
+    if (this.gamepadIndices.button !== undefined
+        && gamepad.buttons.length > this.gamepadIndices.button) {
       const gamepadButton = gamepad.buttons[this.gamepadIndices.button];
       this.values.button = gamepadButton.value;
       this.values.button = (this.values.button < 0) ? 0 : this.values.button;
@@ -68,8 +68,8 @@ class Component {
     }
 
     // Get and normalize x axis value
-    if (this.gamepadIndices.xAxis !== undefined &&
-      gamepad.axes.length > this.gamepadIndices.xAxis) {
+    if (this.gamepadIndices.xAxis !== undefined
+        && gamepad.axes.length > this.gamepadIndices.xAxis) {
       this.values.xAxis = gamepad.axes[this.gamepadIndices.xAxis];
       this.values.xAxis = (this.values.xAxis < -1) ? -1 : this.values.xAxis;
       this.values.xAxis = (this.values.xAxis > 1) ? 1 : this.values.xAxis;
@@ -82,8 +82,8 @@ class Component {
     }
 
     // Get and normalize Y axis value
-    if (this.gamepadIndices.yAxis !== undefined &&
-      gamepad.axes.length > this.gamepadIndices.yAxis) {
+    if (this.gamepadIndices.yAxis !== undefined
+        && gamepad.axes.length > this.gamepadIndices.yAxis) {
       this.values.yAxis = gamepad.axes[this.gamepadIndices.yAxis];
       this.values.yAxis = (this.values.yAxis < -1) ? -1 : this.values.yAxis;
       this.values.yAxis = (this.values.yAxis > 1) ? 1 : this.values.yAxis;
