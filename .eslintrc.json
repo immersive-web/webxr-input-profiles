@@ -15,6 +15,7 @@
         "sourceType": "module"
     },
     "rules": {
+        "linebreak-style": ["warn", "unix"],
         "comma-dangle": ["error", "never"],
         "import/no-extraneous-dependencies": ["error", {"packageDir": "./"}]
     },
