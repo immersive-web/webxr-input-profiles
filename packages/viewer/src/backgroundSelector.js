@@ -10,20 +10,20 @@ export default class BackgroundSelector extends EventTarget {
     this.selectedBackground = window.localStorage.getItem('background') || defaultBackground;
     this.backgroundList = {};
     fetch('backgrounds/backgrounds.json')
-      .then((response) => response.json())
+      .then(response => response.json())
       .then((backgrounds) => {
-      this.backgroundList = backgrounds;
-      for(let background in backgrounds) {
-        const option = document.createElement('option');
-        option.value = background;
-        option.innerText = background;
-        if (this.selectedBackground == background) {
-          option.selected = true;
-        }
-        this.backgroundSelectorElement.appendChild(option); 
-      }
-      this.dispatchEvent(new Event('selectionchange'));
-    });
+        this.backgroundList = backgrounds;
+        Object.keys(backgrounds).forEach((background) => {
+          const option = document.createElement('option');
+          option.value = background;
+          option.innerText = background;
+          if (this.selectedBackground === background) {
+            option.selected = true;
+          }
+          this.backgroundSelectorElement.appendChild(option);
+        });
+        this.dispatchEvent(new Event('selectionchange'));
+      });
   }
 
   onBackgroundChange() {

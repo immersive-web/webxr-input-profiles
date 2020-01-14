@@ -17,25 +17,27 @@ class ControllerModel extends THREE.Object3D {
     this.rootNode = null;
     this.nodes = {};
     this.loaded = false;
-    this._environmentMap = null;
+    this.envMap = null;
   }
 
   set environmentMap(value) {
-    if (this._environmentMap == value) {
+    if (this.envMap === value) {
       return;
     }
 
-    this._environmentMap = value;
+    this.envMap = value;
+    /* eslint-disable no-param-reassign */
     this.traverse((child) => {
       if (child.isMesh) {
-        child.material.envMap = this._environmentMap;
+        child.material.envMap = this.envMap;
         child.material.needsUpdate = true;
       }
     });
+    /* eslint-enable */
   }
 
   get environmentMap() {
-    return this._environmentMap;
+    return this.envMap;
   }
 
   async initialize(motionController) {
@@ -52,12 +54,14 @@ class ControllerModel extends THREE.Object3D {
       );
     }));
 
-    if (this._environmentMap) {
+    if (this.envMap) {
+      /* eslint-disable no-param-reassign */
       this.asset.scene.traverse((child) => {
         if (child.isMesh) {
-          child.material.envMap = this._environmentMap;
+          child.material.envMap = this.envMap;
         }
       });
+      /* eslint-enable */
     }
 
     this.rootNode = this.asset.scene;
