@@ -83,3 +83,9 @@ section {
   margin: 0.5em;
   list-style-position: inside;
 }
+
+#backgrounds {
+  position: absolute;
+  z-index: 2;
+  margin: 1em;
+}
