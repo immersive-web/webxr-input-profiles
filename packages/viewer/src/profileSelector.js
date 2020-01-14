@@ -22,6 +22,8 @@ class ProfileSelector extends EventTarget {
     this.handednessSelectorElement = document.getElementById('handednessSelector');
     this.handednessSelectorElement.addEventListener('change', () => { this.onHandednessChange(); });
 
+    this.forceVRProfileElement = document.getElementById('forceVRProfile');
+
     this.localProfile = new LocalProfile();
     this.localProfile.addEventListener('localprofilechange', (event) => { this.onLocalProfileChange(event); });
 
@@ -163,6 +165,13 @@ class ProfileSelector extends EventTarget {
    */
   onLocalProfileChange() {
     this.populateProfileSelector();
+  }
+
+  /**
+   * Updates the profiles dropdown to ensure local profile is in the list
+   */
+  get forceVRProfile() {
+    return this.forceVRProfileElement.checked;
   }
 
   /**
