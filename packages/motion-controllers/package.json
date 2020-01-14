@@ -12,7 +12,8 @@
     "src/**"
   ],
   "scripts": {
-    "clean": "rm -r dist 2> /dev/null || true",
+    "clean": "node -e \"require('fs').rmdirSync('dist', { recursive: true });\"",
+      "badClean": "rm -r dist 2> /dev/null || true",
     "build": "rollup -c",
     "cleanBuild": "npm run clean && npm run build",
     "watch": "rollup -c -w -m inline",
