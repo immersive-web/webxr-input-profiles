@@ -6,7 +6,7 @@ class MockXRInputSource {
    * @param {Object} gamepad - The Gamepad object that provides the button and axis data
    * @param {string} handedness - The handedness to report
    */
-  constructor(gamepad, handedness) {
+  constructor(profiles, gamepad, handedness) {
     this.gamepad = gamepad;
 
     if (!handedness) {
@@ -14,7 +14,7 @@ class MockXRInputSource {
     }
 
     this.handedness = handedness;
-    this.profiles = Object.freeze([this.gamepad.id]);
+    this.profiles = Object.freeze(profiles);
   }
 }
 

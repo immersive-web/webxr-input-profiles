@@ -33,7 +33,14 @@ function initializeVRController(index) {
     const controllerModel = new ControllerModel();
     vrController.add(controllerModel);
 
-    const motionController = await profileSelector.createMotionController(event.data);
+    let xrInputSource = event.data;
+    if (profileSelector.forceVRProfile) {
+      xrInputSource = new MockXRInputSource(
+        [profileSelector.profile.profileId], event.data.gamepad, event.data.handedness
+      );
+    }
+
+    const motionController = await profileSelector.createMotionController(xrInputSource);
     await controllerModel.initialize(motionController);
   });
 
@@ -126,7 +133,9 @@ function onSelectionClear() {
 async function onSelectionChange() {
   onSelectionClear();
   const mockGamepad = new MockGamepad(profileSelector.profile, profileSelector.handedness);
-  const mockXRInputSource = new MockXRInputSource(mockGamepad, profileSelector.handedness);
+  const mockXRInputSource = new MockXRInputSource(
+    [profileSelector.profile.profileId], mockGamepad, profileSelector.handedness
+  );
   mockControllerModel = new ControllerModel(mockXRInputSource);
   three.scene.add(mockControllerModel);
 
