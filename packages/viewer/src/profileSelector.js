@@ -77,6 +77,7 @@ class ProfileSelector extends EventTarget {
       this.profileIdSelectorElement.innerHTML += `
       <option value='${this.localProfile.profileId}'>${this.localProfile.profileId}</option>
       `;
+      this.profilesList[this.localProfile.profileId] = this.localProfile;
     }
 
     // Override the default selection if values were present in local storage
