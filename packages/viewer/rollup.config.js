@@ -13,6 +13,7 @@ export default [
     ],
     external: [
       './three/build/three.module.js',
+      './three/examples/jsm/loaders/RGBELoader.js',
       './three/examples/jsm/loaders/GLTFLoader.js',
       './three/examples/jsm/loaders/FBXLoader.js',
       './three/examples/jsm/controls/OrbitControls.js',
@@ -28,6 +29,12 @@ export default [
       copy(
         [
           { files: 'src/*.{html,css}', dest: `${DIST_FOLDER}` }
+        ],
+        { verbose: true, watch: process.env.ROLLUP_WATCH }
+      ),
+      copy(
+        [
+          { files: 'backgrounds/*.{hdr,json}', dest: `${DIST_FOLDER}/backgrounds` }
         ],
         { verbose: true, watch: process.env.ROLLUP_WATCH }
       ),

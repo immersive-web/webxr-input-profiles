@@ -17,6 +17,27 @@ class ControllerModel extends THREE.Object3D {
     this.rootNode = null;
     this.nodes = {};
     this.loaded = false;
+    this.envMap = null;
+  }
+
+  set environmentMap(value) {
+    if (this.envMap === value) {
+      return;
+    }
+
+    this.envMap = value;
+    /* eslint-disable no-param-reassign */
+    this.traverse((child) => {
+      if (child.isMesh) {
+        child.material.envMap = this.envMap;
+        child.material.needsUpdate = true;
+      }
+    });
+    /* eslint-enable */
+  }
+
+  get environmentMap() {
+    return this.envMap;
   }
 
   async initialize(motionController) {
@@ -32,6 +53,16 @@ class ControllerModel extends THREE.Object3D {
         () => { reject(new AssetError(`Asset ${motionController.assetUrl} missing or malformed.`)); }
       );
     }));
+
+    if (this.envMap) {
+      /* eslint-disable no-param-reassign */
+      this.asset.scene.traverse((child) => {
+        if (child.isMesh) {
+          child.material.envMap = this.envMap;
+        }
+      });
+      /* eslint-enable */
+    }
 
     this.rootNode = this.asset.scene;
     this.addTouchDots();

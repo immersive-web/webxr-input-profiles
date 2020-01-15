@@ -1,12 +1,14 @@
 /* eslint-disable import/no-unresolved */
 import * as THREE from './three/build/three.module.js';
 import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
+import { RGBELoader } from './three/examples/jsm/loaders/RGBELoader.js';
 import { VRButton } from './three/examples/jsm/webxr/VRButton.js';
 /* eslint-enable */
 
 import ManualControls from './manualControls.js';
 import ControllerModel from './controllerModel.js';
 import ProfileSelector from './profileSelector.js';
+import BackgroundSelector from './backgroundSelector.js';
 import AssetError from './assetError.js';
 import MockGamepad from './mocks/mockGamepad.js';
 import MockXRInputSource from './mocks/mockXRInputSource.js';
@@ -15,6 +17,7 @@ const three = {};
 let canvasParentElement;
 
 let profileSelector;
+let backgroundSelector;
 let mockControllerModel;
 let isImmersive = false;
 
@@ -96,13 +99,6 @@ function initializeThree() {
   three.cameraControls.enablePan = false;
   three.cameraControls.update();
 
-  // Set up the lights so the model can be seen
-  const bottomDirectionalLight = new THREE.DirectionalLight(0xFFFFFF, 2);
-  bottomDirectionalLight.position.set(0, -1, 0);
-  three.scene.add(bottomDirectionalLight);
-  const topDirectionalLight = new THREE.DirectionalLight(0xFFFFFF, 2);
-  three.scene.add(topDirectionalLight);
-
   // Add VR
   canvasParentElement.appendChild(VRButton.createButton(three.renderer));
   three.renderer.xr.enabled = true;
@@ -137,6 +133,32 @@ async function onSelectionChange() {
   const motionController = await profileSelector.createMotionController(mockXRInputSource);
   ManualControls.build(motionController);
   await mockControllerModel.initialize(motionController);
+
+  if (three.environmentMap) {
+    mockControllerModel.environmentMap = three.environmentMap;
+  }
+}
+
+async function onBackgroundChange() {
+  const pmremGenerator = new THREE.PMREMGenerator(three.renderer);
+  pmremGenerator.compileEquirectangularShader();
+
+  await new Promise((resolve) => {
+    const rgbeLoader = new RGBELoader();
+    rgbeLoader.setDataType(THREE.UnsignedByteType);
+    rgbeLoader.setPath('backgrounds/');
+    rgbeLoader.load(backgroundSelector.backgroundPath, (texture) => {
+      three.environmentMap = pmremGenerator.fromEquirectangular(texture).texture;
+      three.scene.background = three.environmentMap;
+
+      if (mockControllerModel) {
+        mockControllerModel.environmentMap = three.environmentMap;
+      }
+
+      pmremGenerator.dispose();
+      resolve(three.environmentMap);
+    });
+  });
 }
 
 /**
@@ -149,5 +171,8 @@ function onLoad() {
 
   profileSelector.addEventListener('selectionclear', onSelectionClear);
   profileSelector.addEventListener('selectionchange', onSelectionChange);
+
+  backgroundSelector = new BackgroundSelector();
+  backgroundSelector.addEventListener('selectionchange', onBackgroundChange);
 }
 window.addEventListener('load', onLoad);
