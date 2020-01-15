@@ -42,6 +42,10 @@ function initializeVRController(index) {
 
     const motionController = await profileSelector.createMotionController(xrInputSource);
     await controllerModel.initialize(motionController);
+
+    if (three.environmentMap) {
+      controllerModel.environmentMap = three.environmentMap;
+    }
   });
 
   vrController.addEventListener('disconnected', () => {
