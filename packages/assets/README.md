@@ -11,6 +11,8 @@ All profiles are located under the './profiles' folder in subfolders for vendor 
 ### Adding an asset
 New assets must match a profile a profiles id in the [registry](../registry) package. To add an asset, save a JSON file that conforms with the [schema](#schema) in `./profiles/[profile id]/`. In the same `./profiles/[profile id]/` folder, place the `.glb` files for each supported handedness.  The package must [build](#development) successfully before submitting a pull request.
 
+For more details read our tutorial on **[Preparing a WebXR input profile asset with Blender](./tutorial/README.md)**
+
 ### Filing a bug
 To file bugs on existing assets, use this [issue template](https://github.com/immersive-web/webxr-input-profiles/issues/new?assignees=&labels=assets&template=asset-bug-report.md&title=)
 
