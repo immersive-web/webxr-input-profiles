@@ -14,3 +14,21 @@ This repository contains information necessary for User Agents to have conforman
 * The [motion-controllers](./packages/motion-controllers/README.md) package contains a javascript library able to load the JSON descriptions published from the [assets](./packages/assets/README.md) package and create component-style representations of the `XRInputSource` data. This library is 3D engine agnostic.
 * The [viewer](./packages/viewer/README.md) package contains webpage page that uses the [motion-controllers](./packages/motion-controllers/README.md) library to load and view the profiles and assets from the [assets](./packages/assets/README.md) package.
 
+## Versioning
+Packaged will be published to npm as changes occur, with version numbers formatted as `<Major>.<Minor>.<Patch>` and updated according to the following guildlines:
+
+### Major
+  - Significant design changes
+
+### Minor
+  - Additional features added
+  - Small breaking changes to schema
+  - Breaking changes in source code or test code
+  
+### Patch
+  - Adds new mapping and/or asset files
+  - Fixes to existing mapping and/or asset files
+  - Critical, non-breaking security fixes
+  - Occasional non-breaking fixes to schema, source code, or test code
+
+Packages from this repo may update their `Minor` and `Patch` versions at a different cadence. Changes to `Major` versions are expected to be large enough that all packages will update in tandem.
