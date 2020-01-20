@@ -73,10 +73,10 @@ async function createMotionController(xrInputSource) {
 ```
 
 ### Updating the motion controller
-TODO
+Once a `MotionController` has been created, the `updateFromGamepad()` method should be called on every `XRSession.requestAnimationFrame()` callback. This will process the current state of the `gamepad` attribute of the `XRInputSource` the motion controller was created with and update each of the `MotionController`'s `Compontents` accordingly.
 
 ```js
-function onAnimationFrameCallback(xrFrame) {
+function onAnimationFrameCallback(timestamp, xrFrame) {
   // Other frame-loop stuff ...
 
   Object.keys(motionControllers).forEach((motionController) =>
@@ -88,7 +88,7 @@ function onAnimationFrameCallback(xrFrame) {
 ```
 
 ## Components
-Once a `MotionController` has been created, developers can access interact with its components such as thumbsticks, touchpads, triggers, squeezes, and buttons. These components expose their current values through the `Components.values` object.  The `values.state` key will always be present and describes the overall state of the component as being `pressed`, `touched`, or `default`.  In addition to `values.state`, components may optionally also have a `values.button`, `values.xAxis`, or `values.yAxis`.  Each of values are populated slightly differently based on the underlying component type.
+ developers can access interact with its components such as thumbsticks, touchpads, triggers, squeezes, and buttons. These components expose their current values through the `Components.values` object.  The `values.state` key will always be present and describes the overall state of the component as being `pressed`, `touched`, or `default`.  In addition to `values.state`, components may optionally also have a `values.button`, `values.xAxis`, or `values.yAxis`.  Each of values are populated slightly differently based on the underlying component type.
 
 ### Trigger, Squeeze, and Button components
 Much of the behavior of `trigger`, `squeeze`, and `button` components is identical, though they are often used for different interactions (e.g. a squeeze may often be preferred for picking up objects). The `values.button` is set directly from the associated `GamepadButton.value`.  If the `GamepadButton.pressed` is true or the `GamepadButton.value` is 1, the `values.state` will be set to `pressed`.  Otherwise, if the `GamepadButton.touched` is true or the `GamepadButton.value` is greater than 0, the component's `values.state` will be set to `touched`. Otherwise the `values.state` is set to `default`. 
