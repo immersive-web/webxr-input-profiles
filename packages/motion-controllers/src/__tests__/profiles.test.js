@@ -17,7 +17,7 @@ const validProfile = {
 };
 
 const profilesList = {
-  [validProfileId]: `${validProfileId}/profile.json`
+  [validProfileId]: { path: `${validProfileId}/profile.json` }
 };
 
 function buildXRInputSource(profiles = [], handedness = Constants.Handedness.NONE) {
