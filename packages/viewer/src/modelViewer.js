@@ -79,7 +79,7 @@ function render() {
 function onResize() {
   const width = canvasParentElement.clientWidth;
   const height = canvasParentElement.clientHeight;
-  three.camera.aspectRatio = width / height;
+  three.camera.aspect = width / height;
   three.camera.updateProjectionMatrix();
   three.renderer.setSize(width, height);
   three.cameraControls.update();

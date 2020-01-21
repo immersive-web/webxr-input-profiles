@@ -68,7 +68,12 @@ async function fetchProfile(xrInputSource, basePath, defaultProfile = null, getA
 
   let assetPath;
   if (getAssetPath) {
-    const layout = profile.layouts[xrInputSource.handedness];
+    let layout;
+    if (xrInputSource.handedness === 'any') {
+      layout = profile.layouts[Object.keys(profile.layouts)[0]];
+    } else {
+      layout = profile.layouts[xrInputSource.handedness];
+    }
     if (!layout) {
       throw new Error(
         `No matching handedness, ${xrInputSource.handedness}, in profile ${match.profileId}`
