@@ -114,7 +114,7 @@ I typically find it easiest to create the value node first and position it. Whil
 ![Aligning a node with a button](./images/tutorial-15.png)
 ![Adjusting the node orientation](./images/tutorial-16.png)
 
-Once positioned, right click and copy the node in the outliner, then paste two copies and rename them to the "min" and "max" variants respectively, which gives us all three nodes at the same place. In the outliner move those nodes under the "root" node, then drag the mesh for the corresponding component and place it under the "max" node.
+Once positioned, right click and copy the node in the outliner, then paste two copies and rename them to the "min" and "max" variants respectively, which gives us all three nodes at the same place. In the outliner move those nodes under the "root" node, then move the mesh for the corresponding component and place it under the "max" node.
 
 ![Parenting the button mesh under the "max" node](./images/tutorial-17.png)
 
@@ -122,7 +122,7 @@ Now, selecting just the "max" node in the outliner, move the node (which will al
 
 ![Adjusting the position of the button when pressed](./images/tutorial-18.png)
 
-If the asset you are working with doesn't show the button in a fully unpressed state by default, repeat the above reparenting and repositioning with the "min" node to set the button's fully unpressed state.
+If the asset you are working with doesn't show the button in a fully unpressed state by default, repeat the above by reparenting and repositioning the button mesh with the "min" node to set the button's fully unpressed state.
 
 Once the button has been positioned, move the button mesh in the outliner to underneath the "value" node instead. This will snap the mesh back to it's original position, but at runtime when the application interpolates the "value" node between the "min" and "max" nodes it will move the button as well.
 
