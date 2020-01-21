@@ -36,12 +36,12 @@ async function fetchProfile(xrInputSource, basePath, defaultProfile = null, getA
   // Find the relative path to the first requested profile that is recognized
   let match;
   xrInputSource.profiles.some((profileId) => {
-    const profile = supportedProfilesList[profileId];
-    if (profile) {
+    const supportedProfile = supportedProfilesList[profileId];
+    if (supportedProfile) {
       match = {
         profileId,
-        profilePath: `${basePath}/${profile.path}`,
-        deprecated: !!profile.deprecated
+        profilePath: `${basePath}/${supportedProfile.path}`,
+        deprecated: !!supportedProfile.deprecated
       };
     }
     return !!match;
@@ -52,14 +52,15 @@ async function fetchProfile(xrInputSource, basePath, defaultProfile = null, getA
       throw new Error('No matching profile name found');
     }
 
-    const relativePath = supportedProfilesList[defaultProfile];
-    if (!relativePath) {
+    const supportedProfile = supportedProfilesList[defaultProfile];
+    if (!supportedProfile) {
       throw new Error(`No matching profile name found and default profile "${defaultProfile}" missing.`);
     }
 
     match = {
       profileId: defaultProfile,
-      profilePath: `${basePath}/${relativePath}`
+      profilePath: `${basePath}/${supportedProfile.path}`,
+      deprecated: !!supportedProfile.deprecated
     };
   }
 
