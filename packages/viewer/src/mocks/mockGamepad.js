@@ -1,4 +1,6 @@
-import Constants from '../../../motion-controllers/src/constants.js';
+/* eslint-disable import/no-unresolved */
+import { Constants } from '../motion-controllers.module.js';
+/* eslint-enable */
 
 /**
  * A false gamepad to be used in tests

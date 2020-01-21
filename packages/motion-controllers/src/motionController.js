@@ -1,4 +1,4 @@
-import Component from './components';
+import { Component } from './components';
 
 /**
   * @description Builds a motion controller with components and visual responses based on the
@@ -65,4 +65,4 @@ class MotionController {
   }
 }
 
-export default MotionController;
+export { MotionController };

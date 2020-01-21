@@ -17,7 +17,8 @@
     "rules": {
         "linebreak-style": ["warn", "unix"],
         "comma-dangle": ["error", "never"],
-        "import/no-extraneous-dependencies": ["error", {"packageDir": "./"}]
+        "import/no-extraneous-dependencies": ["error", {"packageDir": "./"}],
+        "import/prefer-default-export": ["none"]
     },
     "overrides": [
         {
