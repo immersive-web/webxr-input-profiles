@@ -21,7 +21,7 @@ async function fetchProfilesList(basePath) {
   return profilesList;
 }
 
-async function fetchProfile(xrInputSource, basePath, getAssetPath = true) {
+async function fetchProfile(xrInputSource, basePath, defaultProfile = null, getAssetPath = true) {
   if (!xrInputSource) {
     throw new Error('No xrInputSource supplied');
   }
@@ -47,7 +47,19 @@ async function fetchProfile(xrInputSource, basePath, getAssetPath = true) {
   });
 
   if (!match) {
-    throw new Error('No matching profile name found');
+    if (!defaultProfile) {
+      throw new Error('No matching profile name found');
+    }
+
+    const relativePath = supportedProfilesList[defaultProfile];
+    if (!relativePath) {
+      throw new Error(`No matching profile name found and default profile "${defaultProfile}" missing.`);
+    }
+
+    match = {
+      profileId: defaultProfile,
+      profilePath: `${basePath}/${relativePath}`
+    };
   }
 
   const profile = await fetchJsonFile(match.profilePath);

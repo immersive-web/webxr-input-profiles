@@ -106,9 +106,20 @@ describe('fetchProfile', () => {
       .once(JSON.stringify(profilesList))
       .once(JSON.stringify(validProfile));
 
-    const { profile, assetPath } = await fetchProfile(xrInputSource, basePath, false);
+    const { profile, assetPath } = await fetchProfile(xrInputSource, basePath, null, false);
     expect(profile).toEqual(validProfile);
     expect(assetPath).toBeUndefined();
+  });
+
+  test('Successfully fetch a default profile when no results found in the array', async () => {
+    const xrInputSource = buildXRInputSource(['made up profile id']);
+    fetch
+      .once(JSON.stringify(profilesList))
+      .once(JSON.stringify(validProfile));
+
+    const { profile, assetPath } = await fetchProfile(xrInputSource, basePath, validProfileId);
+    expect(profile).toEqual(validProfile);
+    expect(assetPath).toEqual(`${basePath}/${validProfileId}/${validAssetPath}`);
   });
 
   test('Successfully fetch second profile from array length 2', async () => {
