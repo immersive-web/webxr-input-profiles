@@ -72,6 +72,18 @@ For example
 
 The `XRInputSource.profiles` array is comprised of these two properties; the `profileId` is the first element followed by the elements in the `fallbackProfileIds` property.
 
+### Deprecated profile ids
+In some cases an input source may have been identified by a non-standard profile id in the past or in some user agents. These can be listed in the `deprecatedProfileIds` array, which will cause those ids to be associated with the correct profile and assets so that user agents advertising the non-standard id still provide users with the right resources.
+
+```json
+{
+    "profileId" : "vendorprefix-profileid",
+    "deprecatedProfileIds" : ["vendorprefix-oldprofileid"]
+}
+```
+
+User agents should always prefer reporting the standard profile ids, and should not intentionally report deprecated ids, even as a fallback profile. User agents that currently report a deprecated profile id should make an effort to change to the standard profile id instead. 
+
 ### Layouts
 Profiles are required to have a `layouts` property which contains the layouts for each supported `handedness`. The `layouts` property must have one, and only one, of the following arrangements of keys to be considered valid:
 * `none`

@@ -66,9 +66,12 @@ class ProfileSelector extends EventTarget {
     // Add each profile to the dropdown
     this.profileIdSelectorElement.innerHTML = '';
     Object.keys(this.profilesList).forEach((profileId) => {
-      this.profileIdSelectorElement.innerHTML += `
-      <option value='${profileId}'>${profileId}</option>
-      `;
+      const profile = this.profilesList[profileId];
+      if (!profile.deprecated) {
+        this.profileIdSelectorElement.innerHTML += `
+        <option value='${profileId}'>${profileId}</option>
+        `;
+      }
     });
 
     // Add the local profile if it isn't already included

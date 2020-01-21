@@ -14,7 +14,19 @@ function generate() {
         files.forEach((file) => {
           const profileId = path.basename(file, '.json');
           const relativePath = file.substr((taskPaths.profilesSrc.length) + 1);
-          profilesList[profileId] = relativePath;
+          profilesList[profileId] = { path: relativePath };
+
+          // If there are any deprecated profile ids listed in the file, list
+          // them as pointing to the same path as the standard profile id.
+          const profileJson = fs.readJsonSync(file);
+          if (profileJson.deprecatedProfileIds) {
+            profileJson.deprecatedProfileIds.forEach((deprecatedId) => {
+              profilesList[deprecatedId] = {
+                path: relativePath,
+                deprecated: true
+              };
+            });
+          }
         });
 
         resolve(profilesList);

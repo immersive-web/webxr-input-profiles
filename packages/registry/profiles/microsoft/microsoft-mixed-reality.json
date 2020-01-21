@@ -1,6 +1,7 @@
 {
     "profileId": "microsoft-mixed-reality",
     "fallbackProfileIds": [ "generic-trigger-squeeze-touchpad-thumbstick"],
+    "deprecatedProfileIds": [ "windows-mixed-reality" ],
     "layouts" : {
         "left-right" : {
             "selectComponentId": "xr-standard-trigger",

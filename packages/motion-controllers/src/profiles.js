@@ -36,11 +36,12 @@ async function fetchProfile(xrInputSource, basePath, getAssetPath = true) {
   // Find the relative path to the first requested profile that is recognized
   let match;
   xrInputSource.profiles.some((profileId) => {
-    const relativePath = supportedProfilesList[profileId];
-    if (relativePath) {
+    const profile = supportedProfilesList[profileId];
+    if (profile) {
       match = {
         profileId,
-        profilePath: `${basePath}/${relativePath}`
+        profilePath: `${basePath}/${profile.path}`,
+        deprecated: !!profile.deprecated
       };
     }
     return !!match;

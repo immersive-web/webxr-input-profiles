@@ -12,6 +12,11 @@
             "items": { "$ref": "common.schema.json#/definitions/profileId" },
             "uniqueItems": true
         },
+        "deprecatedProfileIds" : {
+            "type": "array",
+            "items": { "$ref": "common.schema.json#/definitions/profileId" },
+            "uniqueItems": true
+        },
         "layouts" : {
             "type": "object",
             "additionalProperties": false,
