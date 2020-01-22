@@ -28,6 +28,9 @@ To visually validate the asset looks and behaves as expected, follow the [viewer
 ### Licence
 See the [LICENSE.md](LICENSE.md).
 
+### Trademarks
+Please note: Some assets portray registered trademarks of the device manufacturers in the interest of accurately depicting the corresponding physical device. The license _does not_ grant permission to use these trademarks in derivative works (such as alternate controller skins), and they may not be used to endorse or promote products derived from this software without specific prior written permission.
+
 ## Usage
 
 ### Getting started
