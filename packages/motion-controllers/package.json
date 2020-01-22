@@ -3,6 +3,7 @@
   "version": "0.2.0",
   "description": "",
   "main": "dist/motion-controllers.module.js",
+  "types": "src/index.d.ts",
   "files": [
     "package.json",
     "LICENSE",
@@ -15,7 +16,8 @@
     "build": "rollup -c",
     "cleanBuild": "npm run clean && npm run build",
     "watch": "rollup -c -w -m inline",
-    "test": "echo \"Run tests from root\" && exit 1"
+    "test": "echo \"Run tests from root\" && exit 1",
+    "typecheck": "tsc -p tsconfig.json"
   },
   "devDependencies": {
     "@webxr-input-profiles/assets": "^0.2.0"

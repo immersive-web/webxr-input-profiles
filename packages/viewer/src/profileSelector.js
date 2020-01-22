@@ -109,7 +109,7 @@ class ProfileSelector extends EventTarget {
       // Attempt to load the profile
       this.profileIdSelectorElement.disabled = true;
       this.handednessSelectorElement.disabled = true;
-      fetchProfile({ profiles: [profileId], handedness: 'any' }, profilesBasePath, false).then(({ profile }) => {
+      fetchProfile({ profiles: [profileId], handedness: 'any' }, profilesBasePath, null, false).then(({ profile }) => {
         this.profile = profile;
         this.populateHandednessSelector();
       })

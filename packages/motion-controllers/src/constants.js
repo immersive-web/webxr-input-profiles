@@ -36,4 +36,4 @@ const Constants = {
   })
 };
 
-export default Constants;
+export { Constants };

@@ -1,11 +1,14 @@
 import { fetchProfile, fetchProfilesList } from '../profiles';
-import Constants from '../constants';
+import { Constants } from '../constants';
 
-global.fetch = require('jest-fetch-mock');
+const fetchMock = require('fetch-mock');
 
 // Setup mock objects
 const basePath = 'madeup/base/path';
+const profilesListPath = `${basePath}/profilesList.json`;
+
 const validProfileId = 'generic-trigger';
+const validProfilePath = `${basePath}/${validProfileId}/profile.json`;
 const validAssetPath = 'none.glb';
 
 const validProfile = {
@@ -28,11 +31,11 @@ function buildXRInputSource(profiles = [], handedness = Constants.Handedness.NON
   return xrInputSource;
 }
 
-beforeEach(() => { fetch.resetMocks(); });
+afterEach(fetchMock.reset);
 
 describe('fetchProfilesList', () => {
   test('Successfully fetch profilesList', async () => {
-    fetch.once(JSON.stringify(profilesList));
+    fetchMock.getOnce(profilesListPath, { status: 200, body: profilesList });
 
     const fetchedProfilesList = await fetchProfilesList(basePath);
     expect(fetchedProfilesList).toEqual(profilesList);
@@ -66,18 +69,18 @@ describe('fetchProfile', () => {
   test('Fail to first fetch profiles list', async () => {
     const xrInputSource = buildXRInputSource();
 
-    fetch.mockRejectOnce(new Error('File not found'), { status: 404 });
+    const error = new Error('File not found');
+    fetchMock.getOnce(profilesListPath, { status: 404, throws: error });
 
     await expect(fetchProfile(xrInputSource, basePath))
-      .rejects.toEqual(new Error('File not found'));
+      .rejects.toEqual(error);
   });
 
   test('Successfully fetch profile with asset path', async () => {
     const xrInputSource = buildXRInputSource([validProfileId]);
 
-    fetch
-      .once(JSON.stringify(profilesList))
-      .once(JSON.stringify(validProfile));
+    fetchMock.getOnce(profilesListPath, { status: 200, body: profilesList });
+    fetchMock.getOnce(validProfilePath, { status: 200, body: validProfile });
 
     const { profile, assetPath } = await fetchProfile(xrInputSource, basePath);
     expect(profile).toEqual(validProfile);
@@ -91,20 +94,18 @@ describe('fetchProfile', () => {
       layouts: { none: {} }
     };
 
-    fetch
-      .once(JSON.stringify(profilesList))
-      .once(JSON.stringify(validProfileNoAssetPath));
+    fetchMock.getOnce(profilesListPath, { status: 200, body: profilesList });
+    fetchMock.getOnce(validProfilePath, { status: 200, body: validProfileNoAssetPath });
 
-    const { profile, assetPath } = await fetchProfile(xrInputSource, basePath);
+    const { profile, assetPath } = await fetchProfile(xrInputSource, basePath, null, false);
     expect(profile).toEqual(validProfileNoAssetPath);
     expect(assetPath).toBeUndefined();
   });
 
   test('Successfully fetch profile skipping assetPath', async () => {
     const xrInputSource = buildXRInputSource([validProfileId], Constants.Handedness.LEFT);
-    fetch
-      .once(JSON.stringify(profilesList))
-      .once(JSON.stringify(validProfile));
+    fetchMock.getOnce(profilesListPath, { status: 200, body: profilesList });
+    fetchMock.getOnce(validProfilePath, { status: 200, body: validProfile });
 
     const { profile, assetPath } = await fetchProfile(xrInputSource, basePath, null, false);
     expect(profile).toEqual(validProfile);
@@ -113,9 +114,8 @@ describe('fetchProfile', () => {
 
   test('Successfully fetch a default profile when no results found in the array', async () => {
     const xrInputSource = buildXRInputSource(['made up profile id']);
-    fetch
-      .once(JSON.stringify(profilesList))
-      .once(JSON.stringify(validProfile));
+    fetchMock.getOnce(profilesListPath, { status: 200, body: profilesList });
+    fetchMock.getOnce(validProfilePath, { status: 200, body: validProfile });
 
     const { profile, assetPath } = await fetchProfile(xrInputSource, basePath, validProfileId);
     expect(profile).toEqual(validProfile);
@@ -124,9 +124,8 @@ describe('fetchProfile', () => {
 
   test('Successfully fetch second profile from array length 2', async () => {
     const xrInputSource = buildXRInputSource(['made up profile id', validProfileId]);
-    fetch
-      .once(JSON.stringify(profilesList))
-      .once(JSON.stringify(validProfile));
+    fetchMock.getOnce(profilesListPath, { status: 200, body: profilesList });
+    fetchMock.getOnce(validProfilePath, { status: 200, body: validProfile });
 
     const { profile } = await fetchProfile(xrInputSource, basePath);
     expect(profile).toEqual(validProfile);
@@ -134,9 +133,8 @@ describe('fetchProfile', () => {
 
   test('Successfully fetch second profile from array length 3', async () => {
     const xrInputSource = buildXRInputSource(['made up name', validProfileId, 'other made up name']);
-    fetch
-      .once(JSON.stringify(profilesList))
-      .once(JSON.stringify(validProfile));
+    fetchMock.getOnce(profilesListPath, { status: 200, body: profilesList });
+    fetchMock.getOnce(validProfilePath, { status: 200, body: validProfile });
 
     const { profile } = await fetchProfile(xrInputSource, basePath);
     expect(profile).toEqual(validProfile);
@@ -144,27 +142,28 @@ describe('fetchProfile', () => {
 
   test('Fail to fetch non-existent profile id', async () => {
     const xrInputSource = buildXRInputSource(['made up name']);
-    fetch.once(JSON.stringify(profilesList));
+    fetchMock.getOnce(profilesListPath, { status: 200, body: profilesList });
 
+    const error = new Error('No matching profile name found');
     await expect(fetchProfile(xrInputSource, basePath))
-      .rejects.toEqual(new Error('No matching profile name found'));
+      .rejects.toEqual(error);
   });
 
   test('Fail to fetch etch missing profile JSON', async () => {
     const xrInputSource = buildXRInputSource([validProfileId]);
-    fetch
-      .once(JSON.stringify(profilesList))
-      .mockRejectOnce(new Error('File not found'), { status: 404 });
+    fetchMock.getOnce(profilesListPath, { status: 200, body: profilesList });
+
+    const error = new Error('File not found');
+    fetchMock.getOnce(validProfilePath, { status: 404, throws: error });
 
     await expect(fetchProfile(xrInputSource, basePath))
-      .rejects.toEqual(new Error('File not found'));
+      .rejects.toEqual(error);
   });
 
   test('Fail to fetch profile with mismatched handedness', async () => {
     const xrInputSource = buildXRInputSource([validProfileId], Constants.Handedness.LEFT);
-    fetch
-      .once(JSON.stringify(profilesList))
-      .once(JSON.stringify(validProfile));
+    fetchMock.getOnce(profilesListPath, { status: 200, body: profilesList });
+    fetchMock.getOnce(validProfilePath, { status: 200, body: validProfile });
 
     await expect(fetchProfile(xrInputSource, basePath))
       .rejects.toEqual(new Error(`No matching handedness, left, in profile ${validProfileId}`));

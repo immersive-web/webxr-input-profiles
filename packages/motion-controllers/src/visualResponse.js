@@ -1,4 +1,4 @@
-import Constants from './constants';
+import { Constants } from './constants';
 
 /** @constant {Object} */
 const defaultComponentValues = {
@@ -65,7 +65,7 @@ class VisualResponse {
 
   /**
    * Computes the visual response's interpolation weight based on component state
-   * @param {Object} component - The component from which to update
+   * @param {Object} componentValues - The component from which to update
    * @param {number} xAxis - The reported X axis value of the component
    * @param {number} yAxis - The reported Y axis value of the component
    * @param {number} button - The reported value of the component's button
@@ -98,4 +98,4 @@ class VisualResponse {
   }
 }
 
-export default VisualResponse;
+export { VisualResponse };

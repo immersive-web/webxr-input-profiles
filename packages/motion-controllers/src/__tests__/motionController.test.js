@@ -1,5 +1,5 @@
-import Constants from '../constants';
-import MotionController from '../motionController';
+import { Constants } from '../constants';
+import { MotionController } from '../motionController';
 
 const profile = {
   id: 'mock-one-button',

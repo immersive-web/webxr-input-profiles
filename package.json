@@ -42,30 +42,34 @@
     "dev": "http-server ./packages/viewer/dist -c-1 -p 8080",
     "prepublishOnly": "npm run clean && npm run lint && npm run build",
     "pretest": "npm run prepublishOnly",
-    "test": "npm run testOnly"
+    "test": "npx lerna run typecheck && npm run testOnly"
   },
   "devDependencies": {
     "@babel/plugin-transform-spread": "^7.2.2",
     "@babel/preset-env": "^7.3.4",
+    "@types/fetch-mock": "^7.3.2",
+    "@types/jest": "^24.9.0",
     "ajv": "^6.10.0",
     "babel-jest": "^24.1.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.17.2",
     "eslint-plugin-jest": "^22.15.2",
+    "fetch-mock": "^8.3.1",
     "fs-extra": "^8.1.0",
     "glob": "^7.1.4",
     "gulp": "^4.0.2",
     "gulp-jsoncombine": "^1.0.4",
     "http-server": "^0.11.1",
     "jest": "^24.1.0",
-    "jest-fetch-mock": "^2.1.2",
     "lerna": "^3.16.4",
+    "node-fetch": "^2.6.0",
     "optional-require": "^1.0.0",
     "rollup": "^1.4.0",
     "rollup-plugin-copy-glob": "^0.3.1",
     "rollup-plugin-license": "^0.13.0",
     "three": "^0.112.0",
-    "through2": "^3.0.1"
+    "through2": "^3.0.1",
+    "typescript": "^3.7.5"
   }
 }

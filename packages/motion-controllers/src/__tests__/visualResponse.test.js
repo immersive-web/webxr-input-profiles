@@ -1,5 +1,5 @@
-import Constants from '../constants';
-import VisualResponse from '../visualResponse';
+import { Constants } from '../constants';
+import { VisualResponse } from '../visualResponse';
 
 describe('Construction tests', () => {
   test('Fail to construct visual response when description is not provided', () => {

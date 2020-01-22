@@ -1,5 +1,5 @@
-import Constants from '../constants';
-import Component from '../components';
+import { Constants } from '../constants';
+import { Component } from '../components';
 
 const buttonComponent = {
   id: 'buttonComponent',

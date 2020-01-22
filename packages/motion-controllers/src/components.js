@@ -1,5 +1,5 @@
-import Constants from './constants';
-import VisualResponse from './visualResponse';
+import { Constants } from './constants';
+import { VisualResponse } from './visualResponse';
 
 class Component {
   /**
@@ -102,4 +102,4 @@ class Component {
   }
 }
 
-export default Component;
+export { Component };
