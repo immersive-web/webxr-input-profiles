@@ -7,3 +7,4 @@ export function fetchProfile(
   defaultProfileId?: string,
   getAssetPath?: boolean
 ): { profile: object; assetPath?: string };
+export function clearProfilesCache();

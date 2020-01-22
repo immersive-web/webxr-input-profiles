@@ -1,4 +1,4 @@
-import { fetchProfile, fetchProfilesList } from '../profiles';
+import { fetchProfile, fetchProfilesList, clearProfilesCache } from '../profiles';
 import { Constants } from '../constants';
 
 const fetchMock = require('fetch-mock');
@@ -31,7 +31,10 @@ function buildXRInputSource(profiles = [], handedness = Constants.Handedness.NON
   return xrInputSource;
 }
 
-afterEach(fetchMock.reset);
+afterEach(() => {
+  fetchMock.reset();
+  clearProfilesCache();
+});
 
 describe('fetchProfilesList', () => {
   test('Successfully fetch profilesList', async () => {

@@ -11,13 +11,25 @@ async function fetchJsonFile(path) {
   }
 }
 
+let profileListCache = {};
+let profileCache = {};
+
+function clearProfilesCache() {
+  profileListCache = {};
+  profileCache = {};
+}
+
 async function fetchProfilesList(basePath) {
   if (!basePath) {
     throw new Error('No basePath supplied');
   }
 
-  const profileListFileName = 'profilesList.json';
-  const profilesList = await fetchJsonFile(`${basePath}/${profileListFileName}`);
+  if (!profileListCache[basePath]) {
+    const profileListFileName = 'profilesList.json';
+    profileListCache[basePath] = fetchJsonFile(`${basePath}/${profileListFileName}`);
+  }
+
+  const profilesList = await profileListCache[basePath];
   return profilesList;
 }
 
@@ -64,7 +76,10 @@ async function fetchProfile(xrInputSource, basePath, defaultProfile = null, getA
     };
   }
 
-  const profile = await fetchJsonFile(match.profilePath);
+  if (!profileCache[match.profilePath]) {
+    profileCache[match.profilePath] = fetchJsonFile(match.profilePath);
+  }
+  const profile = await profileCache[match.profilePath];
 
   let assetPath;
   if (getAssetPath) {
@@ -88,4 +103,4 @@ async function fetchProfile(xrInputSource, basePath, defaultProfile = null, getA
   return { profile, assetPath };
 }
 
-export { fetchProfilesList, fetchProfile };
+export { fetchProfilesList, fetchProfile, clearProfilesCache };
