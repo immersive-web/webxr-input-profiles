@@ -1,7 +1,6 @@
 {
   "name": "@webxr-input-profiles/motion-controllers",
-  "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "",
   "main": "dist/motion-controllers.module.js",
   "types": "src/index.d.ts",
@@ -14,7 +13,6 @@
   ],
   "scripts": {
     "clean": "node -e \"try { require('fs').rmdirSync('./dist', { recursive: true }); } catch {}\"",
-    "badClean": "rm -r dist 2> /dev/null || true",
     "build": "rollup -c",
     "cleanBuild": "npm run clean && npm run build",
     "watch": "rollup -c -w -m inline",
@@ -22,6 +20,6 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "devDependencies": {
-    "@webxr-input-profiles/assets": "^0.1.0"
+    "@webxr-input-profiles/assets": "^0.2.0"
   }
 }
