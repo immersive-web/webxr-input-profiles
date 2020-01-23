@@ -1,7 +1,7 @@
 {
   "name": "@webxr-input-profiles/viewer",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A viewer",
   "main": "dist/index.js",
   "files": [
@@ -18,7 +18,7 @@
     "test": "echo \"Run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@webxr-input-profiles/assets": "^0.1.0",
-    "@webxr-input-profiles/motion-controllers": "^0.1.0"
+    "@webxr-input-profiles/assets": "^1.0.0",
+    "@webxr-input-profiles/motion-controllers": "^1.0.0"
   }
 }

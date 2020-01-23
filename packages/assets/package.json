@@ -1,6 +1,6 @@
 {
   "name": "@webxr-input-profiles/assets",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "assets",
   "main": "dist/profilesList.json",
   "files": [
@@ -19,6 +19,6 @@
     "test": "echo \"Run tests from root\" && exit 1"
   },
   "devDependencies": {
-    "@webxr-input-profiles/registry": "^0.1.0"
+    "@webxr-input-profiles/registry": "^1.0.0"
   }
 }

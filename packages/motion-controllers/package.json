@@ -1,6 +1,6 @@
 {
   "name": "@webxr-input-profiles/motion-controllers",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "",
   "main": "dist/motion-controllers.module.js",
   "types": "src/index.d.ts",
@@ -20,6 +20,6 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "devDependencies": {
-    "@webxr-input-profiles/assets": "^0.2.0"
+    "@webxr-input-profiles/assets": "^1.0.0"
   }
 }
