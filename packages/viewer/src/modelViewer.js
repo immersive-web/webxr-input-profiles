@@ -15,6 +15,7 @@ import MockXRInputSource from './mocks/mockXRInputSource.js';
 
 const three = {};
 let canvasParentElement;
+let vrProfilesElement, vrProfilesListElement;
 
 let profileSelector;
 let backgroundSelector;
@@ -34,6 +35,9 @@ function initializeVRController(index) {
     vrController.add(controllerModel);
 
     let xrInputSource = event.data;
+
+    vrProfilesListElement.innerHTML += `<li><b>${xrInputSource.handedness}:</b> [${xrInputSource.profiles}]</li>`;
+
     if (profileSelector.forceVRProfile) {
       xrInputSource = new MockXRInputSource(
         [profileSelector.profile.profileId], event.data.gamepad, event.data.handedness
@@ -93,6 +97,9 @@ function initializeThree() {
   const width = canvasParentElement.clientWidth;
   const height = canvasParentElement.clientHeight;
 
+  vrProfilesElement = document.getElementById('vrProfiles');
+  vrProfilesListElement = document.getElementById('vrProfilesList');
+
   // Set up the THREE.js infrastructure
   three.camera = new THREE.PerspectiveCamera(75, width / height, 0.01, 1000);
   three.camera.position.y = 0.5;
@@ -113,8 +120,12 @@ function initializeThree() {
   // Add VR
   canvasParentElement.appendChild(VRButton.createButton(three.renderer));
   three.renderer.xr.enabled = true;
-  three.renderer.xr.addEventListener('sessionstart', () => { isImmersive = true; });
-  three.renderer.xr.addEventListener('sessionend', () => { isImmersive = false; });
+  three.renderer.xr.addEventListener('sessionstart', () => {
+    vrProfilesElement.hidden = false;
+    vrProfilesListElement.innerHTML = '';
+    isImmersive = true;
+  });
+  three.renderer.xr.addEventListener('sessionend', () => {isImmersive = false; });
   initializeVRController(0);
   initializeVRController(1);
 
