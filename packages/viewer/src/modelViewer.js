@@ -15,7 +15,8 @@ import MockXRInputSource from './mocks/mockXRInputSource.js';
 
 const three = {};
 let canvasParentElement;
-let vrProfilesElement, vrProfilesListElement;
+let vrProfilesElement;
+let vrProfilesListElement;
 
 let profileSelector;
 let backgroundSelector;
@@ -125,7 +126,7 @@ function initializeThree() {
     vrProfilesListElement.innerHTML = '';
     isImmersive = true;
   });
-  three.renderer.xr.addEventListener('sessionend', () => {isImmersive = false; });
+  three.renderer.xr.addEventListener('sessionend', () => { isImmersive = false; });
   initializeVRController(0);
   initializeVRController(1);
 
