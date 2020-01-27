@@ -10,7 +10,7 @@
                 "xr-standard-touchpad": { "type": "touchpad" },
                 "xr-standard-thumbstick": { "type": "thumbstick" },
                 "a-button" : { "type": "button" },
-                "b-button" : { "type": "button" }
+                "b-button" : { "type": "button", "reserved": true }
             },
             "gamepad": {
                 "mapping": "xr-standard",
