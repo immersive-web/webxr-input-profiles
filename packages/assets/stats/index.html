@@ -39,23 +39,80 @@
     <canvas id='profilesPieChart'></canvas>
 
     <script>
-      const JSDELIVR_API_ROOT = 'https://data.jsdelivr.com/v1/package/npm/@webxr-input-profiles/assets@1.0.0/stats';
+      const JSDELIVR_API_ROOT = 'https://data.jsdelivr.com/v1/package/npm/@webxr-input-profiles/assets'; //@1.0.0/stats';
 
-      async function processStats() {
+      const profileListCtx = document.getElementById('profileListChart').getContext('2d');
+      const profilesCtx = document.getElementById('profilesChart').getContext('2d');
+      const profilesPieCtx = document.getElementById('profilesPieChart').getContext('2d');
+
+      async function processVersions() {
         let response = await fetch(JSDELIVR_API_ROOT);
-        let stats = await response.json();
+        let versionJson = await response.json();
 
-        let profileListStats = stats.files['/dist/profiles/profilesList.json'];
-        let dateLabels = Object.keys(profileListStats.dates);
+        let stats = {
+          profileList: {
+            dates: {}
+          },
+          profiles: {}
+        };
 
-        let profileListCtx = document.getElementById('profileListChart').getContext('2d');
+        let statPromises = [];
+        for (let version of versionJson.versions) {
+          statPromises.push(processVersionStats(version, stats));
+        }
+        await Promise.all(statPromises);
+
+        processStats(stats);
+      }
+
+      async function processVersionStats(version, stats) {
+        let response = await fetch(`${JSDELIVR_API_ROOT}@${version}/stats`);
+        let statsJson = await response.json();
+
+        let profileListStats = statsJson.files['/dist/profiles/profilesList.json'];
+
+        for (let date in profileListStats.dates) {
+          if (!stats.profileList.dates[date]) {
+            stats.profileList.dates[date] = 0;
+          }
+          stats.profileList.dates[date] += profileListStats.dates[date];
+        }
+        
+        for(let key in statsJson.files) {
+          if(/.json$/.test(key) && key != '/dist/profiles/profilesList.json') {
+            let profile = statsJson.files[key];
+            let total = profile.total;
+            if (total == 0) continue;
+
+            let label = key.replace('/dist/profiles/', '').replace('/profile.json', '');
+            if (!stats.profiles[label]) {
+              stats.profiles[label] = {
+                total: 0,
+                dates: {}
+              };
+            }
+            stats.profiles[label].total += total;
+            
+            for (let date in profile.dates) {
+              if (!stats.profiles[label].dates[date]) {
+                stats.profiles[label].dates[date] = 0;
+              }
+              stats.profiles[label].dates[date] += profile.dates[date];
+            }
+          }
+        }
+      }
+      
+      function processStats(stats) {
+        let dateLabels = Object.keys(stats.profileList.dates);
+
         let profileListChart = new Chart(profileListCtx, {
             type: 'line',
             data: {
                 labels: dateLabels,
                 datasets: [{
                     label: 'Profile List Requests',
-                    data: Object.values(profileListStats.dates)
+                    data: Object.values(stats.profileList.dates)
                 }]
             },
         });
@@ -74,28 +131,21 @@
         let profileTotals = [];
         let profileDatasets = [];
         let colorIndex = 0;
-        for(let key in stats.files) {
-            if(/.json$/.test(key) && key != '/dist/profiles/profilesList.json') {
-              let profile = stats.files[key];
-              let total = profile.total;
-              if (total == 0) continue;
+        for(let key in stats.profiles) {
+          let profile = stats.profiles[key];
+          profileLabels.push(key);
+          profileTotals.push(profile.total);
 
-              let label = key.replace('/dist/profiles/', '').replace('/profile.json', '');
-              profileLabels.push(label);
-              profileTotals.push(total);
-
-              let color = backgroundColors[colorIndex++ % backgroundColors.length];
-              let dataset = {
-                label: label,
-                data: Object.values(profile.dates),
-                backgroundColor: color,
-                borderColor: color,
-              }
-              profileDatasets.push(dataset);
-            }
+          let color = backgroundColors[colorIndex++ % backgroundColors.length];
+          let dataset = {
+            label: key,
+            data: Object.values(profile.dates),
+            backgroundColor: color,
+            borderColor: color,
+          }
+          profileDatasets.push(dataset);
         }
 
-        let profilesCtx = document.getElementById('profilesChart').getContext('2d');
         let profilesChart = new Chart(profilesCtx, {
             type: 'line',
             data: {
@@ -103,8 +153,7 @@
                 datasets: profileDatasets
             },
         });
-
-        let profilesPieCtx = document.getElementById('profilesPieChart').getContext('2d');
+        
         let profilesPieChart = new Chart(profilesPieCtx, {
             type: 'doughnut',
             data: {
@@ -117,7 +166,7 @@
         });
       }
 
-      processStats();
+      processVersions();
     </script>
   </body>
 </html>
