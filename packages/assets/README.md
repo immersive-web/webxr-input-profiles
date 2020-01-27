@@ -5,6 +5,8 @@
 ## Overview
 This package provides 3D assets and JSON descriptions of how to relate those assets to the `XRInputSource` objects with matching profile ids. This package can be used on its own, but may be easier to use with the javascript library in the [@webxr-input-source/motion-controllers](../motion-controllers) package also published by this repository. Assets are available under MIT license in .glTF, or .glb formats.
 
+We also have some [simple statistics about library usage](./stats/);
+
 ## Contributing
 All profiles are located under the './profiles' folder in subfolders for vendor prefixes. At build time, these profiles are combined with the matching profiles from the [registry](../packages/registry/README.md) package and a merged JSON profile is output for each match.
 
