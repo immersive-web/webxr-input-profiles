@@ -19,8 +19,7 @@
                     "xr-standard-squeeze",
                     "xr-standard-touchpad",
                     "xr-standard-thumbstick",
-                    "a-button",
-                    "b-button"
+                    "a-button"
                 ],
                 "axes":[
                     { "componentId": "xr-standard-touchpad", "axis": "x-axis"},
