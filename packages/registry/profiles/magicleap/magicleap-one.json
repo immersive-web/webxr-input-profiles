@@ -2,7 +2,7 @@
     "profileId": "magicleap-one",
     "fallbackProfileIds": ["generic-trigger-squeeze-touchpad"],
     "layouts" : {
-        "none" : {
+        "left-right-none" : {
             "selectComponentId": "xr-standard-trigger",
             "components": {
                 "xr-standard-trigger": { "type": "trigger" },
