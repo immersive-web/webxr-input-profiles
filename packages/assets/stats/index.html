@@ -71,6 +71,10 @@
 
         let profileListStats = statsJson.files['/dist/profiles/profilesList.json'];
 
+        if (!profileListStats) {
+          return;
+        }
+
         for (let date in profileListStats.dates) {
           if (!stats.profileList.dates[date]) {
             stats.profileList.dates[date] = 0;
