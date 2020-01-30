@@ -29,11 +29,11 @@ let isImmersive = false;
  * @param {number} index
  */
 function initializeVRController(index) {
-  const vrController = three.renderer.xr.getController(index);
+  const vrControllerGrip = three.renderer.xr.getControllerGrip(index);
 
-  vrController.addEventListener('connected', async (event) => {
+  vrControllerGrip.addEventListener('connected', async (event) => {
     const controllerModel = new ControllerModel();
-    vrController.add(controllerModel);
+    vrControllerGrip.add(controllerModel);
 
     let xrInputSource = event.data;
 
@@ -53,11 +53,36 @@ function initializeVRController(index) {
     }
   });
 
-  vrController.addEventListener('disconnected', () => {
-    vrController.remove(vrController.children[0]);
+  vrControllerGrip.addEventListener('disconnected', () => {
+    vrControllerGrip.remove(vrControllerGrip.children[0]);
   });
 
-  three.scene.add(vrController);
+  three.scene.add(vrControllerGrip);
+
+  const vrControllerTarget = three.renderer.xr.getController(index);
+
+  vrControllerTarget.addEventListener('connected', () => {
+    if (profileSelector.showTargetRay) {
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0, 0, 0, -1], 3));
+      geometry.setAttribute('color', new THREE.Float32BufferAttribute([0.5, 0.5, 0.5, 0, 0, 0], 3));
+
+      const material = new THREE.LineBasicMaterial({
+        vertexColors: THREE.VertexColors,
+        blending: THREE.AdditiveBlending
+      });
+
+      vrControllerTarget.add(new THREE.Line(geometry, material));
+    }
+  });
+
+  vrControllerTarget.addEventListener('disconnected', () => {
+    if (vrControllerTarget.children.length) {
+      vrControllerTarget.remove(vrControllerTarget.children[0]);
+    }
+  });
+
+  three.scene.add(vrControllerTarget);
 }
 
 /**

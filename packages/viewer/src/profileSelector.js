@@ -23,6 +23,7 @@ class ProfileSelector extends EventTarget {
     this.handednessSelectorElement.addEventListener('change', () => { this.onHandednessChange(); });
 
     this.forceVRProfileElement = document.getElementById('forceVRProfile');
+    this.showTargetRayElement = document.getElementById('showTargetRay');
 
     this.localProfile = new LocalProfile();
     this.localProfile.addEventListener('localprofilechange', (event) => { this.onLocalProfileChange(event); });
@@ -172,10 +173,19 @@ class ProfileSelector extends EventTarget {
   }
 
   /**
-   * Updates the profiles dropdown to ensure local profile is in the list
+   * Indicates if the currently selected profile should be shown in VR instead
+   * of the profiles advertised by the real XRInputSource.
    */
   get forceVRProfile() {
     return this.forceVRProfileElement.checked;
+  }
+
+  /**
+   * Indicates if the targetRaySpace for an input source should be visualized in
+   * VR.
+   */
+  get showTargetRay() {
+    return this.showTargetRayElement.checked;
   }
 
   /**
