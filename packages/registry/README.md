@@ -56,6 +56,7 @@ The following prefixes are reserved for companies with XR hardware
 * *oculus* - [Oculus](https://www.oculus.com/)
 * *samsung* - [Samsung](https://www.samsung.com)
 * *valve* - [Valve Corporation](https://www.valvesoftware.com/en/)
+* *pico* - [Pico Interactive](https://www.pico-interactive.com/)
 
 ## Schema
 
