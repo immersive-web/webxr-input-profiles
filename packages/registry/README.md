@@ -50,6 +50,7 @@ The "*generic*" prefix is reserved for all profiles not associated with a specif
 ### Reserved vendor prefixes
 The following prefixes are reserved for companies with XR hardware
 * *google* - [Google](https://www.google.com)
+* *hp* - [Hewlett-Packard](https://www.hp.com)
 * *htc* - [HTC](https://www.htc.com/)
 * *magicleap* - [Magic Leap](https://www.magicleap.com/)
 * *microsoft* - [Microsoft Corp](https://www.microsoft.com/)
