@@ -10,8 +10,6 @@
             "gamepad": {
                 "mapping": "",
                 "buttons": [ 
-                    null,
-                    null,
                     "touchpad"
                 ],
                 "axes":[
