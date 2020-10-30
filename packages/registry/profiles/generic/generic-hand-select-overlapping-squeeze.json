@@ -1,5 +1,5 @@
 {
-    "profileId" : "generic-hand-select-squeeze",
+    "profileId" : "generic-hand-select-overlapping-squeeze",
     "fallbackProfileIds": ["generic-hand-select"],
     "layouts" : {
         "left-right-none" : {
