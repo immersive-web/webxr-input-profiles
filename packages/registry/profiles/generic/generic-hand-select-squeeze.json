@@ -1,0 +1,24 @@
+{
+    "profileId" : "generic-hand-select-squeeze",
+    "fallbackProfileIds": ["generic-hand-select"],
+    "layouts" : {
+        "left-right-none" : {
+            "selectComponentId": "xr-standard-trigger",
+            "components": {
+                "xr-standard-trigger": { "type": "trigger" },
+                "xr-overlapping-squeeze": { "type": "squeeze" }
+            },
+            "gamepad": {
+                "mapping": "xr-standard",
+                "buttons": [
+                    "xr-standard-trigger",
+                    null,
+                    null,
+                    null,
+                    "xr-overlapping-squeeze"
+				],
+                "axes":[]
+            }
+        }
+    }
+}
