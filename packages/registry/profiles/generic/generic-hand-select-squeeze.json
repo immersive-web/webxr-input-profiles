@@ -6,7 +6,7 @@
             "selectComponentId": "xr-standard-trigger",
             "components": {
                 "xr-standard-trigger": { "type": "trigger" },
-                "xr-overlapping-squeeze": { "type": "squeeze" }
+                "overlapping-squeeze": { "type": "squeeze" }
             },
             "gamepad": {
                 "mapping": "xr-standard",
@@ -15,7 +15,7 @@
                     null,
                     null,
                     null,
-                    "xr-overlapping-squeeze"
+                    "overlapping-squeeze"
                 ],
                 "axes":[]
             }
