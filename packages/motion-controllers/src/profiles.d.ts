@@ -1,7 +1,7 @@
 export as namespace Profiles;
 
-export async function fetchProfilesList(basePath: string): Promise<{ [key: string]: string }>;
-export async function fetchProfile(
+export function fetchProfilesList(basePath: string): Promise<{ [key: string]: string }>;
+export function fetchProfile(
   xrInputSource: object,
   basePath: string,
   defaultProfileId?: string,
