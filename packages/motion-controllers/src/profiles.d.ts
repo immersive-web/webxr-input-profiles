@@ -1,9 +1,9 @@
 export as namespace Profiles;
 
-export function fetchProfilesList(basePath: string): { [key: string]: string };
-export function fetchProfile(
+export async function fetchProfilesList(basePath: string): Promise<{ [key: string]: string }>;
+export async function fetchProfile(
   xrInputSource: object,
   basePath: string,
   defaultProfileId?: string,
   getAssetPath?: boolean
-): { profile: object; assetPath?: string };
+): Promise<{ profile: object; assetPath?: string }>;
