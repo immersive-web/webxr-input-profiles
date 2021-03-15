@@ -38,9 +38,9 @@ First, load the mesh you're going to be using (this is, sadly, not a modeling tu
 
 ![Blender 2.8, with an Oculus Touch controller mesh](./images/tutorial-1.png)
 
-*IMPORTANT NOTE:* Please keep in mind the performance limitation and graphical fidelity of the platform the input device is associated with when selecting or authoring assets. For example, assets for devices based on mobile chipsets should generally use lower polygon counts and smaller textures, while assets for PC-based headsets should strive to be a bit more detailed in both geometry and material. In all cases the assets should attempt to resemble the physical input device as much as possible. Submitted assets that have excessively high polygon counts, overly large textures, or which are too stylized are likely to be rejected. Exceptions for stylized assets will be made if they match the style used throughout the devices platform.
+*IMPORTANT NOTE:* Please keep in mind the performance limitation and graphical fidelity of the platform the input device is associated with when selecting or authoring assets. For example, assets for devices based on mobile chipsets should generally use lower polygon counts and smaller textures, while assets for PC-based headsets should strive to be a bit more detailed in both geometry and material. In all cases the assets should attempt to resemble the physical input device as much as possible. Submitted assets that have excessively high polygon counts, overly large textures, or which are too stylized are likely to be rejected. Exceptions for stylized assets will be made if they match the style used throughout the device's platform.
 
-One the mesh is ready select the `File > Export > glTF 2.0 (.glb/gltf)` menu option.
+Once the mesh is ready select the `File > Export > glTF 2.0 (.glb/gltf)` menu option.
 
 ![Blender export menu](./images/tutorial-2.png)
 
@@ -48,7 +48,7 @@ Make sure the format is `glTF Binary (.glb)` and export the file to the `package
 
 ![Blender glTF export dialog](./images/tutorial-3.png)
 
-Next, just for the purposes of testing, you'll want to copy the regitry .json file that corresponds to your asset into the `packages\assets\profiles\<profileId>` folder. This allows it to be loaded by the web tool much more easily. This file should not be checked in at that location once you're ready to submit your pull request!
+Next, just for the purposes of testing, you'll want to copy the registry .json file that corresponds to your asset into the `packages\assets\profiles\<profileId>` folder. This allows it to be loaded by the web tool much more easily. This file should not be checked in at that location once you're ready to submit your pull request!
 
 Now navigate your browser to [https://immersive-web.github.io/webxr-input-profiles/packages/viewer/dist/index.html](https://immersive-web.github.io/webxr-input-profiles/packages/viewer/dist/index.html), which is a tool for viewing existing assets for the profiles already in the registry. To make sure your asset has an appropriate profile and the .glb is exporting as expected, click the "Choose Files" button.
 
@@ -80,14 +80,14 @@ Then on the mesh click or drag select while holding down shift to select all of 
 
 ![The faces of a button selected for separating from the main mesh](./images/tutorial-9.png)
 
-Then use the "Mesh > Separate > Selection" menu item to break the component out into it's own mesh in the outliner. Rename it (by double clicking on the mesh name in the outliner) to something that you'll recognize.
+Then use the "Mesh > Separate > Selection" menu item to break the component out into its own mesh in the outliner. Rename it (by double clicking on the mesh name in the outliner) to something that you'll recognize.
 
 ![Blender separate selection tool](./images/tutorial-10.png)
 ![Renaming the newly separated mesh](./images/tutorial-11.png)
 
 ## Setting the root node
 
-Most of the rest of the tutorial is going to involve setting up specifically named and carefully placed "nodes" for the glTF file's heirarchy. In Blender, these are represented by creating empty Axes objects, which you can do from the `Add > Empty > Plain Axes` menu item in `Object Mode`.
+Most of the rest of the tutorial is going to involve setting up specifically named and carefully placed "nodes" for the glTF file's hierarchy. In Blender, these are represented by creating empty Axes objects, which you can do from the `Add > Empty > Plain Axes` menu item in `Object Mode`.
 
 ![Add Plain Axes tool](./images/tutorial-12.png)
 
@@ -103,13 +103,13 @@ Next, we'll set up a series of nodes that describe the motion extents of each co
 
 ## Buttons
 
-If your input device has any simple buttons like the "A" and "B" buttons on the Oculus Touch controller, they tend to be the easiest component to rig. Each moving component needs at minimum three nodes to describe it's motion. A "value", a "min", and a "max". At runtime the value node will be interpolated between the min and the max nodes, based on the value reported by the XRInputSource's gamepad. By extension, any meshes underneath that node in the scene hierarchy will be moved as well, creating our desired animation.
+If your input device has any simple buttons like the "A" and "B" buttons on the Oculus Touch controller, they tend to be the easiest component to rig. Each moving component needs at minimum three nodes to describe its motion. A "value", a "min", and a "max". At runtime the value node will be interpolated between the min and the max nodes, based on the value reported by the XRInputSource's gamepad. By extension, any meshes underneath that node in the scene hierarchy will be moved as well, creating our desired animation.
 
 The nodes must be named specifically so that the library can locate them and associate them with the appropriate gamepad inputs. (These names can be overriden if needed in the `profile.json`, but it's typically easiest to just use the default names.)
 
 For a simple button component the default node names are `<buttonName>_pressed_value`, `<buttonName>_pressed_min`, and `<buttonName>_pressed_max` where any dashes (`-`) in the buttonName are replaced with underscores (`_`). To make things easier, the profile viewer page from earlier will also tell you some of the node names it's unable to find. In my case the Oculus Touch's "A" will need a `a_button_pressed_value`, `a_button_pressed_min`, `a_button_pressed_max`.
 
-I typically find it easiest to create the value node first and position it. While it's not required, it's helpful to not only align the value node with the button's center, but also rotate it so that the axis points stright up out of the button.
+I typically find it easiest to create the value node first and position it. While it's not required, it's helpful to not only align the value node with the button's center, but also rotate it so that the axis points straight up out of the button.
 
 ![Aligning a node with a button](./images/tutorial-15.png)
 ![Adjusting the node orientation](./images/tutorial-16.png)
@@ -124,7 +124,7 @@ Now, selecting just the "max" node in the outliner, move the node (which will al
 
 If the asset you are working with doesn't show the button in a fully unpressed state by default, repeat the above by reparenting and repositioning the button mesh with the "min" node to set the button's fully unpressed state.
 
-Once the button has been positioned, move the button mesh in the outliner to underneath the "value" node instead. This will snap the mesh back to it's original position, but at runtime when the application interpolates the "value" node between the "min" and "max" nodes it will move the button as well.
+Once the button has been positioned, move the button mesh in the outliner to underneath the "value" node instead. This will snap the mesh back to its original position, but at runtime when the application interpolates the "value" node between the "min" and "max" nodes it will move the button as well.
 
 ![Reparenting the mesh under the "value" node](./images/tutorial-19.png)
 
@@ -134,7 +134,7 @@ That's it! The button is now ready to animate! To verify that it's working as in
 
 If the button isn't moving properly ensure that the node names are all correct and that the button mesh is properly parented to the "value" node.
 
-The final node heirarchy for each button after rigging looks like the following, where `a_button` is substituted for the name of the button you are rigging:
+The final node hierarchy for each button after rigging looks like the following, where `a_button` is substituted for the name of the button you are rigging:
 
   * `a_button_pressed_max`: _Button center when fully pressed_
   * `a_button_pressed_min`: : _Button center_
@@ -145,13 +145,13 @@ Repeat for each button on your device that WebXR exposes.
 
 ## Triggers
 
-Triggers are almost handled identically to buttons, with the primary difference than instead of translating they typically pivot on a hinge. Triggers are also likely to fall under the "xr-standard" mapping, which means they will have a default node name of `xr_standard_trigger_pressed_value` and so on.
+Triggers are almost handled identically to buttons, with the primary difference that instead of translating they typically pivot on a hinge. Triggers are also likely to fall under the "xr-standard" mapping, which means they will have a default node name of `xr_standard_trigger_pressed_value` and so on.
 
-When rigging a trigger follow all of the above steps for buttons but place the nodes at the point where the trigger should swivel around. It's very helpful to observe the physical hardware here to see if you can determine where it's actually rotating. Then, when placing the mesh under the "max" node, rotate it instead of (or in addition to) translating it to position the trigger in it's appropriate fully pressed state. As with the buttons ensure the mesh is placed under the "value" node once the "max" node has been positioned.
+When rigging a trigger follow all of the above steps for buttons but place the nodes at the point where the trigger should swivel around. It's very helpful to observe the physical hardware here to see if you can determine where it's actually rotating. Then, when placing the mesh under the "max" node, rotate it instead of (or in addition to) translating it to position the trigger in its appropriate fully pressed state. As with the buttons ensure the mesh is placed under the "value" node once the "max" node has been positioned.
 
 ![Adjusting the trigger orientation](./images/tutorial-21.png)
 
-The final node heirarchy you should end up with after rigging the thumbstick should look like this, with all nodes placed at the thumbsticks rotation origin.
+The final node hierarchy you should end up with after rigging the thumbstick should look like this, with all nodes placed at the thumbstick's rotation origin.
 
   * `xr_standard_trigger_pressed_max`: _Trigger rotation origin position/rotation when fully pressed_
   * `xr_standard_trigger_pressed_min`: : _Trigger rotation origin_
@@ -166,23 +166,23 @@ Thumbsticks are a bit more complicated than buttons and triggers, because we wan
 
 First, if the thumbstick can be pressed you'll want to set up a `xr_standard_thumbstick_pressed_value` node with the appropriate "min" and "max" counterparts exactly like the button above to animate the thumbstick being pressed.
 
-Next, you'll need to set up an `xr_standard_thumbstick_xaxis_pressed_value` node, also with "min" and "max" counterparts, all of which should be placed underneath `xr_standard_thumbstick_pressed_value` in the outliner heirarchy. As with before, it's helpful if these nodes are rotated to align with the thumbstick itself (with on axis pointing straight up through the middle) and the nodes should ideally be placed at the center of the imaginary "ball" created by the base of the thumbstick, since that's where the physical pivot point most likely is.
+Next, you'll need to set up an `xr_standard_thumbstick_xaxis_pressed_value` node, also with "min" and "max" counterparts, all of which should be placed underneath `xr_standard_thumbstick_pressed_value` in the outliner hierarchy. As with before, it's helpful if these nodes are rotated to align with the thumbstick itself (with one axis pointing straight up through the middle) and the nodes should ideally be placed at the center of the imaginary "ball" created by the base of the thumbstick, since that's where the physical pivot point most likely is.
 
 ![Positioning node for thumbstick rotation](./images/tutorial-22.png)
 
 Now place the thumbstick mesh underneath the "max" node and rotate it to the right till it's reached the same extent as the physical joystick is capable of.
 
-![Rotating the thumbstick to it's max extent](./images/tutorial-23.png)
+![Rotating the thumbstick to its max extent](./images/tutorial-23.png)
 
 Repeat with the "min" node, rotating to the left physical extent.
 
-![Rotating the thumbstick to it's min extent](./images/tutorial-24.png)
+![Rotating the thumbstick to its min extent](./images/tutorial-24.png)
 
-Now copy the `xr_standard_thumbstick_xaxis_pressed_value` node and create three copies to produce the `xr_standard_thumbstick_yaxis_pressed_value` and associate "min"/"max" nodes. (Having them all placed at the same point helps the animation work smoothly.) Place all three new nodes under the `xr_standard_thumbstick_xaxis_pressed_value` node, which allows the animation of the X and Y axis to both affect the thumbstick position.
+Now copy the `xr_standard_thumbstick_xaxis_pressed_value` node and create three copies to produce the `xr_standard_thumbstick_yaxis_pressed_value` and associated "min"/"max" nodes. (Having them all placed at the same point helps the animation work smoothly.) Place all three new nodes under the `xr_standard_thumbstick_xaxis_pressed_value` node, which allows the animation of the X and Y axis to both affect the thumbstick position.
 
 Now position the Y axis min and max extents in the same way the X axis extents were set, with the Y axis min being pushed forward, away from the user and the Y axis max being pulled back towards the user.
 
-Finally, the thumbstick mesh should be placed under `xr_standard_thumbstick_yaxis_pressed_value` in the outliner heriarchy, as this will allow it to respond to pressing, x axis, and y axis movements. The final node heirarchy you should end up with after rigging the thumbstick should look like this, with all nodes placed at the thumbsticks rotation origin.
+Finally, the thumbstick mesh should be placed under `xr_standard_thumbstick_yaxis_pressed_value` in the outliner heriarchy, as this will allow it to respond to pressing, x axis, and y axis movements. The final node hierarchy you should end up with after rigging the thumbstick should look like this, with all nodes placed at the thumbstick's rotation origin.
 
   * `xr_standard_thumbstick_pressed_max`: _Thumbstick rotation origin when pressed_
   * `xr_standard_thumbstick_pressed_min`: : _Thumbstick rotation origin_
@@ -201,7 +201,7 @@ Last we have touchpads, which are the most complex to rig. The Oculus Touch does
 
 ![Location of touchpad nodes](./images/tutorial-25.png)
 
-The way touchpads work is that a placeholder node is positioned at the center of the touchpad (shown here in red) which has no mesh associated with it. The application is expected to attach one later for visualization if needed. Then, similar to how the thumbstick is handled, "touched" min/max nodes are placed at the extends of each axis (shown here in yellow). The placeholder node is then transitioned between them at runtime to show where the user is touching. There's also a "pressed" node set that visualizes if the touchpad can be physically clicked. The touchpad mesh should be attached to the "pressed_value" node if it can move.
+The way touchpads work is that a placeholder node is positioned at the center of the touchpad (shown here in red) which has no mesh associated with it. The application is expected to attach one later for visualization if needed. Then, similar to how the thumbstick is handled, "touched" min/max nodes are placed at the extents of each axis (shown here in yellow). The placeholder node is then transitioned between them at runtime to show where the user is touching. There's also a "pressed" node set that visualizes if the touchpad can be physically clicked. The touchpad mesh should be attached to the "pressed_value" node if it can move.
 
 By this point you should be more familiar with the way that the nodes work, so I'll just provide the node hierarchy and a description of where each goes.
 
@@ -219,8 +219,7 @@ By this point you should be more familiar with the way that the nodes work, so I
 
 ## Device Position/Scale
 
-The final step is to make sure that the asset is in the right position and is the right size for use in VR. The intent is for the asset to match the size and, position, and orientation of the device in the user's hand. The best way to adjust this is to move, rotate, and scale the "root" node (for me the `oculus_touch_right` node). To display properly the center of the controller's handle should be at the scene
-s origin, and the handle should point straight down the "Y" axis (the glTF export will automatically convert this to the -Z axis, as WebXR requires.)
+The final step is to make sure that the asset is in the right position and is the right size for use in VR. The intent is for the asset to match the size, position, and orientation of the device in the user's hand. The best way to adjust this is to move, rotate, and scale the "root" node (for me the `oculus_touch_right` node). To display properly the center of the controller's handle should be at the scene's origin, and the handle should point straight down the "Y" axis (the glTF export will automatically convert this to the -Z axis, as WebXR requires.)
 
 ![Positioning the root node](./images/tutorial-26.png)
 
