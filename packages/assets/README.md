@@ -11,7 +11,7 @@ We also have some [simple statistics about library usage](./stats/);
 All profiles are located under the './profiles' folder in subfolders for vendor prefixes. At build time, these profiles are combined with the matching profiles from the [registry](../packages/registry/README.md) package and a merged JSON profile is output for each match.
 
 ### Adding an asset
-New assets must match a profile a profiles id in the [registry](../registry) package. To add an asset, save a JSON file that conforms with the [schema](#schema) in `./profiles/[profile id]/`. In the same `./profiles/[profile id]/` folder, place the `.glb` files for each supported handedness.  The package must [build](#development) successfully before submitting a pull request.
+New assets must match a profile id in the [registry](../registry) package. To add an asset, save a JSON file that conforms with the [schema](#schema) in `./profiles/[profile id]/`. In the same `./profiles/[profile id]/` folder, place the `.glb` files for each supported handedness.  The package must [build](#development) successfully before submitting a pull request.
 
 For more details read our tutorial on **[Preparing a WebXR input profile asset with Blender](./tutorial/README.md)**
 
@@ -114,7 +114,7 @@ For example
 ```
 
 ### Visual responses
-The visual representation of a motion controller in a VR must respond to reflect its physical state in the real-world.  For example, when a physical thumbstick is moved to the left, the virtual thumbstick should also move to the left.  The `visualResponses` object contains descriptions of all visual changes that will be applied when the associated controller component is interacted with.
+The visual representation of a motion controller in VR must respond to reflect its physical state in the real-world.  For example, when a physical thumbstick is moved to the left, the virtual thumbstick should also move to the left.  The `visualResponses` object contains descriptions of all visual changes that will be applied when the associated controller component is interacted with.
 
 The `visualResponses` object contains children that each uniquely describe a single visual response to be applied to the asset and the key name should reflect that purpose.  The children of `visualResponses` may be null, in which case the key name must match a default visual reponse to be removed from the generate profile.  When non-null, the object contain `componentProperty`, `states`, and `valueNodeProperty` children.
 

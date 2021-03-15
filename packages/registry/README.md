@@ -1,6 +1,6 @@
 # WebXR Input Profiles Registry
 
-This package contains information for User Agents ensure they expose consistent intrinsic values for all WebXR `XRInputSource` objects. For each hardware device, this information currently includes:
+This package contains information for User Agents to ensure they expose consistent intrinsic values for all WebXR `XRInputSource` objects. For each hardware device, this information currently includes:
 * The profile id
 * The ordered list of fallback profile ids as specified in the [WebXR Device API](https:www.w3.org/tr/webxr)
 * The allowable `XRInputSource.handedness` values
@@ -62,7 +62,7 @@ The following prefixes are reserved for companies with XR hardware
 ## Schema
 
 ### Profile id and fallback profile ids
-Profiles are required to have a `profileId` that uniquely identifies the profile and must conform to the format specified by the [WebXR Device API](http://www.w3.org/tr/webxr). A `profileId` cannot be changed once added to the registry; if changes are necessary a new `profileId` must be defined.Profiles are also required to have a `fallbackProfileIds` array containing profile ids defined in the registry that are considered acceptable fallback substitutes for profile. The contents of this array may be modified after the profile has been added to the repository, however changes should be avoided if at all possible due to the potential for conformance mismatches.  Profiles with the `generic` prefix may leave the `fallbackProfileIds` array empty.  All other profiles must have at least one fallback profile id, and the the last entry in the array must have the `generic` vendor prefix. 
+Profiles are required to have a `profileId` that uniquely identifies the profile and must conform to the format specified by the [WebXR Device API](http://www.w3.org/tr/webxr). A `profileId` cannot be changed once added to the registry; if changes are necessary a new `profileId` must be defined. Profiles are also required to have a `fallbackProfileIds` array containing profile ids defined in the registry that are considered acceptable fallback substitutes for the profile. The contents of this array may be modified after the profile has been added to the repository, however changes should be avoided if at all possible due to the potential for conformance mismatches.  Profiles with the `generic` prefix may leave the `fallbackProfileIds` array empty.  All other profiles must have at least one fallback profile id, and the last entry in the array must have the `generic` vendor prefix.
 
 For example
 ```json
@@ -84,7 +84,7 @@ In some cases an input source may have been identified by a non-standard profile
 }
 ```
 
-User agents should always prefer reporting the standard profile ids, and should not intentionally report deprecated ids, even as a fallback profile. User agents that currently report a deprecated profile id should make an effort to change to the standard profile id instead. 
+User agents should always prefer reporting the standard profile ids, and should not intentionally report deprecated ids, even as a fallback profile. User agents that currently report a deprecated profile id should make an effort to change to the standard profile id instead.
 
 ### Layouts
 Profiles are required to have a `layouts` property which contains the layouts for each supported `handedness`. The `layouts` property must have one, and only one, of the following arrangements of keys to be considered valid:
@@ -104,8 +104,9 @@ For example:
     }
 }
 ```
+
 ### Components
-Each layout is required to have a `components` property which contains information about all the individual parts of an `XRInputSource`. Components are comprised of a key which uniquely identifies them and a which describes their behavior. Component keys must not contain spaces at the beginning or end. Currently, the valid types are: `trigger`, `squeeze`, `touchpad`, `thumbstick`, and `button`
+Each layout is required to have a `components` property which contains information about all the individual parts of an `XRInputSource`. Components are comprised of a key which uniquely identifies them and a type which describes their behavior. Component keys must not contain spaces at the beginning or end. Currently, the valid types are: `trigger`, `squeeze`, `touchpad`, `thumbstick`, and `button`
 
 Each layout is also required to have a `selectComponentId` property which refers to an entry in the `components` object. This component will cause the WebXR `select`, `selectStart`, and `selectEnd` events to fire.
 
