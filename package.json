@@ -1,6 +1,6 @@
 {
   "name": "webxr-input-profiles",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A tool for making W3C Gamepad objects easier to work with in XR on the web",
   "author": "Nell Waliczek <nell@nell.dev>",
   "license": "MIT",
