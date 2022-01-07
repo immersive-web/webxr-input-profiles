@@ -14,6 +14,10 @@ export default [
       {
         format: 'es',
         file: `${DIST_FOLDER}/motion-controllers.module.js`
+      },
+      {
+        format: 'cjs',
+        file: `${DIST_FOLDER}/motion-controllers.js`
       }
     ]
   }
