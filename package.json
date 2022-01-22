@@ -63,7 +63,7 @@
     "http-server": "^0.12.1",
     "jest": "^24.1.0",
     "lerna": "^3.16.4",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^3.1.1",
     "optional-require": "^1.0.0",
     "rollup": "^1.4.0",
     "rollup-plugin-copy-glob": "^0.3.1",
