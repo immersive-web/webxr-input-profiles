@@ -104,10 +104,9 @@ class ControllerModel extends THREE.Object3D {
         } else if (valueNodeProperty === Constants.VisualResponseProperty.TRANSFORM) {
           const minNode = this.nodes[minNodeName];
           const maxNode = this.nodes[maxNodeName];
-          THREE.Quaternion.slerp(
+          valueNode.quaternion.slerpQuaternions(
             minNode.quaternion,
             maxNode.quaternion,
-            valueNode.quaternion,
             value
           );
 

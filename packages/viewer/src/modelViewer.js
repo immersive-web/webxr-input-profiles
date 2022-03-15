@@ -133,7 +133,7 @@ function initializeThree() {
   three.scene.background = new THREE.Color(0x00aa44);
   three.renderer = new THREE.WebGLRenderer({ antialias: true });
   three.renderer.setSize(width, height);
-  three.renderer.gammaOutput = true;
+  three.renderer.outputEncoding = THREE.sRGBEncoding;
 
   // Set up the controls for moving the scene around
   three.cameraControls = new OrbitControls(three.camera, three.renderer.domElement);
