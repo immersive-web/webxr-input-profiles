@@ -1,6 +1,6 @@
 {
   "name": "@webxr-input-profiles/assets",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "assets",
   "main": "dist/profilesList.json",
   "files": [
