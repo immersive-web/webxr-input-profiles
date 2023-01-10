@@ -1,6 +1,6 @@
 {
   "name": "@webxr-input-profiles/registry",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Registry for profile ids and their associated button layouts",
   "main": "dist/profilesList.json",
   "files": [
