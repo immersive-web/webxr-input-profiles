@@ -78,6 +78,9 @@
   "oculus-touch": {
     "path": "oculus-touch/profile.json"
   },
+  "pico-4": {
+    "path": "pico-4/profile.json"
+  },
   "pico-g2": {
     "path": "pico-g2/profile.json"
   },

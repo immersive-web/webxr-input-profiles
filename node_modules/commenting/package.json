@@ -1,0 +1,35 @@
+{
+  "name": "commenting",
+  "version": "1.1.0",
+  "description": "Wrap content in a comment that is valid for a given file type.",
+  "main": "index.js",
+  "scripts": {
+    "100%": "istanbul check-coverage --statements 100 --functions 100 --lines 100 --branches 100",
+    "test": "mocha test.js",
+    "watch": "mocha --watch test.js",
+    "coverage": "istanbul cover ./node_modules/.bin/_mocha -- test.js",
+    "test-travis": "istanbul cover node_modules/.bin/_mocha --report lcovonly -- test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/3rd-Eden/commenting.git"
+  },
+  "keywords": [
+    "comment",
+    "comments",
+    "commenting"
+  ],
+  "author": "Arnout Kazemier",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/3rd-Eden/commenting/issues"
+  },
+  "homepage": "https://github.com/3rd-Eden/commenting#readme",
+  "devDependencies": {
+    "assume": "1.4.x",
+    "istanbul": "0.3.x",
+    "mocha": "2.2.x",
+    "pre-commit": "1.0.x"
+  },
+  "pre-commit": ["coverage", "100%"]
+}
