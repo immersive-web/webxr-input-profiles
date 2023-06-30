@@ -58,6 +58,7 @@ The following prefixes are reserved for companies with XR hardware
 * *samsung* - [Samsung](https://www.samsung.com)
 * *valve* - [Valve Corporation](https://www.valvesoftware.com/en/)
 * *pico* - [Pico Interactive](https://www.pico-interactive.com/)
+* *yvr* - [YVR](https://yvrdream.com/)
 
 ## Schema
 
