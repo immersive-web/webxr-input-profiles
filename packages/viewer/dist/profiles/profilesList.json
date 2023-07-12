@@ -98,5 +98,8 @@
   },
   "valve-index": {
     "path": "valve-index/profile.json"
+  },
+  "yvr-touch": {
+    "path": "yvr-touch/profile.json"
   }
 }

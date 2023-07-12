@@ -107,5 +107,8 @@
   },
   "valve-index": {
     "path": "valve/valve-index.json"
+  },
+  "yvr-touch": {
+    "path": "yvr/yvr-touch.json"
   }
 }
