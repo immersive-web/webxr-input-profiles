@@ -65,6 +65,9 @@
   "magicleap-one": {
     "path": "magicleap/magicleap-one.json"
   },
+  "meta-quest-touch-plus": {
+    "path": "meta/meta-quest-touch-plus.json"
+  },
   "meta-quest-touch-pro": {
     "path": "meta/meta-quest-touch-pro.json"
   },
