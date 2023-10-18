@@ -1,12 +1,12 @@
 import { Constants } from './constants';
 
 /** @constant {Object} */
-const defaultComponentValues = {
+const defaultComponentValues = /* @__PURE__ */ (() => ({
   xAxis: 0,
   yAxis: 0,
   button: 0,
   state: Constants.ComponentState.DEFAULT
-};
+}))();
 
 /**
  * @description Converts an X, Y coordinate from the range -1 to 1 (as reported by the Gamepad
