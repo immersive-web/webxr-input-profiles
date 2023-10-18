@@ -2,10 +2,6 @@
  * @webxr-input-profiles/motion-controllers 1.0.0 https://github.com/immersive-web/webxr-input-profiles
  */
 
-'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
 const Constants = {
   Handedness: /* @__PURE__ */ Object.freeze({
     NONE: 'none',
@@ -398,7 +394,4 @@ class MotionController {
   }
 }
 
-exports.Constants = Constants;
-exports.MotionController = MotionController;
-exports.fetchProfile = fetchProfile;
-exports.fetchProfilesList = fetchProfilesList;
+export { Constants, MotionController, fetchProfile, fetchProfilesList };
