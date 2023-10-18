@@ -2,14 +2,20 @@
   "name": "@webxr-input-profiles/motion-controllers",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/motion-controllers.js",
-  "module": "dist/motion-controllers.module.js",
-  "types": "src/index.d.ts",
+  "type": "module",
+  "main": "./dist/motion-controllers.cjs",
+  "module": "./dist/motion-controllers.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    "types": "./src/index.d.ts",
+    "require": "./dist/motion-controllers.cjs",
+    "import": "./dist/motion-controllers.js"
+  },
   "files": [
     "package.json",
     "LICENSE",
     "README.md",
-    "dist/motion-controllers.module.js",
+    "dist/**",
     "src/**"
   ],
   "scripts": {

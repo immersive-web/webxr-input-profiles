@@ -13,11 +13,11 @@ export default [
     output: [
       {
         format: 'es',
-        file: `${DIST_FOLDER}/motion-controllers.module.js`
+        file: `${DIST_FOLDER}/motion-controllers.js`
       },
       {
         format: 'cjs',
-        file: `${DIST_FOLDER}/motion-controllers.js`
+        file: `${DIST_FOLDER}/motion-controllers.cjs`
       }
     ]
   }
