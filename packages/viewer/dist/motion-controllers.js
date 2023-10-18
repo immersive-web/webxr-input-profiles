@@ -7,26 +7,26 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 const Constants = {
-  Handedness: Object.freeze({
+  Handedness: /* @__PURE__ */ Object.freeze({
     NONE: 'none',
     LEFT: 'left',
     RIGHT: 'right'
   }),
 
-  ComponentState: Object.freeze({
+  ComponentState: /* @__PURE__ */ Object.freeze({
     DEFAULT: 'default',
     TOUCHED: 'touched',
     PRESSED: 'pressed'
   }),
 
-  ComponentProperty: Object.freeze({
+  ComponentProperty: /* @__PURE__ */ Object.freeze({
     BUTTON: 'button',
     X_AXIS: 'xAxis',
     Y_AXIS: 'yAxis',
     STATE: 'state'
   }),
 
-  ComponentType: Object.freeze({
+  ComponentType: /* @__PURE__ */ Object.freeze({
     TRIGGER: 'trigger',
     SQUEEZE: 'squeeze',
     TOUCHPAD: 'touchpad',
@@ -38,7 +38,7 @@ const Constants = {
 
   AxisTouchThreshold: 0.1,
 
-  VisualResponseProperty: Object.freeze({
+  VisualResponseProperty: /* @__PURE__ */ Object.freeze({
     TRANSFORM: 'transform',
     VISIBILITY: 'visibility'
   })
@@ -135,12 +135,12 @@ async function fetchProfile(xrInputSource, basePath, defaultProfile = null, getA
 }
 
 /** @constant {Object} */
-const defaultComponentValues = {
+const defaultComponentValues = /* @__PURE__ */ (() => ({
   xAxis: 0,
   yAxis: 0,
   button: 0,
   state: Constants.ComponentState.DEFAULT
-};
+}))();
 
 /**
  * @description Converts an X, Y coordinate from the range -1 to 1 (as reported by the Gamepad
