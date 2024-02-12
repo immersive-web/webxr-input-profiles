@@ -22,7 +22,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout 🛎️
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Installs NPM dependencies
       - name: Install 🔧
@@ -33,7 +33,7 @@ jobs:
         run: npm run test
 
       - name: Deploy 🚀
-        uses: Cecilapp/GitHub-Pages-deploy@3.2.0
+        uses: Cecilapp/GitHub-Pages-deploy@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
