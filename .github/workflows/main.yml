@@ -39,5 +39,4 @@ jobs:
         with:
           email: tojiro@gmail.com
           build_dir: .
-          jekyll: yes
 
