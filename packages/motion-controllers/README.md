@@ -59,7 +59,7 @@ function onInputSourcesChange(event) {
 Creating a `MotionController` requires a JSON profile in the format published by the [assets](../assets/README.md) package and, if available, the path to an associated asset. The `fetchProfile` function can be used to fetch this information for a supplied `XRInputSource` from a supplied `basePath`. It will first fetch the `profilesList.json` file at the root of the `basePath`; this file must contain a JSON object with keys for each available profile id whose values are the relative paths to the profiles' locations. It will then iterate through the `XRInputSource.profiles` array to find the first matching profile and retrieve it.
 
 ```js
-import { fetchProfile, MotionController } from '@webxr-input-profiles/motion-controllers/motion-controllers.module.js'
+import { fetchProfile, MotionController } from '@webxr-input-profiles/motion-controllers/motion-controllers.js'
 
 const uri = 'URI of folder with profiles and assets';
 const motionControllers = {};

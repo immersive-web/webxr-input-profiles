@@ -1,5 +1,5 @@
 /* eslint-disable import/no-unresolved */
-import { Constants } from '../motion-controllers.module.js';
+import { Constants } from '../motion-controllers.js';
 /* eslint-enable */
 
 /**
