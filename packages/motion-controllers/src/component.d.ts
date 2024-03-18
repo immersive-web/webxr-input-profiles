@@ -20,4 +20,5 @@ export class Component {
   get data(): object;
 
   updateFromGamepad(gamepad: Gamepad): void;
+  updateValuesFromGamepad(gamepad: Gamepad): void;
 }
