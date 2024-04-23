@@ -1,5 +1,5 @@
 /* eslint-disable import/no-unresolved */
-import { fetchProfile, fetchProfilesList, MotionController } from './motion-controllers.module.js';
+import { fetchProfile, fetchProfilesList, MotionController } from './motion-controllers.js';
 /* eslint-enable */
 
 import AssetError from './assetError.js';
