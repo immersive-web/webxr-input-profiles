@@ -19,8 +19,8 @@ export default [
       './three/examples/jsm/controls/OrbitControls.js',
       './three/examples/jsm/webxr/VRButton.js',
       './ajv/ajv.min.js',
-      './motion-controllers.module.js',
-      '../motion-controllers.module.js',
+      './motion-controllers.js',
+      '../motion-controllers.js',
       './registryTools/validateRegistryProfile.js',
       './assetTools/expandRegistryProfile.js',
       './assetTools/buildAssetProfile.js'
