@@ -81,6 +81,9 @@
   "oculus-go": {
     "path": "oculus/oculus-go.json"
   },
+  "oculus-hand": {
+    "path": "oculus/oculus-hand.json"
+  },
   "oculus-touch-v2": {
     "path": "oculus/oculus-touch-v2.json"
   },

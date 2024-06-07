@@ -160,6 +160,27 @@
               "maxNodeName": "thumbrest_pressed_max"
             }
           }
+        },
+        "menu": {
+          "type": "button",
+          "gamepadIndices": {
+            "button": 7
+          },
+          "rootNodeName": "menu",
+          "visualResponses": {
+            "menu_pressed": {
+              "componentProperty": "button",
+              "states": [
+                "default",
+                "touched",
+                "pressed"
+              ],
+              "valueNodeProperty": "transform",
+              "valueNodeName": "menu_pressed_value",
+              "minNodeName": "menu_pressed_min",
+              "maxNodeName": "menu_pressed_max"
+            }
+          }
         }
       },
       "gamepadMapping": "xr-standard",
