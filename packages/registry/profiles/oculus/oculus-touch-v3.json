@@ -11,7 +11,7 @@
                 "x-button" : { "type": "button" },
                 "y-button" : { "type": "button" },
                 "thumbrest" : { "type": "button" },
-                "menu" : { "type": "button", "reserved": true }
+                "menu" : { "type": "button" }
             },
             "gamepad": {
                 "mapping": "xr-standard",
@@ -22,7 +22,8 @@
                     "xr-standard-thumbstick",
                     "x-button",
                     "y-button",
-                    "thumbrest"
+                    "thumbrest",
+                    "menu"
                 ],
                 "axes":[
                     null,
