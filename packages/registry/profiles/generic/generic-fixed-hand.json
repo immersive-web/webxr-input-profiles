@@ -1,6 +1,6 @@
 {
     "profileId" : "generic-fixed-hand",
-    "fallbackProfileIds": ["generic-hand", "generic-hand-select"],
+    "fallbackProfileIds": ["generic-hand-select", "generic-trigger"],
     "layouts" : {
         "left" : {
             "selectComponentId": "xr-standard-trigger",
