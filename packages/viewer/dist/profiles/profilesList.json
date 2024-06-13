@@ -2,6 +2,9 @@
   "generic-button": {
     "path": "generic-button/profile.json"
   },
+  "generic-fixed-hand": {
+    "path": "generic-fixed-hand/profile.json"
+  },
   "generic-hand": {
     "path": "generic-hand/profile.json"
   },

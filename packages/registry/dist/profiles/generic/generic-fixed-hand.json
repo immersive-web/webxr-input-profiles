@@ -22,8 +22,8 @@
             },
             "gamepad": {
                 "mapping": "xr-standard",
-                "buttons": [ 
-                    "xr-standard-trigger" 
+                "buttons": [
+                    "xr-standard-trigger"
                 ],
                 "axes":[]
             }
