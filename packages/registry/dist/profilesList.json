@@ -68,6 +68,9 @@
   "magicleap-one": {
     "path": "magicleap/magicleap-one.json"
   },
+  "meta-fixed-hand": {
+    "path": "meta/meta-fixed-hand.json"
+  },
   "meta-quest-touch-plus": {
     "path": "meta/meta-quest-touch-plus.json"
   },

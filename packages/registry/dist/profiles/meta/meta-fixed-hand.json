@@ -1,0 +1,37 @@
+{
+    "profileId" : "meta-fixed-hand",
+    "fallbackProfileIds": ["generic-fixed-hand", "generic-hand-select", "generic-trigger"],
+    "layouts" : {
+        "left" : {
+            "selectComponentId": "xr-standard-trigger",
+            "components": {
+                "xr-standard-trigger": { "type": "trigger" },
+                "menu": { "type": "button" }
+            },
+            "gamepad": {
+                "mapping": "xr-standard",
+                "buttons": [
+                    "xr-standard-trigger",
+                    null,
+                    null,
+                    null,
+                    "menu"
+                ],
+                "axes":[]
+            }
+        },
+        "right" : {
+            "selectComponentId": "xr-standard-trigger",
+            "components": {
+                "xr-standard-trigger": { "type": "trigger" }
+            },
+            "gamepad": {
+                "mapping": "xr-standard",
+                "buttons": [ 
+                    "xr-standard-trigger" 
+                ],
+                "axes":[]
+            }
+        }
+    }
+}
