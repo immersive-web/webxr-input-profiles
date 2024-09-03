@@ -1,0 +1,54 @@
+{
+  "profileId": "logitech-mx-ink",
+  "fallbackProfileIds": [
+    "generic-trigger-squeeze-thumbstick"
+  ],
+  "layouts": {
+    "left": {
+      "selectComponentId": "xr-standard-trigger",
+      "components": {
+        "xr-standard-trigger": { "type": "trigger" },
+        "xr-standard-squeeze": { "type": "squeeze" },
+        "touch-pad": { "type": "button" },
+        "tip-force": { "type": "button" },
+        "docked": { "type": "button" }
+      },
+      "gamepad": {
+        "mapping": "xr-standard",
+        "buttons": [
+          "xr-standard-trigger",
+          "xr-standard-squeeze",
+          null,
+          null,
+          "touch-pad",
+          "tip-force",
+          "docked"
+        ],
+        "axes": []
+      }
+    },
+    "right": {
+      "selectComponentId": "xr-standard-trigger",
+      "components": {
+        "xr-standard-trigger": { "type": "trigger" },
+        "xr-standard-squeeze": { "type": "squeeze" },
+        "touch-pad": { "type": "button" },
+        "tip-force": { "type": "button" },
+        "docked": { "type": "button" }
+      },
+      "gamepad": {
+        "mapping": "xr-standard",
+        "buttons": [
+          "xr-standard-trigger",
+          "xr-standard-squeeze",
+          null,
+          null,
+          "touch-pad",
+          "tip-force",
+          "docked"
+        ],
+        "axes": []
+      }
+    }
+  }
+}
