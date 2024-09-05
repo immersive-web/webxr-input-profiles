@@ -1,7 +1,7 @@
 {
   "profileId": "logitech-mx-ink",
   "fallbackProfileIds": [
-    "generic-trigger-squeeze-thumbstick"
+    "generic-trigger"
   ],
   "layouts": {
     "left-right-none": {
