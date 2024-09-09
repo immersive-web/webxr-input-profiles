@@ -65,6 +65,9 @@
   "htc-vive": {
     "path": "htc/htc-vive.json"
   },
+  "logitech-mx-ink": {
+    "path": "logitech/logitech-mx-ink.json"
+  },
   "magicleap-one": {
     "path": "magicleap/magicleap-one.json"
   },
