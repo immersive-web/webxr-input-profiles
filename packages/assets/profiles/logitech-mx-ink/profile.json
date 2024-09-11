@@ -1,0 +1,9 @@
+{
+    "profileId" : "logitech-mx-ink",
+    "overrides" : {
+        "left-right": {
+            "rootNodeName": "logitech_mx_ink_none",
+            "assetPath": "none.glb"
+        }
+    }
+}
