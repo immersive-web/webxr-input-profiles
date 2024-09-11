@@ -114,8 +114,8 @@
         }
       },
       "gamepadMapping": "xr-standard",
-      "rootNodeName": "logitech-mx-ink-left",
-      "assetPath": "left.glb"
+      "rootNodeName": "logitech_mx_ink_none",
+      "assetPath": "none.glb"
     },
     "right": {
       "selectComponentId": "xr-standard-trigger",
@@ -227,8 +227,8 @@
         }
       },
       "gamepadMapping": "xr-standard",
-      "rootNodeName": "logitech-mx-ink-right",
-      "assetPath": "right.glb"
+      "rootNodeName": "logitech_mx_ink_none",
+      "assetPath": "none.glb"
     },
     "none": {
       "selectComponentId": "xr-standard-trigger",
