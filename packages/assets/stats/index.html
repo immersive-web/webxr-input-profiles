@@ -16,6 +16,12 @@
       broader trends in device usage on the web.
     </p>
 
+    <form id='args' method='GET'>
+      <label for='period'>Period:</label>
+      <input name='period' type='text' placeholder='YYYY-MM' />
+      <input type='submit' value='Refresh'/>
+    </form>
+
     <h2>Profile List requests</h2>
     <p>
       Almost all uses of the library fetch this list prior to requesting specific assets, so it serves as a rough
@@ -39,14 +45,26 @@
     <canvas id='profilesPieChart'></canvas>
 
     <script>
-      const JSDELIVR_API_ROOT = 'https://data.jsdelivr.com/v1/package/npm/@webxr-input-profiles/assets'; //@1.0.0/stats';
+      const JSDELIVR_API_ROOT = 'https://data.jsdelivr.com/v1/stats/packages/npm/%40webxr-input-profiles%2Fassets'
 
       const profileListCtx = document.getElementById('profileListChart').getContext('2d');
       const profilesCtx = document.getElementById('profilesChart').getContext('2d');
       const profilesPieCtx = document.getElementById('profilesPieChart').getContext('2d');
 
-      async function processVersions() {
-        let response = await fetch(JSDELIVR_API_ROOT);
+      let profileListChart;
+      let profilesChart;
+      let profilesPieChart;
+
+      const argsForm = document.getElementById('args');
+      argsForm.addEventListener('submit', (ev) => {
+        ev.preventDefault();
+        const args = new FormData(argsForm);
+        processVersions(args);
+      });
+
+      async function processVersions(args = new FormData()) {
+        let queryArgs = new URLSearchParams(args).toString();
+        let response = await fetch(`${JSDELIVR_API_ROOT}/versions?${queryArgs}`);
         let versionJson = await response.json();
 
         let stats = {
@@ -57,8 +75,8 @@
         };
 
         let statPromises = [];
-        for (let version of versionJson.versions) {
-          statPromises.push(processVersionStats(version, stats));
+        for (let version of versionJson) {
+          statPromises.push(processVersionStats(version.version, stats, args));
         }
         await Promise.all(statPromises);
 
@@ -73,30 +91,24 @@
         processStats(stats);
       }
 
-      async function processVersionStats(version, stats) {
-        let response = await fetch(`${JSDELIVR_API_ROOT}@${version}/stats`);
+      async function processVersionStats(version, stats, args) {
+        let queryArgs = new URLSearchParams(args).toString();
+        let response = await fetch(`${JSDELIVR_API_ROOT}@${version}/files?${queryArgs}`);
         let statsJson = await response.json();
 
-        let profileListStats = statsJson.files['/dist/profiles/profilesList.json'];
-
-        if (!profileListStats) {
-          return;
-        }
-
-        for (let date in profileListStats.dates) {
-          if (!stats.profileList.dates[date]) {
-            stats.profileList.dates[date] = 0;
-          }
-          stats.profileList.dates[date] += profileListStats.dates[date];
-        }
-
-        for(let key in statsJson.files) {
-          if(/.json$/.test(key) && key != '/dist/profiles/profilesList.json') {
-            let profile = statsJson.files[key];
-            let total = profile.total;
+        for(let file of statsJson) {
+          if (file.name === '/dist/profiles/profilesList.json') {
+            for (let date in file.hits.dates) {
+              if (!stats.profileList.dates[date]) {
+                stats.profileList.dates[date] = 0;
+              }
+              stats.profileList.dates[date] += file.hits.dates[date];
+            }
+          } else if(/.json$/.test(file.name) && file.name != '/dist/profiles/profilesList.json') {
+            let total = file.hits.total;
             if (total == 0) continue;
 
-            let label = key.replace('/dist/profiles/', '').replace('/profile.json', '');
+            let label = file.name.replace('/dist/profiles/', '').replace('/profile.json', '');
             if (!stats.profiles[label]) {
               stats.profiles[label] = {
                 total: 0,
@@ -105,11 +117,11 @@
             }
             stats.profiles[label].total += total;
 
-            for (let date in profile.dates) {
+            for (let date in file.hits.dates) {
               if (!stats.profiles[label].dates[date]) {
                 stats.profiles[label].dates[date] = 0;
               }
-              stats.profiles[label].dates[date] += profile.dates[date];
+              stats.profiles[label].dates[date] += file.hits.dates[date];
             }
           }
         }
@@ -118,7 +130,8 @@
       function processStats(stats) {
         let dateLabels = Object.keys(stats.profileList.dates);
 
-        let profileListChart = new Chart(profileListCtx, {
+        if (profileListChart) { profileListChart.destroy(); }
+        profileListChart = new Chart(profileListCtx, {
             type: 'line',
             data: {
                 labels: dateLabels,
@@ -188,7 +201,8 @@
           });
         }
 
-        let profilesChart = new Chart(profilesCtx, {
+        if (profilesChart) { profilesChart.destroy(); }
+        profilesChart = new Chart(profilesCtx, {
             type: 'line',
             data: {
                 labels: dateLabels,
@@ -196,7 +210,8 @@
             },
         });
 
-        let profilesPieChart = new Chart(profilesPieCtx, {
+        if (profilesPieChart) { profilesPieChart.destroy(); }
+        profilesPieChart = new Chart(profilesPieCtx, {
             type: 'doughnut',
             data: {
                 labels: profileLabels,
