@@ -62,6 +62,9 @@
   "magicleap-one": {
     "path": "magicleap-one/profile.json"
   },
+  "magicleap-two": {
+    "path": "magicleap-two/profile.json"
+  },
   "meta-quest-touch-plus": {
     "path": "meta-quest-touch-plus/profile.json"
   },
