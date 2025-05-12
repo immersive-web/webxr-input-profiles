@@ -9,7 +9,12 @@
             "selectComponentId": "xr-standard-trigger",
             "components": {
                 "xr-standard-trigger": { "type": "trigger" },
-                "menu": { "type": "button" }
+                "menu": { "type": "button" },
+                "swipe-left": { "type": "button" },
+                "swipe-right": { "type": "button" },
+                "swipe-forward": { "type": "button" },
+                "swipe-backward": { "type": "button" },
+                "tap-thumb": { "type": "button" }
             },
             "gamepad": {
                 "mapping": "xr-standard",
@@ -18,7 +23,12 @@
                     null,
                     null,
                     null,
-                    "menu"
+                    "menu",
+                    "swipe-left",
+                    "swipe-right",
+                    "swipe-forward",
+                    "swipe-backward",
+                    "tap-thumb"
                 ],
                 "axes":[]
             }
@@ -26,12 +36,26 @@
         "right" : {
             "selectComponentId": "xr-standard-trigger",
             "components": {
-                "xr-standard-trigger": { "type": "trigger" }
+                "xr-standard-trigger": { "type": "trigger" },
+                "swipe-left": { "type": "button" },
+                "swipe-right": { "type": "button" },
+                "swipe-forward": { "type": "button" },
+                "swipe-backward": { "type": "button" },
+                "tap-thumb": { "type": "button" }
             },
             "gamepad": {
                 "mapping": "xr-standard",
                 "buttons": [
-                    "xr-standard-trigger"
+                    "xr-standard-trigger",
+                    null,
+                    null,
+                    null,
+                    null,
+                    "swipe-left",
+                    "swipe-right",
+                    "swipe-forward",
+                    "swipe-backward",
+                    "tap-thumb"
                 ],
                 "axes":[]
             }
