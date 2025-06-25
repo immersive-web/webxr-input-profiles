@@ -77,6 +77,9 @@
   "meta-fixed-hand": {
     "path": "meta/meta-fixed-hand.json"
   },
+  "meta-quest-touch-plus-v2": {
+    "path": "meta/meta-quest-touch-plus-v2.json"
+  },
   "meta-quest-touch-plus": {
     "path": "meta/meta-quest-touch-plus.json"
   },
