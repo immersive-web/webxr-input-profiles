@@ -108,6 +108,9 @@
   "pico-neo3": {
     "path": "pico-neo3/profile.json"
   },
+  "samsung-galaxyxr": {
+    "path": "samsung-galaxyxr/profile.json"
+  },
   "samsung-gearvr": {
     "path": "samsung-gearvr/profile.json"
   },
