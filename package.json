@@ -61,7 +61,7 @@
     "gulp": "^4.0.2",
     "gulp-jsoncombine": "^1.0.4",
     "http-server": "^0.12.1",
-    "jest": "^24.1.0",
+    "jest": "^29.1.2",
     "lerna": "^3.16.4",
     "node-fetch": "^2.6.0",
     "optional-require": "^1.0.0",
