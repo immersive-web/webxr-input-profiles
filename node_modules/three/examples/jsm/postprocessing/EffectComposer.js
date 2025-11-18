@@ -1,103 +1,177 @@
 import {
-	BufferGeometry,
 	Clock,
-	Float32BufferAttribute,
-	LinearFilter,
-	Mesh,
-	OrthographicCamera,
-	RGBAFormat,
+	HalfFloatType,
+	NoBlending,
 	Vector2,
 	WebGLRenderTarget
-} from '../../../build/three.module.js';
+} from 'three';
 import { CopyShader } from '../shaders/CopyShader.js';
-import { ShaderPass } from '../postprocessing/ShaderPass.js';
-import { MaskPass } from '../postprocessing/MaskPass.js';
-import { ClearMaskPass } from '../postprocessing/MaskPass.js';
+import { ShaderPass } from './ShaderPass.js';
+import { ClearMaskPass, MaskPass } from './MaskPass.js';
 
-var EffectComposer = function ( renderer, renderTarget ) {
+/**
+ * Used to implement post-processing effects in three.js.
+ * The class manages a chain of post-processing passes to produce the final visual result.
+ * Post-processing passes are executed in order of their addition/insertion.
+ * The last pass is automatically rendered to screen.
+ *
+ * This module can only be used with {@link WebGLRenderer}.
+ *
+ * ```js
+ * const composer = new EffectComposer( renderer );
+ *
+ * // adding some passes
+ * const renderPass = new RenderPass( scene, camera );
+ * composer.addPass( renderPass );
+ *
+ * const glitchPass = new GlitchPass();
+ * composer.addPass( glitchPass );
+ *
+ * const outputPass = new OutputPass()
+ * composer.addPass( outputPass );
+ *
+ * function animate() {
+ *
+ * 	composer.render(); // instead of renderer.render()
+ *
+ * }
+ * ```
+ *
+ * @three_import import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+ */
+class EffectComposer {
 
-	this.renderer = renderer;
+	/**
+	 * Constructs a new effect composer.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {WebGLRenderTarget} [renderTarget] - This render target and a clone will
+	 * be used as the internal read and write buffers. If not given, the composer creates
+	 * the buffers automatically.
+	 */
+	constructor( renderer, renderTarget ) {
 
-	if ( renderTarget === undefined ) {
+		/**
+		 * The renderer.
+		 *
+		 * @type {WebGLRenderer}
+		 */
+		this.renderer = renderer;
 
-		var parameters = {
-			minFilter: LinearFilter,
-			magFilter: LinearFilter,
-			format: RGBAFormat
-		};
-
-		var size = renderer.getSize( new Vector2() );
 		this._pixelRatio = renderer.getPixelRatio();
-		this._width = size.width;
-		this._height = size.height;
 
-		renderTarget = new WebGLRenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, parameters );
-		renderTarget.texture.name = 'EffectComposer.rt1';
+		if ( renderTarget === undefined ) {
 
-	} else {
+			const size = renderer.getSize( new Vector2() );
+			this._width = size.width;
+			this._height = size.height;
 
-		this._pixelRatio = 1;
-		this._width = renderTarget.width;
-		this._height = renderTarget.height;
+			renderTarget = new WebGLRenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType } );
+			renderTarget.texture.name = 'EffectComposer.rt1';
+
+		} else {
+
+			this._width = renderTarget.width;
+			this._height = renderTarget.height;
+
+		}
+
+		this.renderTarget1 = renderTarget;
+		this.renderTarget2 = renderTarget.clone();
+		this.renderTarget2.texture.name = 'EffectComposer.rt2';
+
+		/**
+		 * A reference to the internal write buffer. Passes usually write
+		 * their result into this buffer.
+		 *
+		 * @type {WebGLRenderTarget}
+		 */
+		this.writeBuffer = this.renderTarget1;
+
+		/**
+		 * A reference to the internal read buffer. Passes usually read
+		 * the previous render result from this buffer.
+		 *
+		 * @type {WebGLRenderTarget}
+		 */
+		this.readBuffer = this.renderTarget2;
+
+		/**
+		 * Whether the final pass is rendered to the screen (default framebuffer) or not.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.renderToScreen = true;
+
+		/**
+		 * An array representing the (ordered) chain of post-processing passes.
+		 *
+		 * @type {Array<Pass>}
+		 */
+		this.passes = [];
+
+		/**
+		 * A copy pass used for internal swap operations.
+		 *
+		 * @private
+		 * @type {ShaderPass}
+		 */
+		this.copyPass = new ShaderPass( CopyShader );
+		this.copyPass.material.blending = NoBlending;
+
+		/**
+		 * The internal clock for managing time data.
+		 *
+		 * @private
+		 * @type {Clock}
+		 */
+		this.clock = new Clock();
 
 	}
 
-	this.renderTarget1 = renderTarget;
-	this.renderTarget2 = renderTarget.clone();
-	this.renderTarget2.texture.name = 'EffectComposer.rt2';
+	/**
+	 * Swaps the internal read/write buffers.
+	 */
+	swapBuffers() {
 
-	this.writeBuffer = this.renderTarget1;
-	this.readBuffer = this.renderTarget2;
-
-	this.renderToScreen = true;
-
-	this.passes = [];
-
-	// dependencies
-
-	if ( CopyShader === undefined ) {
-
-		console.error( 'THREE.EffectComposer relies on CopyShader' );
-
-	}
-
-	if ( ShaderPass === undefined ) {
-
-		console.error( 'THREE.EffectComposer relies on ShaderPass' );
-
-	}
-
-	this.copyPass = new ShaderPass( CopyShader );
-
-	this.clock = new Clock();
-
-};
-
-Object.assign( EffectComposer.prototype, {
-
-	swapBuffers: function () {
-
-		var tmp = this.readBuffer;
+		const tmp = this.readBuffer;
 		this.readBuffer = this.writeBuffer;
 		this.writeBuffer = tmp;
 
-	},
+	}
 
-	addPass: function ( pass ) {
+	/**
+	 * Adds the given pass to the pass chain.
+	 *
+	 * @param {Pass} pass - The pass to add.
+	 */
+	addPass( pass ) {
 
 		this.passes.push( pass );
 		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
 
-	},
+	}
 
-	insertPass: function ( pass, index ) {
+	/**
+	 * Inserts the given pass at a given index.
+	 *
+	 * @param {Pass} pass - The pass to insert.
+	 * @param {number} index - The index into the pass chain.
+	 */
+	insertPass( pass, index ) {
 
 		this.passes.splice( index, 0, pass );
 		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
 
-	},
+	}
 
-	removePass: function ( pass ) {
+	/**
+	 * Removes the given pass from the pass chain.
+	 *
+	 * @param {Pass} pass - The pass to remove.
+	 */
+	removePass( pass ) {
 
 		const index = this.passes.indexOf( pass );
 
@@ -107,11 +181,17 @@ Object.assign( EffectComposer.prototype, {
 
 		}
 
-	},
+	}
 
-	isLastEnabledPass: function ( passIndex ) {
+	/**
+	 * Returns `true` if the pass for the given index is the last enabled pass in the pass chain.
+	 *
+	 * @param {number} passIndex - The pass index.
+	 * @return {boolean} Whether the pass for the given index is the last pass in the pass chain.
+	 */
+	isLastEnabledPass( passIndex ) {
 
-		for ( var i = passIndex + 1; i < this.passes.length; i ++ ) {
+		for ( let i = passIndex + 1; i < this.passes.length; i ++ ) {
 
 			if ( this.passes[ i ].enabled ) {
 
@@ -123,9 +203,15 @@ Object.assign( EffectComposer.prototype, {
 
 		return true;
 
-	},
+	}
 
-	render: function ( deltaTime ) {
+	/**
+	 * Executes all enabled post-processing passes in order to produce the final frame.
+	 *
+	 * @param {number} deltaTime - The delta time in seconds. If not given, the composer computes
+	 * its own time delta value.
+	 */
+	render( deltaTime ) {
 
 		// deltaTime value is in seconds
 
@@ -135,15 +221,13 @@ Object.assign( EffectComposer.prototype, {
 
 		}
 
-		var currentRenderTarget = this.renderer.getRenderTarget();
+		const currentRenderTarget = this.renderer.getRenderTarget();
 
-		var maskActive = false;
+		let maskActive = false;
 
-		var pass, i, il = this.passes.length;
+		for ( let i = 0, il = this.passes.length; i < il; i ++ ) {
 
-		for ( i = 0; i < il; i ++ ) {
-
-			pass = this.passes[ i ];
+			const pass = this.passes[ i ];
 
 			if ( pass.enabled === false ) continue;
 
@@ -154,8 +238,8 @@ Object.assign( EffectComposer.prototype, {
 
 				if ( maskActive ) {
 
-					var context = this.renderer.getContext();
-					var stencil = this.renderer.state.buffers.stencil;
+					const context = this.renderer.getContext();
+					const stencil = this.renderer.state.buffers.stencil;
 
 					//context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
 					stencil.setFunc( context.NOTEQUAL, 1, 0xffffffff );
@@ -189,13 +273,19 @@ Object.assign( EffectComposer.prototype, {
 
 		this.renderer.setRenderTarget( currentRenderTarget );
 
-	},
+	}
 
-	reset: function ( renderTarget ) {
+	/**
+	 * Resets the internal state of the EffectComposer.
+	 *
+	 * @param {WebGLRenderTarget} [renderTarget] - This render target has the same purpose like
+	 * the one from the constructor. If set, it is used to setup the read and write buffers.
+	 */
+	reset( renderTarget ) {
 
 		if ( renderTarget === undefined ) {
 
-			var size = this.renderer.getSize( new Vector2() );
+			const size = this.renderer.getSize( new Vector2() );
 			this._pixelRatio = this.renderer.getPixelRatio();
 			this._width = size.width;
 			this._height = size.height;
@@ -213,28 +303,41 @@ Object.assign( EffectComposer.prototype, {
 		this.writeBuffer = this.renderTarget1;
 		this.readBuffer = this.renderTarget2;
 
-	},
+	}
 
-	setSize: function ( width, height ) {
+	/**
+	 * Resizes the internal read and write buffers as well as all passes. Similar to {@link WebGLRenderer#setSize},
+	 * this method honors the current pixel ration.
+	 *
+	 * @param {number} width - The width in logical pixels.
+	 * @param {number} height - The height in logical pixels.
+	 */
+	setSize( width, height ) {
 
 		this._width = width;
 		this._height = height;
 
-		var effectiveWidth = this._width * this._pixelRatio;
-		var effectiveHeight = this._height * this._pixelRatio;
+		const effectiveWidth = this._width * this._pixelRatio;
+		const effectiveHeight = this._height * this._pixelRatio;
 
 		this.renderTarget1.setSize( effectiveWidth, effectiveHeight );
 		this.renderTarget2.setSize( effectiveWidth, effectiveHeight );
 
-		for ( var i = 0; i < this.passes.length; i ++ ) {
+		for ( let i = 0; i < this.passes.length; i ++ ) {
 
 			this.passes[ i ].setSize( effectiveWidth, effectiveHeight );
 
 		}
 
-	},
+	}
 
-	setPixelRatio: function ( pixelRatio ) {
+	/**
+	 * Sets device pixel ratio. This is usually used for HiDPI device to prevent blurring output.
+	 * Setting the pixel ratio will automatically resize the composer.
+	 *
+	 * @param {number} pixelRatio - The pixel ratio to set.
+	 */
+	setPixelRatio( pixelRatio ) {
 
 		this._pixelRatio = pixelRatio;
 
@@ -242,88 +345,19 @@ Object.assign( EffectComposer.prototype, {
 
 	}
 
-} );
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever the composer is no longer used in your app.
+	 */
+	dispose() {
 
+		this.renderTarget1.dispose();
+		this.renderTarget2.dispose();
 
-var Pass = function () {
-
-	// if set to true, the pass is processed by the composer
-	this.enabled = true;
-
-	// if set to true, the pass indicates to swap read and write buffer after rendering
-	this.needsSwap = true;
-
-	// if set to true, the pass clears its buffer before rendering
-	this.clear = false;
-
-	// if set to true, the result of the pass is rendered to screen. This is set automatically by EffectComposer.
-	this.renderToScreen = false;
-
-};
-
-Object.assign( Pass.prototype, {
-
-	setSize: function ( /* width, height */ ) {},
-
-	render: function ( /* renderer, writeBuffer, readBuffer, deltaTime, maskActive */ ) {
-
-		console.error( 'THREE.Pass: .render() must be implemented in derived pass.' );
+		this.copyPass.dispose();
 
 	}
 
-} );
+}
 
-// Helper for passes that need to fill the viewport with a single quad.
-Pass.FullScreenQuad = ( function () {
-
-	var camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-
-	// https://github.com/mrdoob/three.js/pull/21358
-
-	var geometry = new BufferGeometry();
-	geometry.setAttribute( 'position', new Float32BufferAttribute( [ - 1, 3, 0, - 1, - 1, 0, 3, - 1, 0 ], 3 ) );
-	geometry.setAttribute( 'uv', new Float32BufferAttribute( [ 0, 2, 0, 0, 2, 0 ], 2 ) );
-
-	var FullScreenQuad = function ( material ) {
-
-		this._mesh = new Mesh( geometry, material );
-
-	};
-
-	Object.defineProperty( FullScreenQuad.prototype, 'material', {
-
-		get: function () {
-
-			return this._mesh.material;
-
-		},
-
-		set: function ( value ) {
-
-			this._mesh.material = value;
-
-		}
-
-	} );
-
-	Object.assign( FullScreenQuad.prototype, {
-
-		dispose: function () {
-
-			this._mesh.geometry.dispose();
-
-		},
-
-		render: function ( renderer ) {
-
-			renderer.render( this._mesh, camera );
-
-		}
-
-	} );
-
-	return FullScreenQuad;
-
-} )();
-
-export { EffectComposer, Pass };
+export { EffectComposer };

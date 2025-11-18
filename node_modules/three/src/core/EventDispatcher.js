@@ -1,12 +1,34 @@
 /**
- * https://github.com/mrdoob/eventdispatcher.js/
+ * This modules allows to dispatch event objects on custom JavaScript objects.
+ *
+ * Main repository: [eventdispatcher.js](https://github.com/mrdoob/eventdispatcher.js/)
+ *
+ * Code Example:
+ * ```js
+ * class Car extends EventDispatcher {
+ * 	start() {
+ *		this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } );
+ *	}
+ *};
+ *
+ * // Using events with the custom object
+ * const car = new Car();
+ * car.addEventListener( 'start', function ( event ) {
+ * 	alert( event.message );
+ * } );
+ *
+ * car.start();
+ * ```
  */
+class EventDispatcher {
 
-function EventDispatcher() {}
-
-Object.assign( EventDispatcher.prototype, {
-
-	addEventListener: function ( type, listener ) {
+	/**
+	 * Adds the given event listener to the given event type.
+	 *
+	 * @param {string} type - The type of event to listen to.
+	 * @param {Function} listener - The function that gets called when the event is fired.
+	 */
+	addEventListener( type, listener ) {
 
 		if ( this._listeners === undefined ) this._listeners = {};
 
@@ -24,23 +46,37 @@ Object.assign( EventDispatcher.prototype, {
 
 		}
 
-	},
+	}
 
-	hasEventListener: function ( type, listener ) {
-
-		if ( this._listeners === undefined ) return false;
+	/**
+	 * Returns `true` if the given event listener has been added to the given event type.
+	 *
+	 * @param {string} type - The type of event.
+	 * @param {Function} listener - The listener to check.
+	 * @return {boolean} Whether the given event listener has been added to the given event type.
+	 */
+	hasEventListener( type, listener ) {
 
 		const listeners = this._listeners;
+
+		if ( listeners === undefined ) return false;
 
 		return listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1;
 
-	},
+	}
 
-	removeEventListener: function ( type, listener ) {
-
-		if ( this._listeners === undefined ) return;
+	/**
+	 * Removes the given event listener from the given event type.
+	 *
+	 * @param {string} type - The type of event.
+	 * @param {Function} listener - The listener to remove.
+	 */
+	removeEventListener( type, listener ) {
 
 		const listeners = this._listeners;
+
+		if ( listeners === undefined ) return;
+
 		const listenerArray = listeners[ type ];
 
 		if ( listenerArray !== undefined ) {
@@ -55,13 +91,19 @@ Object.assign( EventDispatcher.prototype, {
 
 		}
 
-	},
+	}
 
-	dispatchEvent: function ( event ) {
-
-		if ( this._listeners === undefined ) return;
+	/**
+	 * Dispatches an event object.
+	 *
+	 * @param {Object} event - The event that gets fired.
+	 */
+	dispatchEvent( event ) {
 
 		const listeners = this._listeners;
+
+		if ( listeners === undefined ) return;
+
 		const listenerArray = listeners[ event.type ];
 
 		if ( listenerArray !== undefined ) {
@@ -83,7 +125,7 @@ Object.assign( EventDispatcher.prototype, {
 
 	}
 
-} );
+}
 
 
 export { EventDispatcher };

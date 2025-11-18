@@ -1,112 +1,155 @@
 import {
 	LinearFilter,
-	Mesh,
 	NearestFilter,
-	OrthographicCamera,
-	PlaneGeometry,
 	RGBAFormat,
-	Scene,
 	ShaderMaterial,
 	StereoCamera,
 	WebGLRenderTarget
-} from '../../../build/three.module.js';
+} from 'three';
+import { FullScreenQuad } from '../postprocessing/Pass.js';
 
-var ParallaxBarrierEffect = function ( renderer ) {
+/**
+ * A class that creates an parallax barrier effect.
+ *
+ * Note that this class can only be used with {@link WebGLRenderer}.
+ * When using {@link WebGPURenderer}, use {@link ParallaxBarrierPassNode}.
+ *
+ * @three_import import { ParallaxBarrierEffect } from 'three/addons/effects/ParallaxBarrierEffect.js';
+ */
+class ParallaxBarrierEffect {
 
-	var _camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	/**
+	 * Constructs a new parallax barrier effect.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 */
+	constructor( renderer ) {
 
-	var _scene = new Scene();
+		const _stereo = new StereoCamera();
 
-	var _stereo = new StereoCamera();
+		const _params = { minFilter: LinearFilter, magFilter: NearestFilter, format: RGBAFormat };
 
-	var _params = { minFilter: LinearFilter, magFilter: NearestFilter, format: RGBAFormat };
+		const _renderTargetL = new WebGLRenderTarget( 512, 512, _params );
+		const _renderTargetR = new WebGLRenderTarget( 512, 512, _params );
 
-	var _renderTargetL = new WebGLRenderTarget( 512, 512, _params );
-	var _renderTargetR = new WebGLRenderTarget( 512, 512, _params );
+		const _material = new ShaderMaterial( {
 
-	var _material = new ShaderMaterial( {
+			uniforms: {
 
-		uniforms: {
+				'mapLeft': { value: _renderTargetL.texture },
+				'mapRight': { value: _renderTargetR.texture }
 
-			'mapLeft': { value: _renderTargetL.texture },
-			'mapRight': { value: _renderTargetR.texture }
+			},
 
-		},
+			vertexShader: [
 
-		vertexShader: [
+				'varying vec2 vUv;',
 
-			'varying vec2 vUv;',
+				'void main() {',
 
-			'void main() {',
+				'	vUv = vec2( uv.x, uv.y );',
+				'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 
-			'	vUv = vec2( uv.x, uv.y );',
-			'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+				'}'
 
-			'}'
+			].join( '\n' ),
 
-		].join( '\n' ),
+			fragmentShader: [
 
-		fragmentShader: [
+				'uniform sampler2D mapLeft;',
+				'uniform sampler2D mapRight;',
+				'varying vec2 vUv;',
 
-			'uniform sampler2D mapLeft;',
-			'uniform sampler2D mapRight;',
-			'varying vec2 vUv;',
+				'void main() {',
 
-			'void main() {',
+				'	vec2 uv = vUv;',
 
-			'	vec2 uv = vUv;',
+				'	if ( ( mod( gl_FragCoord.y, 2.0 ) ) > 1.00 ) {',
 
-			'	if ( ( mod( gl_FragCoord.y, 2.0 ) ) > 1.00 ) {',
+				'		gl_FragColor = texture2D( mapLeft, uv );',
 
-			'		gl_FragColor = texture2D( mapLeft, uv );',
+				'	} else {',
 
-			'	} else {',
+				'		gl_FragColor = texture2D( mapRight, uv );',
 
-			'		gl_FragColor = texture2D( mapRight, uv );',
+				'	}',
 
-			'	}',
+				'	#include <tonemapping_fragment>',
+				'	#include <colorspace_fragment>',
 
-			'}'
+				'}'
 
-		].join( '\n' )
+			].join( '\n' )
 
-	} );
+		} );
 
-	var mesh = new Mesh( new PlaneGeometry( 2, 2 ), _material );
-	_scene.add( mesh );
+		const _quad = new FullScreenQuad( _material );
 
-	this.setSize = function ( width, height ) {
+		/**
+		 * Resizes the effect.
+		 *
+		 * @param {number} width - The width of the effect in logical pixels.
+		 * @param {number} height - The height of the effect in logical pixels.
+		 */
+		this.setSize = function ( width, height ) {
 
-		renderer.setSize( width, height );
+			renderer.setSize( width, height );
 
-		var pixelRatio = renderer.getPixelRatio();
+			const pixelRatio = renderer.getPixelRatio();
 
-		_renderTargetL.setSize( width * pixelRatio, height * pixelRatio );
-		_renderTargetR.setSize( width * pixelRatio, height * pixelRatio );
+			_renderTargetL.setSize( width * pixelRatio, height * pixelRatio );
+			_renderTargetR.setSize( width * pixelRatio, height * pixelRatio );
 
-	};
+		};
 
-	this.render = function ( scene, camera ) {
+		/**
+		 * When using this effect, this method should be called instead of the
+		 * default {@link WebGLRenderer#render}.
+		 *
+		 * @param {Object3D} scene - The scene to render.
+		 * @param {Camera} camera - The camera.
+		 */
+		this.render = function ( scene, camera ) {
 
-		scene.updateMatrixWorld();
+			const currentRenderTarget = renderer.getRenderTarget();
 
-		if ( camera.parent === null ) camera.updateMatrixWorld();
+			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
-		_stereo.update( camera );
+			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
-		renderer.setRenderTarget( _renderTargetL );
-		renderer.clear();
-		renderer.render( scene, _stereo.cameraL );
+			_stereo.update( camera );
 
-		renderer.setRenderTarget( _renderTargetR );
-		renderer.clear();
-		renderer.render( scene, _stereo.cameraR );
+			renderer.setRenderTarget( _renderTargetL );
+			renderer.clear();
+			renderer.render( scene, _stereo.cameraL );
 
-		renderer.setRenderTarget( null );
-		renderer.render( _scene, _camera );
+			renderer.setRenderTarget( _renderTargetR );
+			renderer.clear();
+			renderer.render( scene, _stereo.cameraR );
 
-	};
+			renderer.setRenderTarget( null );
+			_quad.render( renderer );
 
-};
+			renderer.setRenderTarget( currentRenderTarget );
+
+		};
+
+		/**
+		 * Frees internal resources. This method should be called
+		 * when the effect is no longer required.
+		 */
+		this.dispose = function () {
+
+			_renderTargetL.dispose();
+			_renderTargetR.dispose();
+
+			_material.dispose();
+			_quad.dispose();
+
+		};
+
+	}
+
+}
 
 export { ParallaxBarrierEffect };

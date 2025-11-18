@@ -1,5 +1,5 @@
 export default /* glsl */`
-#if defined( USE_LOGDEPTHBUF ) && defined( USE_LOGDEPTHBUF_EXT )
+#if defined( USE_LOGARITHMIC_DEPTH_BUFFER )
 
 	uniform float logDepthBufFC;
 	varying float vFragDepth;

@@ -1,18 +1,72 @@
-// http://download.autodesk.com/us/systemdocs/help/2011/lustre/index.html?url=./files/WSc4e151a45a3b785a24c3d9a411df9298473-7ffd.htm,topicNumber=d0e9492
-
 import {
-	Loader,
-	FileLoader,
-	DataTexture,
-	DataTexture3D,
-	RGBFormat,
-	UnsignedByteType,
 	ClampToEdgeWrapping,
+	Data3DTexture,
+	FileLoader,
 	LinearFilter,
-} from '../../../build/three.module.js';
+	Loader,
+	RGBAFormat,
+	UnsignedByteType,
+} from 'three';
 
+/**
+ * A loader for the 3DL LUT format.
+ *
+ * References:
+ * - [3D LUTs](http://download.autodesk.com/us/systemdocs/help/2011/lustre/index.html?url=./files/WSc4e151a45a3b785a24c3d9a411df9298473-7ffd.htm,topicNumber=d0e9492)
+ * - [Format Spec for .3dl](https://community.foundry.com/discuss/topic/103636/format-spec-for-3dl?mode=Post&postID=895258)
+ *
+ * ```js
+ * const loader = new LUT3dlLoader();
+ * const map = loader.loadAsync( 'luts/Presetpro-Cinematic.3dl' );
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { LUT3dlLoader } from 'three/addons/loaders/LUT3dlLoader.js';
+ */
 export class LUT3dlLoader extends Loader {
 
+	/**
+	 * Constructs a new 3DL LUT loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
+	constructor( manager ) {
+
+		super( manager );
+
+		/**
+		 * The texture type.
+		 *
+		 * @type {(UnsignedByteType|FloatType)}
+		 * @default UnsignedByteType
+		 */
+		this.type = UnsignedByteType;
+
+	}
+
+	/**
+	 * Sets the texture type.
+	 *
+	 * @param {(UnsignedByteType|FloatType)} type - The texture type to set.
+	 * @return {LUT3dlLoader} A reference to this loader.
+	 */
+	setType( type ) {
+
+		this.type = type;
+
+		return this;
+
+	}
+
+	/**
+	 * Starts loading from the given URL and passes the loaded 3DL LUT asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function({size:number,texture3D:Data3DTexture})} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const loader = new FileLoader( this.manager );
@@ -44,98 +98,105 @@ export class LUT3dlLoader extends Loader {
 
 	}
 
-	parse( str ) {
+	/**
+	 * Parses the given 3DL LUT data and returns the resulting 3D data texture.
+	 *
+	 * @param {string} input - The raw 3DL LUT data as a string.
+	 * @return {{size:number,texture3D:Data3DTexture}} The parsed 3DL LUT.
+	 */
+	parse( input ) {
 
-		// remove empty lines and comment lints
-		str = str
-			.replace( /^#.*?(\n|\r)/gm, '' )
-			.replace( /^\s*?(\n|\r)/gm, '' )
-			.trim();
+		const regExpGridInfo = /^[\d ]+$/m;
+		const regExpDataPoints = /^([\d.e+-]+) +([\d.e+-]+) +([\d.e+-]+) *$/gm;
 
-		const lines = str.split( /[\n\r]+/g );
+		// The first line describes the positions of values on the LUT grid.
+		let result = regExpGridInfo.exec( input );
 
-		// first line is the positions on the grid that are provided by the LUT
-		const gridLines = lines[ 0 ].trim().split( /\s+/g ).map( e => parseFloat( e ) );
+		if ( result === null ) {
+
+			throw new Error( 'LUT3dlLoader: Missing grid information' );
+
+		}
+
+		const gridLines = result[ 0 ].trim().split( /\s+/g ).map( Number );
 		const gridStep = gridLines[ 1 ] - gridLines[ 0 ];
 		const size = gridLines.length;
+		const sizeSq = size ** 2;
 
-		for ( let i = 1, l = gridLines.length; i < l; i ++ ) {
+		for ( let i = 1, l = gridLines.length; i < l; ++ i ) {
 
 			if ( gridStep !== ( gridLines[ i ] - gridLines[ i - 1 ] ) ) {
 
-				throw new Error( 'LUT3dlLoader: Inconsistent grid size not supported.' );
+				throw new Error( 'LUT3dlLoader: Inconsistent grid size' );
 
 			}
 
 		}
 
-		const dataArray = new Array( size * size * size * 3 );
+		const dataFloat = new Float32Array( size ** 3 * 4 );
+		let maxValue = 0.0;
 		let index = 0;
-		let maxOutputValue = 0.0;
-		for ( let i = 1, l = lines.length; i < l; i ++ ) {
 
-			const line = lines[ i ].trim();
-			const split = line.split( /\s/g );
+		while ( ( result = regExpDataPoints.exec( input ) ) !== null ) {
 
-			const r = parseFloat( split[ 0 ] );
-			const g = parseFloat( split[ 1 ] );
-			const b = parseFloat( split[ 2 ] );
-			maxOutputValue = Math.max( maxOutputValue, r, g, b );
+			const r = Number( result[ 1 ] );
+			const g = Number( result[ 2 ] );
+			const b = Number( result[ 3 ] );
+
+			maxValue = Math.max( maxValue, r, g, b );
 
 			const bLayer = index % size;
 			const gLayer = Math.floor( index / size ) % size;
-			const rLayer = Math.floor( index / ( size * size ) ) % size;
+			const rLayer = Math.floor( index / ( sizeSq ) ) % size;
 
-			// b grows first, then g, then r
-			const pixelIndex = bLayer * size * size + gLayer * size + rLayer;
-			dataArray[ 3 * pixelIndex + 0 ] = r;
-			dataArray[ 3 * pixelIndex + 1 ] = g;
-			dataArray[ 3 * pixelIndex + 2 ] = b;
-			index += 1;
+			// b grows first, then g, then r.
+			const d4 = ( bLayer * sizeSq + gLayer * size + rLayer ) * 4;
+			dataFloat[ d4 + 0 ] = r;
+			dataFloat[ d4 + 1 ] = g;
+			dataFloat[ d4 + 2 ] = b;
 
-		}
-
-		// Find the apparent bit depth of the stored RGB values and scale the
-		// values to [ 0, 255 ].
-		const bits = Math.ceil( Math.log2( maxOutputValue ) );
-		const maxBitValue = Math.pow( 2.0, bits );
-		for ( let i = 0, l = dataArray.length; i < l; i ++ ) {
-
-			const val = dataArray[ i ];
-			dataArray[ i ] = 255 * val / maxBitValue;
+			++ index;
 
 		}
 
-		const data = new Uint8Array( dataArray );
-		const texture = new DataTexture();
-		texture.image.data = data;
-		texture.image.width = size;
-		texture.image.height = size * size;
-		texture.format = RGBFormat;
-		texture.type = UnsignedByteType;
-		texture.magFilter = LinearFilter;
-		texture.minFilter = LinearFilter;
-		texture.wrapS = ClampToEdgeWrapping;
-		texture.wrapT = ClampToEdgeWrapping;
-		texture.generateMipmaps = false;
+		// Determine the bit depth to scale the values to [0.0, 1.0].
+		const bits = Math.ceil( Math.log2( maxValue ) );
+		const maxBitValue = Math.pow( 2, bits );
 
-		const texture3D = new DataTexture3D();
+		const data = this.type === UnsignedByteType ? new Uint8Array( dataFloat.length ) : dataFloat;
+		const scale = this.type === UnsignedByteType ? 255 : 1;
+
+		for ( let i = 0, l = data.length; i < l; i += 4 ) {
+
+			const i1 = i + 1;
+			const i2 = i + 2;
+			const i3 = i + 3;
+
+			// Note: data is dataFloat when type is FloatType.
+			data[ i ] = dataFloat[ i ] / maxBitValue * scale;
+			data[ i1 ] = dataFloat[ i1 ] / maxBitValue * scale;
+			data[ i2 ] = dataFloat[ i2 ] / maxBitValue * scale;
+			data[ i3 ] = scale;
+
+		}
+
+		const texture3D = new Data3DTexture();
 		texture3D.image.data = data;
 		texture3D.image.width = size;
 		texture3D.image.height = size;
 		texture3D.image.depth = size;
-		texture3D.format = RGBFormat;
-		texture3D.type = UnsignedByteType;
+		texture3D.format = RGBAFormat;
+		texture3D.type = this.type;
 		texture3D.magFilter = LinearFilter;
 		texture3D.minFilter = LinearFilter;
 		texture3D.wrapS = ClampToEdgeWrapping;
 		texture3D.wrapT = ClampToEdgeWrapping;
 		texture3D.wrapR = ClampToEdgeWrapping;
 		texture3D.generateMipmaps = false;
+		texture3D.needsUpdate = true;
 
 		return {
 			size,
-			texture,
 			texture3D,
 		};
 

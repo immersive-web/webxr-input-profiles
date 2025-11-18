@@ -1,52 +1,51 @@
 import {
 	Matrix3,
-	Vector3
-} from '../../../build/three.module.js';
+	Vector3,
+	Color,
+	ColorManagement,
+	SRGBColorSpace
+} from 'three';
 
 /**
- * https://github.com/gkjohnson/ply-exporter-js
+ * An exporter for PLY.
  *
- * Usage:
- *  var exporter = new PLYExporter();
+ * PLY (Polygon or Stanford Triangle Format) is a file format for efficient delivery and
+ * loading of simple, static 3D content in a dense format. Both binary and ascii formats are
+ * supported. PLY can store vertex positions, colors, normals and uv coordinates. No textures
+ * or texture references are saved.
  *
- *  // second argument is a list of options
- *  exporter.parse(mesh, data => console.log(data), { binary: true, excludeAttributes: [ 'color' ], littleEndian: true });
+ * ```js
+ * const exporter = new PLYExporter();
+ * const data = exporter.parse( scene, options );
+ * ```
  *
- * Format Definition:
- * http://paulbourke.net/dataformats/ply/
+ * @three_import import { PLYExporter } from 'three/addons/exporters/PLYExporter.js';
  */
+class PLYExporter {
 
-var PLYExporter = function () {};
+	/**
+	 * Parses the given 3D object and generates the PLY output.
+	 *
+	 * If the 3D object is composed of multiple children and geometry, they are merged into a single mesh in the file.
+	 *
+	 * @param {Object3D} object - The 3D object to export.
+	 * @param {PLYExporter~OnDone} onDone - A callback function that is executed when the export has finished.
+	 * @param {PLYExporter~Options} options - The export options.
+	 * @return {?(string|ArrayBuffer)} The exported PLY.
+	 */
+	parse( object, onDone, options = {} ) {
 
-PLYExporter.prototype = {
-
-	constructor: PLYExporter,
-
-	parse: function ( object, onDone, options ) {
-
-		if ( onDone && typeof onDone === 'object' ) {
-
-			console.warn( 'THREE.PLYExporter: The options parameter is now the third argument to the "parse" function. See the documentation for the new API.' );
-			options = onDone;
-			onDone = undefined;
-
-		}
+		// reference https://github.com/gkjohnson/ply-exporter-js
 
 		// Iterate over the valid meshes in the object
 		function traverseMeshes( cb ) {
 
 			object.traverse( function ( child ) {
 
-				if ( child.isMesh === true ) {
+				if ( child.isMesh === true || child.isPoints ) {
 
-					var mesh = child;
-					var geometry = mesh.geometry;
-
-					if ( geometry.isBufferGeometry !== true ) {
-
-						throw new Error( 'THREE.PLYExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-					}
+					const mesh = child;
+					const geometry = mesh.geometry;
 
 					if ( geometry.hasAttribute( 'position' ) === true ) {
 
@@ -61,7 +60,7 @@ PLYExporter.prototype = {
 		}
 
 		// Default options
-		var defaultOptions = {
+		const defaultOptions = {
 			binary: false,
 			excludeAttributes: [], // normal, uv, color, index
 			littleEndian: false
@@ -69,33 +68,29 @@ PLYExporter.prototype = {
 
 		options = Object.assign( defaultOptions, options );
 
-		var excludeAttributes = options.excludeAttributes;
-		var includeNormals = false;
-		var includeColors = false;
-		var includeUVs = false;
+		const excludeAttributes = options.excludeAttributes;
+		let includeIndices = true;
+		let includeNormals = false;
+		let includeColors = false;
+		let includeUVs = false;
 
 		// count the vertices, check which properties are used,
 		// and cache the BufferGeometry
-		var vertexCount = 0;
-		var faceCount = 0;
+		let vertexCount = 0;
+		let faceCount = 0;
+
 		object.traverse( function ( child ) {
 
 			if ( child.isMesh === true ) {
 
-				var mesh = child;
-				var geometry = mesh.geometry;
+				const mesh = child;
+				const geometry = mesh.geometry;
 
-				if ( geometry.isBufferGeometry !== true ) {
-
-					throw new Error( 'THREE.PLYExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-				}
-
-				var vertices = geometry.getAttribute( 'position' );
-				var normals = geometry.getAttribute( 'normal' );
-				var uvs = geometry.getAttribute( 'uv' );
-				var colors = geometry.getAttribute( 'color' );
-				var indices = geometry.getIndex();
+				const vertices = geometry.getAttribute( 'position' );
+				const normals = geometry.getAttribute( 'normal' );
+				const uvs = geometry.getAttribute( 'uv' );
+				const colors = geometry.getAttribute( 'color' );
+				const indices = geometry.getIndex();
 
 				if ( vertices === undefined ) {
 
@@ -112,11 +107,29 @@ PLYExporter.prototype = {
 
 				if ( colors !== undefined ) includeColors = true;
 
+			} else if ( child.isPoints ) {
+
+				const mesh = child;
+				const geometry = mesh.geometry;
+
+				const vertices = geometry.getAttribute( 'position' );
+				const normals = geometry.getAttribute( 'normal' );
+				const colors = geometry.getAttribute( 'color' );
+
+				vertexCount += vertices.count;
+
+				if ( normals !== undefined ) includeNormals = true;
+
+				if ( colors !== undefined ) includeColors = true;
+
+				includeIndices = false;
+
 			}
 
 		} );
 
-		var includeIndices = excludeAttributes.indexOf( 'index' ) === - 1;
+		const tempColor = new Color();
+		includeIndices = includeIndices && excludeAttributes.indexOf( 'index' ) === - 1;
 		includeNormals = includeNormals && excludeAttributes.indexOf( 'normal' ) === - 1;
 		includeColors = includeColors && excludeAttributes.indexOf( 'color' ) === - 1;
 		includeUVs = includeUVs && excludeAttributes.indexOf( 'uv' ) === - 1;
@@ -125,7 +138,7 @@ PLYExporter.prototype = {
 		if ( includeIndices && faceCount !== Math.floor( faceCount ) ) {
 
 			// point cloud meshes will not have an index array and may not have a
-			// number of vertices that is divisble by 3 (and therefore representable
+			// number of vertices that is divisible by 3 (and therefore representable
 			// as triangles)
 			console.error(
 
@@ -138,9 +151,9 @@ PLYExporter.prototype = {
 
 		}
 
-		var indexByteCount = 4;
+		const indexByteCount = 4;
 
-		var header =
+		let header =
 			'ply\n' +
 			`format ${ options.binary ? ( options.littleEndian ? 'binary_little_endian' : 'binary_big_endian' ) : 'ascii' } 1.0\n` +
 			`element vertex ${vertexCount}\n` +
@@ -192,46 +205,44 @@ PLYExporter.prototype = {
 
 
 		// Generate attribute data
-		var vertex = new Vector3();
-		var normalMatrixWorld = new Matrix3();
-		var result = null;
+		const vertex = new Vector3();
+		const normalMatrixWorld = new Matrix3();
+		let result = null;
 
 		if ( options.binary === true ) {
 
 			// Binary File Generation
-			var headerBin = new TextEncoder().encode( header );
+			const headerBin = new TextEncoder().encode( header );
 
 			// 3 position values at 4 bytes
 			// 3 normal values at 4 bytes
 			// 3 color channels with 1 byte
 			// 2 uv values at 4 bytes
-			var vertexListLength = vertexCount * ( 4 * 3 + ( includeNormals ? 4 * 3 : 0 ) + ( includeColors ? 3 : 0 ) + ( includeUVs ? 4 * 2 : 0 ) );
+			const vertexListLength = vertexCount * ( 4 * 3 + ( includeNormals ? 4 * 3 : 0 ) + ( includeColors ? 3 : 0 ) + ( includeUVs ? 4 * 2 : 0 ) );
 
-			// 1 byte shape desciptor
+			// 1 byte shape descriptor
 			// 3 vertex indices at ${indexByteCount} bytes
-			var faceListLength = includeIndices ? faceCount * ( indexByteCount * 3 + 1 ) : 0;
-			var output = new DataView( new ArrayBuffer( headerBin.length + vertexListLength + faceListLength ) );
+			const faceListLength = includeIndices ? faceCount * ( indexByteCount * 3 + 1 ) : 0;
+			const output = new DataView( new ArrayBuffer( headerBin.length + vertexListLength + faceListLength ) );
 			new Uint8Array( output.buffer ).set( headerBin, 0 );
 
 
-			var vOffset = headerBin.length;
-			var fOffset = headerBin.length + vertexListLength;
-			var writtenVertices = 0;
+			let vOffset = headerBin.length;
+			let fOffset = headerBin.length + vertexListLength;
+			let writtenVertices = 0;
 			traverseMeshes( function ( mesh, geometry ) {
 
-				var vertices = geometry.getAttribute( 'position' );
-				var normals = geometry.getAttribute( 'normal' );
-				var uvs = geometry.getAttribute( 'uv' );
-				var colors = geometry.getAttribute( 'color' );
-				var indices = geometry.getIndex();
+				const vertices = geometry.getAttribute( 'position' );
+				const normals = geometry.getAttribute( 'normal' );
+				const uvs = geometry.getAttribute( 'uv' );
+				const colors = geometry.getAttribute( 'color' );
+				const indices = geometry.getIndex();
 
 				normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
 
-				for ( var i = 0, l = vertices.count; i < l; i ++ ) {
+				for ( let i = 0, l = vertices.count; i < l; i ++ ) {
 
-					vertex.x = vertices.getX( i );
-					vertex.y = vertices.getY( i );
-					vertex.z = vertices.getZ( i );
+					vertex.fromBufferAttribute( vertices, i );
 
 					vertex.applyMatrix4( mesh.matrixWorld );
 
@@ -251,9 +262,7 @@ PLYExporter.prototype = {
 
 						if ( normals != null ) {
 
-							vertex.x = normals.getX( i );
-							vertex.y = normals.getY( i );
-							vertex.z = normals.getZ( i );
+							vertex.fromBufferAttribute( normals, i );
 
 							vertex.applyMatrix3( normalMatrixWorld ).normalize();
 
@@ -292,7 +301,7 @@ PLYExporter.prototype = {
 							output.setFloat32( vOffset, uvs.getY( i ), options.littleEndian );
 							vOffset += 4;
 
-						} else if ( includeUVs !== false ) {
+						} else {
 
 							output.setFloat32( vOffset, 0, options.littleEndian );
 							vOffset += 4;
@@ -309,13 +318,17 @@ PLYExporter.prototype = {
 
 						if ( colors != null ) {
 
-							output.setUint8( vOffset, Math.floor( colors.getX( i ) * 255 ) );
+							tempColor.fromBufferAttribute( colors, i );
+
+							ColorManagement.workingToColorSpace( tempColor, SRGBColorSpace );
+
+							output.setUint8( vOffset, Math.floor( tempColor.r * 255 ) );
 							vOffset += 1;
 
-							output.setUint8( vOffset, Math.floor( colors.getY( i ) * 255 ) );
+							output.setUint8( vOffset, Math.floor( tempColor.g * 255 ) );
 							vOffset += 1;
 
-							output.setUint8( vOffset, Math.floor( colors.getZ( i ) * 255 ) );
+							output.setUint8( vOffset, Math.floor( tempColor.b * 255 ) );
 							vOffset += 1;
 
 						} else {
@@ -341,7 +354,7 @@ PLYExporter.prototype = {
 
 					if ( indices !== null ) {
 
-						for ( var i = 0, l = indices.count; i < l; i += 3 ) {
+						for ( let i = 0, l = indices.count; i < l; i += 3 ) {
 
 							output.setUint8( fOffset, 3 );
 							fOffset += 1;
@@ -359,7 +372,7 @@ PLYExporter.prototype = {
 
 					} else {
 
-						for ( var i = 0, l = vertices.count; i < l; i += 3 ) {
+						for ( let i = 0, l = vertices.count; i < l; i += 3 ) {
 
 							output.setUint8( fOffset, 3 );
 							fOffset += 1;
@@ -392,32 +405,30 @@ PLYExporter.prototype = {
 
 			// Ascii File Generation
 			// count the number of vertices
-			var writtenVertices = 0;
-			var vertexList = '';
-			var faceList = '';
+			let writtenVertices = 0;
+			let vertexList = '';
+			let faceList = '';
 
 			traverseMeshes( function ( mesh, geometry ) {
 
-				var vertices = geometry.getAttribute( 'position' );
-				var normals = geometry.getAttribute( 'normal' );
-				var uvs = geometry.getAttribute( 'uv' );
-				var colors = geometry.getAttribute( 'color' );
-				var indices = geometry.getIndex();
+				const vertices = geometry.getAttribute( 'position' );
+				const normals = geometry.getAttribute( 'normal' );
+				const uvs = geometry.getAttribute( 'uv' );
+				const colors = geometry.getAttribute( 'color' );
+				const indices = geometry.getIndex();
 
 				normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
 
 				// form each line
-				for ( var i = 0, l = vertices.count; i < l; i ++ ) {
+				for ( let i = 0, l = vertices.count; i < l; i ++ ) {
 
-					vertex.x = vertices.getX( i );
-					vertex.y = vertices.getY( i );
-					vertex.z = vertices.getZ( i );
+					vertex.fromBufferAttribute( vertices, i );
 
 					vertex.applyMatrix4( mesh.matrixWorld );
 
 
 					// Position information
-					var line =
+					let line =
 						vertex.x + ' ' +
 						vertex.y + ' ' +
 						vertex.z;
@@ -427,9 +438,7 @@ PLYExporter.prototype = {
 
 						if ( normals != null ) {
 
-							vertex.x = normals.getX( i );
-							vertex.y = normals.getY( i );
-							vertex.z = normals.getZ( i );
+							vertex.fromBufferAttribute( normals, i );
 
 							vertex.applyMatrix3( normalMatrixWorld ).normalize();
 
@@ -455,7 +464,7 @@ PLYExporter.prototype = {
 								uvs.getX( i ) + ' ' +
 								uvs.getY( i );
 
-						} else if ( includeUVs !== false ) {
+						} else {
 
 							line += ' 0 0';
 
@@ -468,10 +477,14 @@ PLYExporter.prototype = {
 
 						if ( colors != null ) {
 
+							tempColor.fromBufferAttribute( colors, i );
+
+							ColorManagement.workingToColorSpace( tempColor, SRGBColorSpace );
+
 							line += ' ' +
-								Math.floor( colors.getX( i ) * 255 ) + ' ' +
-								Math.floor( colors.getY( i ) * 255 ) + ' ' +
-								Math.floor( colors.getZ( i ) * 255 );
+								Math.floor( tempColor.r * 255 ) + ' ' +
+								Math.floor( tempColor.g * 255 ) + ' ' +
+								Math.floor( tempColor.b * 255 );
 
 						} else {
 
@@ -490,7 +503,7 @@ PLYExporter.prototype = {
 
 					if ( indices !== null ) {
 
-						for ( var i = 0, l = indices.count; i < l; i += 3 ) {
+						for ( let i = 0, l = indices.count; i < l; i += 3 ) {
 
 							faceList += `3 ${ indices.getX( i + 0 ) + writtenVertices }`;
 							faceList += ` ${ indices.getX( i + 1 ) + writtenVertices }`;
@@ -500,7 +513,7 @@ PLYExporter.prototype = {
 
 					} else {
 
-						for ( var i = 0, l = vertices.count; i < l; i += 3 ) {
+						for ( let i = 0, l = vertices.count; i < l; i += 3 ) {
 
 							faceList += `3 ${ writtenVertices + i } ${ writtenVertices + i + 1 } ${ writtenVertices + i + 2 }\n`;
 
@@ -521,10 +534,29 @@ PLYExporter.prototype = {
 		}
 
 		if ( typeof onDone === 'function' ) requestAnimationFrame( () => onDone( result ) );
+
 		return result;
 
 	}
 
-};
+}
+
+/**
+ * Export options of `PLYExporter`.
+ *
+ * @typedef {Object} PLYExporter~Options
+ * @property {boolean} [binary=false] - Whether to export in binary format or ASCII.
+ * @property {Array<string>} [excludeAttributes] - Which properties to explicitly exclude from
+ * the exported PLY file. Valid values are `'color'`, `'normal'`, `'uv'`, and `'index'`. If triangle
+ * indices are excluded, then a point cloud is exported.
+ * @property {boolean} [littleEndian=false] - Whether the binary export uses little or big endian.
+ **/
+
+/**
+ * onDone callback of `PLYExporter`.
+ *
+ * @callback PLYExporter~OnDone
+ * @param {string|ArrayBuffer} result - The generated PLY ascii or binary.
+ */
 
 export { PLYExporter };

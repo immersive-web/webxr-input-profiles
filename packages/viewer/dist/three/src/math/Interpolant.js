@@ -13,27 +13,83 @@
  * Time complexity is O(1) for linear access crossing at most two points
  * and O(log N) for random access, where N is the number of positions.
  *
- * References:
+ * References: {@link http://www.oodesign.com/template-method-pattern.html}
  *
- * 		http://www.oodesign.com/template-method-pattern.html
- *
+ * @abstract
  */
+class Interpolant {
 
-function Interpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+	/**
+	 * Constructs a new interpolant.
+	 *
+	 * @param {TypedArray} parameterPositions - The parameter positions hold the interpolation factors.
+	 * @param {TypedArray} sampleValues - The sample values.
+	 * @param {number} sampleSize - The sample size
+	 * @param {TypedArray} [resultBuffer] - The result buffer.
+	 */
+	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
-	this.parameterPositions = parameterPositions;
-	this._cachedIndex = 0;
+		/**
+		 * The parameter positions.
+		 *
+		 * @type {TypedArray}
+		 */
+		this.parameterPositions = parameterPositions;
 
-	this.resultBuffer = resultBuffer !== undefined ?
-		resultBuffer : new sampleValues.constructor( sampleSize );
-	this.sampleValues = sampleValues;
-	this.valueSize = sampleSize;
+		/**
+		 * A cache index.
+		 *
+		 * @private
+		 * @type {number}
+		 * @default 0
+		 */
+		this._cachedIndex = 0;
 
-}
+		/**
+		 * The result buffer.
+		 *
+		 * @type {TypedArray}
+		 */
+		this.resultBuffer = resultBuffer !== undefined ? resultBuffer : new sampleValues.constructor( sampleSize );
 
-Object.assign( Interpolant.prototype, {
+		/**
+		 * The sample values.
+		 *
+		 * @type {TypedArray}
+		 */
+		this.sampleValues = sampleValues;
 
-	evaluate: function ( t ) {
+		/**
+		 * The value size.
+		 *
+		 * @type {TypedArray}
+		 */
+		this.valueSize = sampleSize;
+
+		/**
+		 * The interpolation settings.
+		 *
+		 * @type {?Object}
+		 * @default null
+		 */
+		this.settings = null;
+
+		/**
+		 * The default settings object.
+		 *
+		 * @type {Object}
+		 */
+		this.DefaultSettings_ = {};
+
+	}
+
+	/**
+	 * Evaluate the interpolant at position `t`.
+	 *
+	 * @param {number} t - The interpolation factor.
+	 * @return {TypedArray} The result buffer.
+	 */
+	evaluate( t ) {
 
 		const pp = this.parameterPositions;
 		let i1 = this._cachedIndex,
@@ -64,7 +120,7 @@ Object.assign( Interpolant.prototype, {
 
 								i1 = pp.length;
 								this._cachedIndex = i1;
-								return this.afterEnd_( i1 - 1, t, t0 );
+								return this.copySampleValue_( i1 - 1 );
 
 							}
 
@@ -112,7 +168,7 @@ Object.assign( Interpolant.prototype, {
 								// before start
 
 								this._cachedIndex = 0;
-								return this.beforeStart_( 0, t, t1 );
+								return this.copySampleValue_( 0 );
 
 							}
 
@@ -169,7 +225,7 @@ Object.assign( Interpolant.prototype, {
 				if ( t0 === undefined ) {
 
 					this._cachedIndex = 0;
-					return this.beforeStart_( 0, t, t1 );
+					return this.copySampleValue_( 0 );
 
 				}
 
@@ -177,7 +233,7 @@ Object.assign( Interpolant.prototype, {
 
 					i1 = pp.length;
 					this._cachedIndex = i1;
-					return this.afterEnd_( i1 - 1, t0, t );
+					return this.copySampleValue_( i1 - 1 );
 
 				}
 
@@ -191,22 +247,26 @@ Object.assign( Interpolant.prototype, {
 
 		return this.interpolate_( i1, t0, t, t1 );
 
-	},
+	}
 
-	settings: null, // optional, subclass-specific settings structure
-	// Note: The indirection allows central control of many interpolants.
-
-	// --- Protected interface
-
-	DefaultSettings_: {},
-
-	getSettings_: function () {
+	/**
+	 * Returns the interpolation settings.
+	 *
+	 * @return {Object} The interpolation settings.
+	 */
+	getSettings_() {
 
 		return this.settings || this.DefaultSettings_;
 
-	},
+	}
 
-	copySampleValue_: function ( index ) {
+	/**
+	 * Copies a sample value to the result buffer.
+	 *
+	 * @param {number} index - An index into the sample value buffer.
+	 * @return {TypedArray} The result buffer.
+	 */
+	copySampleValue_( index ) {
 
 		// copies a sample value to the result buffer
 
@@ -223,35 +283,38 @@ Object.assign( Interpolant.prototype, {
 
 		return result;
 
-	},
+	}
 
-	// Template methods for derived classes:
-
-	interpolate_: function ( /* i1, t0, t, t1 */ ) {
+	/**
+	 * Copies a sample value to the result buffer.
+	 *
+	 * @abstract
+	 * @param {number} i1 - An index into the sample value buffer.
+	 * @param {number} t0 - The previous interpolation factor.
+	 * @param {number} t - The current interpolation factor.
+	 * @param {number} t1 - The next interpolation factor.
+	 * @return {TypedArray} The result buffer.
+	 */
+	interpolate_( /* i1, t0, t, t1 */ ) {
 
 		throw new Error( 'call to abstract method' );
 		// implementations shall return this.resultBuffer
 
-	},
+	}
 
-	intervalChanged_: function ( /* i1, t0, t1 */ ) {
+	/**
+	 * Optional method that is executed when the interval has changed.
+	 *
+	 * @param {number} i1 - An index into the sample value buffer.
+	 * @param {number} t0 - The previous interpolation factor.
+	 * @param {number} t - The current interpolation factor.
+	 */
+	intervalChanged_( /* i1, t0, t1 */ ) {
 
 		// empty
 
 	}
 
-} );
-
-// DECLARE ALIAS AFTER assign prototype
-Object.assign( Interpolant.prototype, {
-
-	//( 0, t, t0 ), returns this.resultBuffer
-	beforeStart_: Interpolant.prototype.copySampleValue_,
-
-	//( N-1, tN-1, t ), returns this.resultBuffer
-	afterEnd_: Interpolant.prototype.copySampleValue_,
-
-} );
-
+}
 
 export { Interpolant };

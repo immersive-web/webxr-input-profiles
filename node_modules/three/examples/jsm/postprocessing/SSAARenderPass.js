@@ -1,118 +1,221 @@
 import {
 	AdditiveBlending,
 	Color,
-	LinearFilter,
-	RGBAFormat,
+	HalfFloatType,
 	ShaderMaterial,
 	UniformsUtils,
 	WebGLRenderTarget
-} from '../../../build/three.module.js';
-import { Pass } from '../postprocessing/Pass.js';
+} from 'three';
+import { Pass, FullScreenQuad } from './Pass.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
 /**
-*
-* Supersample Anti-Aliasing Render Pass
-*
-* This manual approach to SSAA re-renders the scene ones for each sample with camera jitter and accumulates the results.
-*
-* References: https://en.wikipedia.org/wiki/Supersampling
-*
-*/
+ * Supersample Anti-Aliasing Render Pass.
+ *
+ * This manual approach to SSAA re-renders the scene ones for each sample with camera jitter and accumulates the results.
+ *
+ * ```js
+ * const ssaaRenderPass = new SSAARenderPass( scene, camera );
+ * ssaaRenderPass.sampleLevel = 3;
+ * composer.addPass( ssaaRenderPass );
+ * ```
+ *
+ * @augments Pass
+ * @three_import import { SSAARenderPass } from 'three/addons/postprocessing/SSAARenderPass.js';
+ */
+class SSAARenderPass extends Pass {
 
-var SSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
+	/**
+	 * Constructs a new SSAA render pass.
+	 *
+	 * @param {Scene} scene - The scene to render.
+	 * @param {Camera} camera - The camera.
+	 * @param {?(number|Color|string)} [clearColor=0x000000] - The clear color of the render pass.
+	 * @param {?number} [clearAlpha=0] - The clear alpha of the render pass.
+	 */
+	constructor( scene, camera, clearColor = 0x000000, clearAlpha = 0 ) {
 
-	Pass.call( this );
+		super();
 
-	this.scene = scene;
-	this.camera = camera;
+		/**
+		 * The scene to render.
+		 *
+		 * @type {Scene}
+		 */
+		this.scene = scene;
 
-	this.sampleLevel = 4; // specified as n, where the number of samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.
-	this.unbiased = true;
+		/**
+		 * The camera.
+		 *
+		 * @type {Camera}
+		 */
+		this.camera = camera;
 
-	// as we need to clear the buffer in this pass, clearColor must be set to something, defaults to black.
-	this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
-	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
-	this._oldClearColor = new Color();
+		/**
+		 * The sample level. Specified as n, where the number of
+		 * samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.
+		 *
+		 * @type {number}
+		 * @default 4
+		 */
+		this.sampleLevel = 4;
 
-	if ( CopyShader === undefined ) console.error( 'THREE.SSAARenderPass relies on CopyShader' );
+		/**
+		 * Whether the pass should be unbiased or not. This property has the most
+		 * visible effect when rendering to a RGBA8 buffer because it mitigates
+		 * rounding errors. By default RGBA16F is used.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.unbiased = true;
 
-	var copyShader = CopyShader;
-	this.copyUniforms = UniformsUtils.clone( copyShader.uniforms );
+		/**
+		 * Whether to use a stencil buffer or not. This property can't
+		 * be changed after the first render.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.stencilBuffer = false;
 
-	this.copyMaterial = new ShaderMaterial(	{
-		uniforms: this.copyUniforms,
-		vertexShader: copyShader.vertexShader,
-		fragmentShader: copyShader.fragmentShader,
-		premultipliedAlpha: true,
-		transparent: true,
-		blending: AdditiveBlending,
-		depthTest: false,
-		depthWrite: false
-	} );
+		/**
+		 * The clear color of the render pass.
+		 *
+		 * @type {?(number|Color|string)}
+		 * @default 0x000000
+		 */
+		this.clearColor = clearColor;
 
-	this.fsQuad = new Pass.FullScreenQuad( this.copyMaterial );
+		/**
+		 * The clear alpha of the render pass.
+		 *
+		 * @type {?number}
+		 * @default 0
+		 */
+		this.clearAlpha = clearAlpha;
 
-};
+		// internals
 
-SSAARenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
+		this._sampleRenderTarget = null;
 
-	constructor: SSAARenderPass,
+		this._oldClearColor = new Color();
 
-	dispose: function () {
+		this._copyUniforms = UniformsUtils.clone( CopyShader.uniforms );
 
-		if ( this.sampleRenderTarget ) {
+		this._copyMaterial = new ShaderMaterial(	{
+			uniforms: this._copyUniforms,
+			vertexShader: CopyShader.vertexShader,
+			fragmentShader: CopyShader.fragmentShader,
+			transparent: true,
+			depthTest: false,
+			depthWrite: false,
+			premultipliedAlpha: true,
+			blending: AdditiveBlending
+		} );
 
-			this.sampleRenderTarget.dispose();
-			this.sampleRenderTarget = null;
+		this._fsQuad = new FullScreenQuad( this._copyMaterial );
+
+	}
+
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever the pass is no longer used in your app.
+	 */
+	dispose() {
+
+		if ( this._sampleRenderTarget ) {
+
+			this._sampleRenderTarget.dispose();
+			this._sampleRenderTarget = null;
 
 		}
 
-	},
+		this._copyMaterial.dispose();
 
-	setSize: function ( width, height ) {
+		this._fsQuad.dispose();
 
-		if ( this.sampleRenderTarget )	this.sampleRenderTarget.setSize( width, height );
+	}
 
-	},
+	/**
+	 * Sets the size of the pass.
+	 *
+	 * @param {number} width - The width to set.
+	 * @param {number} height - The height to set.
+	 */
+	setSize( width, height ) {
 
-	render: function ( renderer, writeBuffer, readBuffer ) {
+		if ( this._sampleRenderTarget )	this._sampleRenderTarget.setSize( width, height );
 
-		if ( ! this.sampleRenderTarget ) {
+	}
 
-			this.sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat } );
-			this.sampleRenderTarget.texture.name = 'SSAARenderPass.sample';
+	/**
+	 * Performs the SSAA render pass.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {WebGLRenderTarget} writeBuffer - The write buffer. This buffer is intended as the rendering
+	 * destination for the pass.
+	 * @param {WebGLRenderTarget} readBuffer - The read buffer. The pass can access the result from the
+	 * previous pass from this buffer.
+	 * @param {number} deltaTime - The delta time in seconds.
+	 * @param {boolean} maskActive - Whether masking is active or not.
+	 */
+	render( renderer, writeBuffer, readBuffer/*, deltaTime, maskActive */ ) {
+
+		if ( ! this._sampleRenderTarget ) {
+
+			this._sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, { type: HalfFloatType, stencilBuffer: this.stencilBuffer } );
+			this._sampleRenderTarget.texture.name = 'SSAARenderPass.sample';
 
 		}
 
-		var jitterOffsets = SSAARenderPass.JitterVectors[ Math.max( 0, Math.min( this.sampleLevel, 5 ) ) ];
+		const jitterOffsets = _JitterVectors[ Math.max( 0, Math.min( this.sampleLevel, 5 ) ) ];
 
-		var autoClear = renderer.autoClear;
+		const autoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
 		renderer.getClearColor( this._oldClearColor );
-		var oldClearAlpha = renderer.getClearAlpha();
+		const oldClearAlpha = renderer.getClearAlpha();
 
-		var baseSampleWeight = 1.0 / jitterOffsets.length;
-		var roundingRange = 1 / 32;
-		this.copyUniforms[ 'tDiffuse' ].value = this.sampleRenderTarget.texture;
+		const baseSampleWeight = 1.0 / jitterOffsets.length;
+		const roundingRange = 1 / 32;
+		this._copyUniforms[ 'tDiffuse' ].value = this._sampleRenderTarget.texture;
 
-		var width = readBuffer.width, height = readBuffer.height;
+		const viewOffset = {
+
+			fullWidth: readBuffer.width,
+			fullHeight: readBuffer.height,
+			offsetX: 0,
+			offsetY: 0,
+			width: readBuffer.width,
+			height: readBuffer.height
+
+		};
+
+		const originalViewOffset = Object.assign( {}, this.camera.view );
+
+		if ( originalViewOffset.enabled ) Object.assign( viewOffset, originalViewOffset );
 
 		// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
-		for ( var i = 0; i < jitterOffsets.length; i ++ ) {
+		for ( let i = 0; i < jitterOffsets.length; i ++ ) {
 
-			var jitterOffset = jitterOffsets[ i ];
+			const jitterOffset = jitterOffsets[ i ];
 
 			if ( this.camera.setViewOffset ) {
 
-				this.camera.setViewOffset( width, height,
-					jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625, // 0.0625 = 1 / 16
-					width, height );
+				this.camera.setViewOffset(
+
+					viewOffset.fullWidth, viewOffset.fullHeight,
+
+					viewOffset.offsetX + jitterOffset[ 0 ] * 0.0625, viewOffset.offsetY + jitterOffset[ 1 ] * 0.0625, // 0.0625 = 1 / 16
+
+					viewOffset.width, viewOffset.height
+
+				);
 
 			}
 
-			var sampleWeight = baseSampleWeight;
+			let sampleWeight = baseSampleWeight;
 
 			if ( this.unbiased ) {
 
@@ -120,14 +223,14 @@ SSAARenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 				// The following equation varies the sampleWeight per sample so that it is uniformly distributed
 				// across a range of values whose rounding errors cancel each other out.
 
-				var uniformCenteredDistribution = ( - 0.5 + ( i + 0.5 ) / jitterOffsets.length );
+				const uniformCenteredDistribution = ( - 0.5 + ( i + 0.5 ) / jitterOffsets.length );
 				sampleWeight += roundingRange * uniformCenteredDistribution;
 
 			}
 
-			this.copyUniforms[ 'opacity' ].value = sampleWeight;
+			this._copyUniforms[ 'opacity' ].value = sampleWeight;
 			renderer.setClearColor( this.clearColor, this.clearAlpha );
-			renderer.setRenderTarget( this.sampleRenderTarget );
+			renderer.setRenderTarget( this._sampleRenderTarget );
 			renderer.clear();
 			renderer.render( this.scene, this.camera );
 
@@ -140,18 +243,34 @@ SSAARenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 			}
 
-			this.fsQuad.render( renderer );
+			this._fsQuad.render( renderer );
 
 		}
 
-		if ( this.camera.clearViewOffset ) this.camera.clearViewOffset();
+		if ( this.camera.setViewOffset && originalViewOffset.enabled ) {
+
+			this.camera.setViewOffset(
+
+				originalViewOffset.fullWidth, originalViewOffset.fullHeight,
+
+				originalViewOffset.offsetX, originalViewOffset.offsetY,
+
+				originalViewOffset.width, originalViewOffset.height
+
+			);
+
+		} else if ( this.camera.clearViewOffset ) {
+
+			this.camera.clearViewOffset();
+
+		}
 
 		renderer.autoClear = autoClear;
 		renderer.setClearColor( this._oldClearColor, oldClearAlpha );
 
 	}
 
-} );
+}
 
 
 // These jitter vectors are specified in integers because it is easier.
@@ -159,7 +278,7 @@ SSAARenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 // before being used, thus these integers need to be scaled by 1/16.
 //
 // Sample patterns reference: https://msdn.microsoft.com/en-us/library/windows/desktop/ff476218%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396
-SSAARenderPass.JitterVectors = [
+const _JitterVectors = [
 	[
 		[ 0, 0 ]
 	],

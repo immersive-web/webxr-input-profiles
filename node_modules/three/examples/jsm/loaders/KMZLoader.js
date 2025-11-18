@@ -3,25 +3,50 @@ import {
 	Group,
 	Loader,
 	LoadingManager
-} from '../../../build/three.module.js';
+} from 'three';
 import { ColladaLoader } from '../loaders/ColladaLoader.js';
-import * as fflate from '../libs/fflate.module.min.js';
+import * as fflate from '../libs/fflate.module.js';
 
-var KMZLoader = function ( manager ) {
+/**
+ * A loader for the KMZ format.
+ *
+ * ```js
+ * const loader = new KMZLoader();
+ * const kmz = await loader.loadAsync( './models/kmz/Box.kmz' );
+ *
+ * scene.add( kmz.scene );
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { KMZLoader } from 'three/addons/loaders/KMZLoader.js';
+ */
+class KMZLoader extends Loader {
 
-	Loader.call( this, manager );
+	/**
+	 * Constructs a new KMZ loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
+	constructor( manager ) {
 
-};
+		super( manager );
 
-KMZLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: KMZLoader,
+	/**
+	 * Starts loading from the given URL and passes the loaded KMZ asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function({scene:Group})} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
+	load( url, onLoad, onProgress, onError ) {
 
-	load: function ( url, onLoad, onProgress, onError ) {
+		const scope = this;
 
-		var scope = this;
-
-		var loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
@@ -50,15 +75,21 @@ KMZLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( data ) {
+	/**
+	 * Parses the given KMZ data and returns an object holding the scene.
+	 *
+	 * @param {ArrayBuffer} data - The raw KMZ data as an array buffer.
+	 * @return {{scene:Group}} The parsed KMZ asset.
+	 */
+	parse( data ) {
 
 		function findFile( url ) {
 
-			for ( var path in zip ) {
+			for ( const path in zip ) {
 
-				if ( path.substr( - url.length ) === url ) {
+				if ( path.slice( - url.length ) === url ) {
 
 					return zip[ path ];
 
@@ -68,16 +99,16 @@ KMZLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		var manager = new LoadingManager();
+		const manager = new LoadingManager();
 		manager.setURLModifier( function ( url ) {
 
-			var image = findFile( url );
+			const image = findFile( url );
 
 			if ( image ) {
 
 				console.log( 'Loading', url );
 
-				var blob = new Blob( [ image.buffer ], { type: 'application/octet-stream' } );
+				const blob = new Blob( [ image.buffer ], { type: 'application/octet-stream' } );
 				return URL.createObjectURL( blob );
 
 			}
@@ -88,18 +119,18 @@ KMZLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		//
 
-		var zip = fflate.unzipSync( new Uint8Array( data ) ); // eslint-disable-line no-undef
+		const zip = fflate.unzipSync( new Uint8Array( data ) );
 
 		if ( zip[ 'doc.kml' ] ) {
 
-			var xml = new DOMParser().parseFromString( fflate.strFromU8( zip[ 'doc.kml' ] ), 'application/xml' ); // eslint-disable-line no-undef
+			const xml = new DOMParser().parseFromString( fflate.strFromU8( zip[ 'doc.kml' ] ), 'application/xml' );
 
-			var model = xml.querySelector( 'Placemark Model Link href' );
+			const model = xml.querySelector( 'Placemark Model Link href' );
 
 			if ( model ) {
 
-				var loader = new ColladaLoader( manager );
-				return loader.parse( fflate.strFromU8( zip[ model.textContent ] ) ); // eslint-disable-line no-undef
+				const loader = new ColladaLoader( manager );
+				return loader.parse( fflate.strFromU8( zip[ model.textContent ] ) );
 
 			}
 
@@ -107,14 +138,14 @@ KMZLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			console.warn( 'KMZLoader: Missing doc.kml file.' );
 
-			for ( var path in zip ) {
+			for ( const path in zip ) {
 
-				var extension = path.split( '.' ).pop().toLowerCase();
+				const extension = path.split( '.' ).pop().toLowerCase();
 
 				if ( extension === 'dae' ) {
 
-					var loader = new ColladaLoader( manager );
-					return loader.parse( fflate.strFromU8( zip[ path ] ) ); // eslint-disable-line no-undef
+					const loader = new ColladaLoader( manager );
+					return loader.parse( fflate.strFromU8( zip[ path ] ) );
 
 				}
 
@@ -127,6 +158,6 @@ KMZLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	}
 
-} );
+}
 
 export { KMZLoader };

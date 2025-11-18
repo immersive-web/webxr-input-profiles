@@ -1,7 +1,12 @@
 import {
 	Color,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
+
+/**
+ * @module GodRaysShader
+ * @three_import import * as GodRaysShader from 'three/addons/shaders/GodRaysShader.js';
+ */
 
 /**
  * God-rays (crepuscular rays)
@@ -12,16 +17,19 @@ import {
  * sample count to produce a blur filter with large support.
  *
  * My implementation performs 3 passes, similar to the implementation from Sousa. I found
- * just 6 samples per pass produced acceptible results. The blur is applied three times,
+ * just 6 samples per pass produced acceptable results. The blur is applied three times,
  * with decreasing filter support. The result is equivalent to a single pass with
  * 6*6*6 = 216 samples.
  *
  * References:
+ * - [Sousa2008, Crysis Next Gen Effects, GDC2008](http://www.crytek.com/sites/default/files/GDC08_SousaT_CrysisEffects.ppt).
  *
- * Sousa2008 - Crysis Next Gen Effects, GDC2008, http://www.crytek.com/sites/default/files/GDC08_SousaT_CrysisEffects.ppt
+ * @constant
+ * @type {ShaderMaterial~Shader}
  */
+const GodRaysDepthMaskShader = {
 
-var GodRaysDepthMaskShader = {
+	name: 'GodRaysDepthMaskShader',
 
 	uniforms: {
 
@@ -31,33 +39,28 @@ var GodRaysDepthMaskShader = {
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
 
-		'varying vec2 vUv;',
+		varying vec2 vUv;
 
-		'void main() {',
+		void main() {
 
-		' vUv = uv;',
-		' gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+		 vUv = uv;
+		 gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		'}'
+	 }`,
 
-	].join( '\n' ),
+	fragmentShader: /* glsl */`
 
-	fragmentShader: [
+		varying vec2 vUv;
 
-		'varying vec2 vUv;',
+		uniform sampler2D tInput;
 
-		'uniform sampler2D tInput;',
+		void main() {
 
-		'void main() {',
+			gl_FragColor = vec4( 1.0 ) - texture2D( tInput, vUv );
 
-		'	gl_FragColor = vec4( 1.0 ) - texture2D( tInput, vUv );',
-
-
-		'}'
-
-	].join( '\n' )
+		}`
 
 };
 
@@ -75,9 +78,13 @@ var GodRaysDepthMaskShader = {
  *
  * The results of the previous pass are re-blurred, each time with a
  * decreased distance between samples.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
  */
+const GodRaysGenerateShader = {
 
-var GodRaysGenerateShader = {
+	name: 'GodRaysGenerateShader',
 
 	uniforms: {
 
@@ -93,58 +100,56 @@ var GodRaysGenerateShader = {
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
 
-		'varying vec2 vUv;',
+		varying vec2 vUv;
 
-		'void main() {',
+		void main() {
 
-		' vUv = uv;',
-		' gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+		 vUv = uv;
+		 gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		'}'
+	 }`,
 
-	].join( '\n' ),
+	fragmentShader: /* glsl */`
 
-	fragmentShader: [
+		#define TAPS_PER_PASS 6.0
 
-		'#define TAPS_PER_PASS 6.0',
+		varying vec2 vUv;
 
-		'varying vec2 vUv;',
+		uniform sampler2D tInput;
 
-		'uniform sampler2D tInput;',
+		uniform vec3 vSunPositionScreenSpace;
+		uniform float fStepSize; // filter step size
 
-		'uniform vec3 vSunPositionScreenSpace;',
-		'uniform float fStepSize;', // filter step size
-
-		'void main() {',
+		void main() {
 
 		// delta from current pixel to "sun" position
 
-		'	vec2 delta = vSunPositionScreenSpace.xy - vUv;',
-		'	float dist = length( delta );',
+			vec2 delta = vSunPositionScreenSpace.xy - vUv;
+			float dist = length( delta );
 
 		// Step vector (uv space)
 
-		'	vec2 stepv = fStepSize * delta / dist;',
+			vec2 stepv = fStepSize * delta / dist;
 
 		// Number of iterations between pixel and sun
 
-		'	float iters = dist/fStepSize;',
+			float iters = dist/fStepSize;
 
-		'	vec2 uv = vUv.xy;',
-		'	float col = 0.0;',
+			vec2 uv = vUv.xy;
+			float col = 0.0;
 
 		// This breaks ANGLE in Chrome 22
 		//	- see http://code.google.com/p/chromium/issues/detail?id=153105
 
 		/*
-		// Unrolling didnt do much on my hardware (ATI Mobility Radeon 3450),
+		// Unrolling didn't do much on my hardware (ATI Mobility Radeon 3450),
 		// so i've just left the loop
 
 		"for ( float i = 0.0; i < TAPS_PER_PASS; i += 1.0 ) {",
 
-		// Accumulate samples, making sure we dont walk past the light source.
+		// Accumulate samples, making sure we don't walk past the light source.
 
 		// The check for uv.y < 1 would not be necessary with "border" UV wrap
 		// mode, with a black border color. I don't think this is currently
@@ -160,48 +165,50 @@ var GodRaysGenerateShader = {
 
 		// Unrolling loop manually makes it work in ANGLE
 
-		'	float f = min( 1.0, max( vSunPositionScreenSpace.z / 1000.0, 0.0 ) );', // used to fade out godrays
+			float f = min( 1.0, max( vSunPositionScreenSpace.z / 1000.0, 0.0 ) ); // used to fade out godrays
 
-		'	if ( 0.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r * f;',
-		'	uv += stepv;',
+			if ( 0.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r * f;
+			uv += stepv;
 
-		'	if ( 1.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r * f;',
-		'	uv += stepv;',
+			if ( 1.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r * f;
+			uv += stepv;
 
-		'	if ( 2.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r * f;',
-		'	uv += stepv;',
+			if ( 2.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r * f;
+			uv += stepv;
 
-		'	if ( 3.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r * f;',
-		'	uv += stepv;',
+			if ( 3.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r * f;
+			uv += stepv;
 
-		'	if ( 4.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r * f;',
-		'	uv += stepv;',
+			if ( 4.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r * f;
+			uv += stepv;
 
-		'	if ( 5.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r * f;',
-		'	uv += stepv;',
+			if ( 5.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r * f;
+			uv += stepv;
 
-		// Should technically be dividing by 'iters', but 'TAPS_PER_PASS' smooths out
+		// Should technically be dividing by 'iters but 'TAPS_PER_PASS' smooths out
 		// objectionable artifacts, in particular near the sun position. The side
 		// effect is that the result is darker than it should be around the sun, as
 		// TAPS_PER_PASS is greater than the number of samples actually accumulated.
-		// When the result is inverted (in the shader 'godrays_combine', this produces
+		// When the result is inverted (in the shader 'godrays_combine this produces
 		// a slight bright spot at the position of the sun, even when it is occluded.
 
-		'	gl_FragColor = vec4( col/TAPS_PER_PASS );',
-		'	gl_FragColor.a = 1.0;',
+			gl_FragColor = vec4( col/TAPS_PER_PASS );
+			gl_FragColor.a = 1.0;
 
-		'}'
-
-	].join( '\n' )
+		}`
 
 };
 
 /**
  * Additively applies god rays from texture tGodRays to a background (tColors).
  * fGodRayIntensity attenuates the god rays.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
  */
+const GodRaysCombineShader = {
 
-var GodRaysCombineShader = {
+	name: 'GodRaysCombineShader',
 
 	uniforms: {
 
@@ -219,40 +226,36 @@ var GodRaysCombineShader = {
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
 
-		'varying vec2 vUv;',
+		varying vec2 vUv;
 
-		'void main() {',
+		void main() {
 
-		'	vUv = uv;',
-		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		'}'
+		}`,
 
-	].join( '\n' ),
+	fragmentShader: /* glsl */`
 
-	fragmentShader: [
+		varying vec2 vUv;
 
-		'varying vec2 vUv;',
+		uniform sampler2D tColors;
+		uniform sampler2D tGodRays;
 
-		'uniform sampler2D tColors;',
-		'uniform sampler2D tGodRays;',
+		uniform float fGodRayIntensity;
 
-		'uniform float fGodRayIntensity;',
-
-		'void main() {',
+		void main() {
 
 		// Since THREE.MeshDepthMaterial renders foreground objects white and background
 		// objects black, the god-rays will be white streaks. Therefore value is inverted
 		// before being combined with tColors
 
-		'	gl_FragColor = texture2D( tColors, vUv ) + fGodRayIntensity * vec4( 1.0 - texture2D( tGodRays, vUv ).r );',
-		'	gl_FragColor.a = 1.0;',
+			gl_FragColor = texture2D( tColors, vUv ) + fGodRayIntensity * vec4( 1.0 - texture2D( tGodRays, vUv ).r );
+			gl_FragColor.a = 1.0;
 
-		'}'
-
-	].join( '\n' )
+		}`
 
 };
 
@@ -260,9 +263,13 @@ var GodRaysCombineShader = {
 /**
  * A dodgy sun/sky shader. Makes a bright spot at the sun location. Would be
  * cheaper/faster/simpler to implement this as a simple sun sprite.
+ *
+ * @constant
+ * @type {Object}
  */
+const GodRaysFakeSunShader = {
 
-var GodRaysFakeSunShader = {
+	name: 'GodRaysFakeSunShader',
 
 	uniforms: {
 
@@ -284,46 +291,42 @@ var GodRaysFakeSunShader = {
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
 
-		'varying vec2 vUv;',
+		varying vec2 vUv;
 
-		'void main() {',
+		void main() {
 
-		'	vUv = uv;',
-		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		'}'
+		}`,
 
-	].join( '\n' ),
+	fragmentShader: /* glsl */`
 
-	fragmentShader: [
+		varying vec2 vUv;
 
-		'varying vec2 vUv;',
+		uniform vec3 vSunPositionScreenSpace;
+		uniform float fAspect;
 
-		'uniform vec3 vSunPositionScreenSpace;',
-		'uniform float fAspect;',
+		uniform vec3 sunColor;
+		uniform vec3 bgColor;
 
-		'uniform vec3 sunColor;',
-		'uniform vec3 bgColor;',
+		void main() {
 
-		'void main() {',
-
-		'	vec2 diff = vUv - vSunPositionScreenSpace.xy;',
+			vec2 diff = vUv - vSunPositionScreenSpace.xy;
 
 		// Correct for aspect ratio
 
-		'	diff.x *= fAspect;',
+			diff.x *= fAspect;
 
-		'	float prop = clamp( length( diff ) / 0.5, 0.0, 1.0 );',
-		'	prop = 0.35 * pow( 1.0 - prop, 3.0 );',
+			float prop = clamp( length( diff ) / 0.5, 0.0, 1.0 );
+			prop = 0.35 * pow( 1.0 - prop, 3.0 );
 
-		'	gl_FragColor.xyz = ( vSunPositionScreenSpace.z > 0.0 ) ? mix( sunColor, bgColor, 1.0 - prop ) : bgColor;',
-		'	gl_FragColor.w = 1.0;',
+			gl_FragColor.xyz = ( vSunPositionScreenSpace.z > 0.0 ) ? mix( sunColor, bgColor, 1.0 - prop ) : bgColor;
+			gl_FragColor.w = 1.0;
 
-		'}'
-
-	].join( '\n' )
+		}`
 
 };
 

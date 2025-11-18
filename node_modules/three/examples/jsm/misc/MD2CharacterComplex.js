@@ -5,102 +5,222 @@ import {
 	Object3D,
 	TextureLoader,
 	UVMapping,
-	sRGBEncoding
-} from '../../../build/three.module.js';
+	SRGBColorSpace
+} from 'three';
 import { MD2Loader } from '../loaders/MD2Loader.js';
 import { MorphBlendMesh } from '../misc/MorphBlendMesh.js';
 
-var MD2CharacterComplex = function () {
+/**
+ * This class represents a management component for animated MD2
+ * character assets. It provides a larger API compared to {@link MD2Character}.
+ *
+ * @three_import import { MD2CharacterComplex } from 'three/addons/misc/MD2CharacterComplex.js';
+ */
+class MD2CharacterComplex {
 
-	var scope = this;
+	/**
+	 * Constructs a new MD2 character.
+	 */
+	constructor() {
 
-	this.scale = 1;
+		/**
+		 * The mesh scale.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.scale = 1;
 
-	// animation parameters
+		/**
+		 * The FPS
+		 *
+		 * @type {number}
+		 * @default 6
+		 */
+		this.animationFPS = 6;
 
-	this.animationFPS = 6;
-	this.transitionFrames = 15;
+		/**
+		 * The transition frames.
+		 *
+		 * @type {number}
+		 * @default 15
+		 */
+		this.transitionFrames = 15;
 
-	// movement model parameters
+		/**
+		 * The character's maximum speed.
+		 *
+		 * @type {number}
+		 * @default 275
+		 */
+		this.maxSpeed = 275;
 
-	this.maxSpeed = 275;
-	this.maxReverseSpeed = - 275;
+		/**
+		 * The character's maximum reverse speed.
+		 *
+		 * @type {number}
+		 * @default - 275
+		 */
+		this.maxReverseSpeed = - 275;
 
-	this.frontAcceleration = 600;
-	this.backAcceleration = 600;
+		/**
+		 * The character's front acceleration.
+		 *
+		 * @type {number}
+		 * @default 600
+		 */
+		this.frontAcceleration = 600;
 
-	this.frontDecceleration = 600;
+		/**
+		 * The character's back acceleration.
+		 *
+		 * @type {number}
+		 * @default 600
+		 */
+		this.backAcceleration = 600;
 
-	this.angularSpeed = 2.5;
+		/**
+		 * The character's front deceleration.
+		 *
+		 * @type {number}
+		 * @default 600
+		 */
+		this.frontDeceleration = 600;
 
-	// rig
+		/**
+		 * The character's angular speed.
+		 *
+		 * @type {number}
+		 * @default 2.5
+		 */
+		this.angularSpeed = 2.5;
 
-	this.root = new Object3D();
+		/**
+		 * The root 3D object
+		 *
+		 * @type {Object3D}
+		 */
+		this.root = new Object3D();
 
-	this.meshBody = null;
-	this.meshWeapon = null;
+		/**
+		 * The body mesh.
+		 *
+		 * @type {?Mesh}
+		 * @default null
+		 */
+		this.meshBody = null;
 
-	this.controls = null;
+		/**
+		 * The weapon mesh.
+		 *
+		 * @type {?Mesh}
+		 * @default null
+		 */
+		this.meshWeapon = null;
 
-	// skins
+		/**
+		 * The movement controls.
+		 *
+		 * @type {?Object}
+		 * @default null
+		 */
+		this.controls = null;
 
-	this.skinsBody = [];
-	this.skinsWeapon = [];
+		/**
+		 * The body skins.
+		 *
+		 * @type {Array<Texture>}
+		 */
+		this.skinsBody = [];
 
-	this.weapons = [];
+		/**
+		 * The weapon skins.
+		 *
+		 * @type {Array<Texture>}
+		 */
+		this.skinsWeapon = [];
 
-	this.currentSkin = undefined;
+		/**
+		 * The weapon meshes.
+		 *
+		 * @type {Array<Mesh>}
+		 */
+		this.weapons = [];
 
-	//
+		/**
+		 * The current skin.
+		 *
+		 * @type {Texture}
+		 * @default undefined
+		 */
+		this.currentSkin = undefined;
 
-	this.onLoadComplete = function () {};
+		//
 
-	// internals
+		this.onLoadComplete = function () {};
 
-	this.meshes = [];
-	this.animations = {};
+		// internals
 
-	this.loadCounter = 0;
+		this.meshes = [];
+		this.animations = {};
 
-	// internal movement control variables
+		this.loadCounter = 0;
 
-	this.speed = 0;
-	this.bodyOrientation = 0;
+		// internal movement control variables
 
-	this.walkSpeed = this.maxSpeed;
-	this.crouchSpeed = this.maxSpeed * 0.5;
+		this.speed = 0;
+		this.bodyOrientation = 0;
 
-	// internal animation parameters
+		this.walkSpeed = this.maxSpeed;
+		this.crouchSpeed = this.maxSpeed * 0.5;
 
-	this.activeAnimation = null;
-	this.oldAnimation = null;
+		// internal animation parameters
 
-	// API
+		this.activeAnimation = null;
+		this.oldAnimation = null;
 
-	this.enableShadows = function ( enable ) {
+		// API
 
-		for ( var i = 0; i < this.meshes.length; i ++ ) {
+	}
+
+	/**
+	 * Toggles shadow casting and receiving on the character's meshes.
+	 *
+	 * @param {boolean} enable - Whether to enable shadows or not.
+	 */
+	enableShadows( enable ) {
+
+		for ( let i = 0; i < this.meshes.length; i ++ ) {
 
 			this.meshes[ i ].castShadow = enable;
 			this.meshes[ i ].receiveShadow = enable;
 
 		}
 
-	};
+	}
 
-	this.setVisible = function ( enable ) {
+	/**
+	 * Toggles visibility on the character's meshes.
+	 *
+	 * @param {boolean} enable - Whether the character is visible or not.
+	 */
+	setVisible( enable ) {
 
-		for ( var i = 0; i < this.meshes.length; i ++ ) {
+		for ( let i = 0; i < this.meshes.length; i ++ ) {
 
 			this.meshes[ i ].visible = enable;
 			this.meshes[ i ].visible = enable;
 
 		}
 
-	};
+	}
 
-
-	this.shareParts = function ( original ) {
+	/**
+	 * Shares certain resources from a different character model.
+	 *
+	 * @param {MD2CharacterComplex} original - The original MD2 character.
+	 */
+	shareParts( original ) {
 
 		this.animations = original.animations;
 		this.walkSpeed = original.walkSpeed;
@@ -111,7 +231,7 @@ var MD2CharacterComplex = function () {
 
 		// BODY
 
-		var mesh = createPart( original.meshBody.geometry, this.skinsBody[ 0 ] );
+		const mesh = this._createPart( original.meshBody.geometry, this.skinsBody[ 0 ] );
 		mesh.scale.set( this.scale, this.scale, this.scale );
 
 		this.root.position.y = original.root.position.y;
@@ -123,9 +243,9 @@ var MD2CharacterComplex = function () {
 
 		// WEAPONS
 
-		for ( var i = 0; i < original.weapons.length; i ++ ) {
+		for ( let i = 0; i < original.weapons.length; i ++ ) {
 
-			var meshWeapon = createPart( original.weapons[ i ].geometry, this.skinsWeapon[ i ] );
+			const meshWeapon = this._createPart( original.weapons[ i ].geometry, this.skinsWeapon[ i ] );
 			meshWeapon.scale.set( this.scale, this.scale, this.scale );
 			meshWeapon.visible = false;
 
@@ -140,9 +260,41 @@ var MD2CharacterComplex = function () {
 
 		}
 
-	};
+	}
 
-	this.loadParts = function ( config ) {
+	/**
+	 * Loads the character model for the given config.
+	 *
+	 * @param {Object} config - The config which defines the model and textures paths.
+	 */
+	loadParts( config ) {
+
+		const scope = this;
+
+		function loadTextures( baseUrl, textureUrls ) {
+
+			const textureLoader = new TextureLoader();
+			const textures = [];
+
+			for ( let i = 0; i < textureUrls.length; i ++ ) {
+
+				textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], checkLoadingComplete );
+				textures[ i ].mapping = UVMapping;
+				textures[ i ].name = textureUrls[ i ];
+				textures[ i ].colorSpace = SRGBColorSpace;
+
+			}
+
+			return textures;
+
+		}
+
+		function checkLoadingComplete() {
+
+			scope.loadCounter -= 1;
+			if ( scope.loadCounter === 0 ) 	scope.onLoadComplete();
+
+		}
 
 		this.animations = config.animations;
 		this.walkSpeed = config.walkSpeed;
@@ -150,8 +302,8 @@ var MD2CharacterComplex = function () {
 
 		this.loadCounter = config.weapons.length * 2 + config.skins.length + 1;
 
-		var weaponsTextures = [];
-		for ( var i = 0; i < config.weapons.length; i ++ ) weaponsTextures[ i ] = config.weapons[ i ][ 1 ];
+		const weaponsTextures = [];
+		for ( let i = 0; i < config.weapons.length; i ++ ) weaponsTextures[ i ] = config.weapons[ i ][ 1 ];
 
 		// SKINS
 
@@ -160,16 +312,16 @@ var MD2CharacterComplex = function () {
 
 		// BODY
 
-		var loader = new MD2Loader();
+		const loader = new MD2Loader();
 
 		loader.load( config.baseUrl + config.body, function ( geo ) {
 
-			var boundingBox = new Box3();
+			const boundingBox = new Box3();
 			boundingBox.setFromBufferAttribute( geo.attributes.position );
 
 			scope.root.position.y = - scope.scale * boundingBox.min.y;
 
-			var mesh = createPart( geo, scope.skinsBody[ 0 ] );
+			const mesh = scope._createPart( geo, scope.skinsBody[ 0 ] );
 			mesh.scale.set( scope.scale, scope.scale, scope.scale );
 
 			scope.root.add( mesh );
@@ -183,11 +335,11 @@ var MD2CharacterComplex = function () {
 
 		// WEAPONS
 
-		var generateCallback = function ( index, name ) {
+		const generateCallback = function ( index, name ) {
 
 			return function ( geo ) {
 
-				var mesh = createPart( geo, scope.skinsWeapon[ index ] );
+				const mesh = scope._createPart( geo, scope.skinsWeapon[ index ] );
 				mesh.scale.set( scope.scale, scope.scale, scope.scale );
 				mesh.visible = false;
 
@@ -205,22 +357,32 @@ var MD2CharacterComplex = function () {
 
 		};
 
-		for ( var i = 0; i < config.weapons.length; i ++ ) {
+		for ( let i = 0; i < config.weapons.length; i ++ ) {
 
 			loader.load( config.baseUrl + config.weapons[ i ][ 0 ], generateCallback( i, config.weapons[ i ][ 0 ] ) );
 
 		}
 
-	};
+	}
 
-	this.setPlaybackRate = function ( rate ) {
+	/**
+	 * Sets the animation playback rate.
+	 *
+	 * @param {number} rate - The playback rate to set.
+	 */
+	setPlaybackRate( rate ) {
 
 		if ( this.meshBody ) this.meshBody.duration = this.meshBody.baseDuration / rate;
 		if ( this.meshWeapon ) this.meshWeapon.duration = this.meshWeapon.baseDuration / rate;
 
-	};
+	}
 
-	this.setWireframe = function ( wireframeEnabled ) {
+	/**
+	 * Sets the wireframe material flag.
+	 *
+	 * @param {boolean} wireframeEnabled - Whether to enable wireframe rendering or not.
+	 */
+	setWireframe( wireframeEnabled ) {
 
 		if ( wireframeEnabled ) {
 
@@ -234,9 +396,15 @@ var MD2CharacterComplex = function () {
 
 		}
 
-	};
+	}
 
-	this.setSkin = function ( index ) {
+	/**
+	 * Sets the skin defined by the given skin index. This will result in a different texture
+	 * for the body mesh.
+	 *
+	 * @param {number} index - The skin index.
+	 */
+	setSkin( index ) {
 
 		if ( this.meshBody && this.meshBody.material.wireframe === false ) {
 
@@ -245,13 +413,19 @@ var MD2CharacterComplex = function () {
 
 		}
 
-	};
+	}
 
-	this.setWeapon = function ( index ) {
+	/**
+	 * Sets the weapon defined by the given weapon index. This will result in a different weapon
+	 * hold by the character.
+	 *
+	 * @param {number} index - The weapon index.
+	 */
+	setWeapon( index ) {
 
-		for ( var i = 0; i < this.weapons.length; i ++ ) this.weapons[ i ].visible = false;
+		for ( let i = 0; i < this.weapons.length; i ++ ) this.weapons[ i ].visible = false;
 
-		var activeWeapon = this.weapons[ index ];
+		const activeWeapon = this.weapons[ index ];
 
 		if ( activeWeapon ) {
 
@@ -267,9 +441,14 @@ var MD2CharacterComplex = function () {
 
 		}
 
-	};
+	}
 
-	this.setAnimation = function ( animationName ) {
+	/**
+	 * Sets the defined animation clip as the active animation.
+	 *
+	 * @param {string} animationName - The name of the animation clip.
+	 */
+	setAnimation( animationName ) {
 
 		if ( animationName === this.activeAnimation || ! animationName ) return;
 
@@ -293,9 +472,9 @@ var MD2CharacterComplex = function () {
 		}
 
 
-	};
+	}
 
-	this.update = function ( delta ) {
+	update( delta ) {
 
 		if ( this.controls ) this.updateMovementModel( delta );
 
@@ -306,11 +485,16 @@ var MD2CharacterComplex = function () {
 
 		}
 
-	};
+	}
 
-	this.updateAnimations = function ( delta ) {
+	/**
+	 * Updates the animations of the mesh. Must be called inside the animation loop.
+	 *
+	 * @param {number} delta - The delta time in seconds.
+	 */
+	updateAnimations( delta ) {
 
-		var mix = 1;
+		let mix = 1;
 
 		if ( this.blendCounter > 0 ) {
 
@@ -337,14 +521,17 @@ var MD2CharacterComplex = function () {
 
 		}
 
-	};
+	}
 
-	this.updateBehaviors = function () {
+	/**
+	 * Updates the animation state based on the control inputs.
+	 */
+	updateBehaviors() {
 
-		var controls = this.controls;
-		var animations = this.animations;
+		const controls = this.controls;
+		const animations = this.animations;
 
-		var moveAnimation, idleAnimation;
+		let moveAnimation, idleAnimation;
 
 		// crouch vs stand
 
@@ -446,11 +633,22 @@ var MD2CharacterComplex = function () {
 
 		}
 
-	};
+	}
 
-	this.updateMovementModel = function ( delta ) {
+	/**
+	 * Transforms the character model based on the control input.
+	 *
+	 * @param {number} delta - The delta time in seconds.
+	 */
+	updateMovementModel( delta ) {
 
-		var controls = this.controls;
+		function exponentialEaseOut( k ) {
+
+			return k === 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1;
+
+		}
+
+		const controls = this.controls;
 
 		// speed based on controls
 
@@ -465,7 +663,7 @@ var MD2CharacterComplex = function () {
 		// orientation based on controls
 		// (don't just stand while turning)
 
-		var dir = 1;
+		const dir = 1;
 
 		if ( controls.moveLeft ) {
 
@@ -487,12 +685,12 @@ var MD2CharacterComplex = function () {
 
 			if ( this.speed > 0 ) {
 
-				var k = exponentialEaseOut( this.speed / this.maxSpeed );
-				this.speed = MathUtils.clamp( this.speed - k * delta * this.frontDecceleration, 0, this.maxSpeed );
+				const k = exponentialEaseOut( this.speed / this.maxSpeed );
+				this.speed = MathUtils.clamp( this.speed - k * delta * this.frontDeceleration, 0, this.maxSpeed );
 
 			} else {
 
-				var k = exponentialEaseOut( this.speed / this.maxReverseSpeed );
+				const k = exponentialEaseOut( this.speed / this.maxReverseSpeed );
 				this.speed = MathUtils.clamp( this.speed + k * delta * this.backAcceleration, this.maxReverseSpeed, 0 );
 
 			}
@@ -501,7 +699,7 @@ var MD2CharacterComplex = function () {
 
 		// displacement
 
-		var forwardDelta = this.speed * delta;
+		const forwardDelta = this.speed * delta;
 
 		this.root.position.x += Math.sin( this.bodyOrientation ) * forwardDelta;
 		this.root.position.z += Math.cos( this.bodyOrientation ) * forwardDelta;
@@ -510,36 +708,18 @@ var MD2CharacterComplex = function () {
 
 		this.root.rotation.y = this.bodyOrientation;
 
-	};
-
-	// internal helpers
-
-	function loadTextures( baseUrl, textureUrls ) {
-
-		var textureLoader = new TextureLoader();
-		var textures = [];
-
-		for ( var i = 0; i < textureUrls.length; i ++ ) {
-
-			textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], checkLoadingComplete );
-			textures[ i ].mapping = UVMapping;
-			textures[ i ].name = textureUrls[ i ];
-			textures[ i ].encoding = sRGBEncoding;
-
-		}
-
-		return textures;
-
 	}
 
-	function createPart( geometry, skinMap ) {
+	// internal
 
-		var materialWireframe = new MeshLambertMaterial( { color: 0xffaa00, wireframe: true, morphTargets: true, morphNormals: true } );
-		var materialTexture = new MeshLambertMaterial( { color: 0xffffff, wireframe: false, map: skinMap, morphTargets: true, morphNormals: true } );
+	_createPart( geometry, skinMap ) {
+
+		const materialWireframe = new MeshLambertMaterial( { color: 0xffaa00, wireframe: true } );
+		const materialTexture = new MeshLambertMaterial( { color: 0xffffff, wireframe: false, map: skinMap } );
 
 		//
 
-		var mesh = new MorphBlendMesh( geometry, materialTexture );
+		const mesh = new MorphBlendMesh( geometry, materialTexture );
 		mesh.rotation.y = - Math.PI / 2;
 
 		//
@@ -549,25 +729,12 @@ var MD2CharacterComplex = function () {
 
 		//
 
-		mesh.autoCreateAnimations( scope.animationFPS );
+		mesh.autoCreateAnimations( this.animationFPS );
 
 		return mesh;
 
 	}
 
-	function checkLoadingComplete() {
-
-		scope.loadCounter -= 1;
-		if ( scope.loadCounter === 0 ) 	scope.onLoadComplete();
-
-	}
-
-	function exponentialEaseOut( k ) {
-
-		return k === 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1;
-
-	}
-
-};
+}
 
 export { MD2CharacterComplex };

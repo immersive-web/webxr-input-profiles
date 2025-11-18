@@ -1,19 +1,40 @@
 import {
 	DataTextureLoader,
 	LinearMipmapLinearFilter
-} from '../../../build/three.module.js';
+} from 'three';
 
-var TGALoader = function ( manager ) {
+/**
+ * A loader for the TGA texture format.
+ *
+ * ```js
+ * const loader = new TGALoader();
+ * const texture = await loader.loadAsync( 'textures/crate_color8.tga' );
+ * texture.colorSpace = THREE.SRGBColorSpace; // only for color textures
+ * ```
+ *
+ * @augments DataTextureLoader
+ * @three_import import { TGALoader } from 'three/addons/loaders/TGALoader.js';
+ */
+class TGALoader extends DataTextureLoader {
 
-	DataTextureLoader.call( this, manager );
+	/**
+	 * Constructs a new TGA loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
+	constructor( manager ) {
 
-};
+		super( manager );
 
-TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype ), {
+	}
 
-	constructor: TGALoader,
-
-	parse: function ( buffer ) {
+	/**
+	 * Parses the given TGA texture data.
+	 *
+	 * @param {ArrayBuffer} buffer - The raw texture data.
+	 * @return {DataTextureLoader~TexData} An object representing the parsed texture data.
+	 */
+	parse( buffer ) {
 
 		// reference from vthibault, https://github.com/vthibault/roBrowser/blob/master/src/Loaders/Targa.js
 
@@ -27,7 +48,7 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 				case TGA_TYPE_RLE_INDEXED:
 					if ( header.colormap_length > 256 || header.colormap_size !== 24 || header.colormap_type !== 1 ) {
 
-						console.error( 'THREE.TGALoader: Invalid type colormap data for indexed type.' );
+						throw new Error( 'THREE.TGALoader: Invalid type colormap data for indexed type.' );
 
 					}
 
@@ -41,7 +62,7 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 				case TGA_TYPE_RLE_GREY:
 					if ( header.colormap_type ) {
 
-						console.error( 'THREE.TGALoader: Invalid type colormap data for colormap type.' );
+						throw new Error( 'THREE.TGALoader: Invalid type colormap data for colormap type.' );
 
 					}
 
@@ -50,12 +71,12 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 					// What the need of a file without data ?
 
 				case TGA_TYPE_NO_DATA:
-					console.error( 'THREE.TGALoader: No data.' );
+					throw new Error( 'THREE.TGALoader: No data.' );
 
 					// Invalid type ?
 
 				default:
-					console.error( 'THREE.TGALoader: Invalid type "%s".', header.image_type );
+					throw new Error( 'THREE.TGALoader: Invalid type ' + header.image_type );
 
 			}
 
@@ -63,7 +84,7 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 			if ( header.width <= 0 || header.height <= 0 ) {
 
-				console.error( 'THREE.TGALoader: Invalid image size.' );
+				throw new Error( 'THREE.TGALoader: Invalid image size.' );
 
 			}
 
@@ -72,7 +93,7 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 			if ( header.pixel_size !== 8 && header.pixel_size !== 16 &&
 				header.pixel_size !== 24 && header.pixel_size !== 32 ) {
 
-				console.error( 'THREE.TGALoader: Invalid pixel size "%s".', header.pixel_size );
+				throw new Error( 'THREE.TGALoader: Invalid pixel size ' + header.pixel_size );
 
 			}
 
@@ -82,13 +103,11 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		function tgaParse( use_rle, use_pal, header, offset, data ) {
 
-			var pixel_data,
-				pixel_size,
-				pixel_total,
+			let pixel_data,
 				palettes;
 
-			pixel_size = header.pixel_size >> 3;
-			pixel_total = header.width * header.height * pixel_size;
+			const pixel_size = header.pixel_size >> 3;
+			const pixel_total = header.width * header.height * pixel_size;
 
 			 // read palettes
 
@@ -104,9 +123,9 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 				 pixel_data = new Uint8Array( pixel_total );
 
-				var c, count, i;
-				var shift = 0;
-				var pixels = new Uint8Array( pixel_size );
+				let c, count, i;
+				let shift = 0;
+				const pixels = new Uint8Array( pixel_size );
 
 				while ( shift < pixel_total ) {
 
@@ -172,9 +191,9 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		function tgaGetImageData8bits( imageData, y_start, y_step, y_end, x_start, x_step, x_end, image, palettes ) {
 
-			var colormap = palettes;
-			var color, i = 0, x, y;
-			var width = header.width;
+			const colormap = palettes;
+			let color, i = 0, x, y;
+			const width = header.width;
 
 			for ( y = y_start; y !== y_end; y += y_step ) {
 
@@ -196,17 +215,17 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		function tgaGetImageData16bits( imageData, y_start, y_step, y_end, x_start, x_step, x_end, image ) {
 
-			var color, i = 0, x, y;
-			var width = header.width;
+			let color, i = 0, x, y;
+			const width = header.width;
 
 			for ( y = y_start; y !== y_end; y += y_step ) {
 
 				for ( x = x_start; x !== x_end; x += x_step, i += 2 ) {
 
-					color = image[ i + 0 ] + ( image[ i + 1 ] << 8 ); // Inversed ?
+					color = image[ i + 0 ] + ( image[ i + 1 ] << 8 );
 					imageData[ ( x + width * y ) * 4 + 0 ] = ( color & 0x7C00 ) >> 7;
 					imageData[ ( x + width * y ) * 4 + 1 ] = ( color & 0x03E0 ) >> 2;
-					imageData[ ( x + width * y ) * 4 + 2 ] = ( color & 0x001F ) >> 3;
+					imageData[ ( x + width * y ) * 4 + 2 ] = ( color & 0x001F ) << 3;
 					imageData[ ( x + width * y ) * 4 + 3 ] = ( color & 0x8000 ) ? 0 : 255;
 
 				}
@@ -219,8 +238,8 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		function tgaGetImageData24bits( imageData, y_start, y_step, y_end, x_start, x_step, x_end, image ) {
 
-			var i = 0, x, y;
-			var width = header.width;
+			let i = 0, x, y;
+			const width = header.width;
 
 			for ( y = y_start; y !== y_end; y += y_step ) {
 
@@ -241,8 +260,8 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		function tgaGetImageData32bits( imageData, y_start, y_step, y_end, x_start, x_step, x_end, image ) {
 
-			var i = 0, x, y;
-			var width = header.width;
+			let i = 0, x, y;
+			const width = header.width;
 
 			for ( y = y_start; y !== y_end; y += y_step ) {
 
@@ -263,8 +282,8 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		function tgaGetImageDataGrey8bits( imageData, y_start, y_step, y_end, x_start, x_step, x_end, image ) {
 
-			var color, i = 0, x, y;
-			var width = header.width;
+			let color, i = 0, x, y;
+			const width = header.width;
 
 			for ( y = y_start; y !== y_end; y += y_step ) {
 
@@ -286,8 +305,8 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		function tgaGetImageDataGrey16bits( imageData, y_start, y_step, y_end, x_start, x_step, x_end, image ) {
 
-			var i = 0, x, y;
-			var width = header.width;
+			let i = 0, x, y;
+			const width = header.width;
 
 			for ( y = y_start; y !== y_end; y += y_step ) {
 
@@ -308,7 +327,7 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		function getTgaRGBA( data, width, height, image, palette ) {
 
-			var x_start,
+			let x_start,
 				y_start,
 				x_step,
 				y_step,
@@ -369,7 +388,7 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 						break;
 
 					default:
-						console.error( 'THREE.TGALoader: Format not supported.' );
+						throw new Error( 'THREE.TGALoader: Format not supported.' );
 						break;
 
 				}
@@ -395,7 +414,7 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 						break;
 
 					default:
-						console.error( 'THREE.TGALoader: Format not supported.' );
+						throw new Error( 'THREE.TGALoader: Format not supported.' );
 						break;
 
 				}
@@ -403,7 +422,7 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 			}
 
 			// Load image data according to specific method
-			// var func = 'tgaGetImageData' + (use_grey ? 'Grey' : '') + (header.pixel_size) + 'bits';
+			// let func = 'tgaGetImageData' + (use_grey ? 'Grey' : '') + (header.pixel_size) + 'bits';
 			// func(data, y_start, y_step, y_end, x_start, x_step, x_end, width, image, palette );
 			return data;
 
@@ -411,7 +430,7 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		// TGA constants
 
-		var TGA_TYPE_NO_DATA = 0,
+		const TGA_TYPE_NO_DATA = 0,
 			TGA_TYPE_INDEXED = 1,
 			TGA_TYPE_RGB = 2,
 			TGA_TYPE_GREY = 3,
@@ -426,10 +445,11 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 			TGA_ORIGIN_UL = 0x02,
 			TGA_ORIGIN_UR = 0x03;
 
-		if ( buffer.length < 19 ) console.error( 'THREE.TGALoader: Not enough data to contain header.' );
+		if ( buffer.length < 19 ) throw new Error( 'THREE.TGALoader: Not enough data to contain header.' );
 
-		var content = new Uint8Array( buffer ),
-			offset = 0,
+		let offset = 0;
+
+		const content = new Uint8Array( buffer ),
 			header = {
 				id_length: content[ offset ++ ],
 				colormap_type: content[ offset ++ ],
@@ -453,7 +473,7 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		if ( header.id_length + offset > buffer.length ) {
 
-			console.error( 'THREE.TGALoader: No data.' );
+			throw new Error( 'THREE.TGALoader: No data.' );
 
 		}
 
@@ -463,7 +483,7 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		// get targa information about RLE compression and palette
 
-		var use_rle = false,
+		let use_rle = false,
 			use_pal = false,
 			use_grey = false;
 
@@ -498,8 +518,8 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		//
 
-		var imageData = new Uint8Array( header.width * header.height * 4 );
-		var result = tgaParse( use_rle, use_pal, header, offset, content );
+		const imageData = new Uint8Array( header.width * header.height * 4 );
+		const result = tgaParse( use_rle, use_pal, header, offset, content );
 		getTgaRGBA( imageData, header.width, header.height, result.pixel_data, result.palettes );
 
 		return {
@@ -515,6 +535,6 @@ TGALoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 	}
 
-} );
+}
 
 export { TGALoader };

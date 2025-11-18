@@ -1,33 +1,59 @@
 import {
 	FileLoader,
 	Loader
-} from '../../../build/three.module.js';
-import { opentype } from '../libs/opentype.module.min.js';
+} from 'three';
+import opentype from '../libs/opentype.module.js';
 
 /**
- * Requires opentype.js to be included in the project.
+ * A loader for the TTF format.
+ *
  * Loads TTF files and converts them into typeface JSON that can be used directly
  * to create THREE.Font objects.
+ *
+ * ```js
+ * const loader = new TTFLoader();
+ * const json = await loader.loadAsync( 'fonts/ttf/kenpixel.ttf' );
+ * const font = new Font( json );
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { TTFLoader } from 'three/addons/loaders/TTFLoader.js';
  */
+class TTFLoader extends Loader {
 
-var TTFLoader = function ( manager ) {
+	/**
+	 * Constructs a new TTF loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
+	constructor( manager ) {
 
-	Loader.call( this, manager );
+		super( manager );
 
-	this.reversed = false;
+		/**
+		 * Whether the TTF commands should be reversed or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.reversed = false;
 
-};
+	}
 
+	/**
+	 * Starts loading from the given URL and passes the loaded TTF asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Object)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
+	load( url, onLoad, onProgress, onError ) {
 
-TTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+		const scope = this;
 
-	constructor: TTFLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
-
-		var scope = this;
-
-		var loader = new FileLoader( this.manager );
+		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
@@ -56,28 +82,34 @@ TTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( arraybuffer ) {
+	/**
+	 * Parses the given TTF data and returns a JSON for creating a font.
+	 *
+	 * @param {ArrayBuffer} arraybuffer - The raw TTF data as an array buffer.
+	 * @return {Object} The result JSON.
+	 */
+	parse( arraybuffer ) {
 
 		function convert( font, reversed ) {
 
-			var round = Math.round;
+			const round = Math.round;
 
-			var glyphs = {};
-			var scale = ( 100000 ) / ( ( font.unitsPerEm || 2048 ) * 72 );
+			const glyphs = {};
+			const scale = ( 100000 ) / ( ( font.unitsPerEm || 2048 ) * 72 );
 
-			var glyphIndexMap = font.encoding.cmap.glyphIndexMap;
-			var unicodes = Object.keys( glyphIndexMap );
+			const glyphIndexMap = font.encoding.cmap.glyphIndexMap;
+			const unicodes = Object.keys( glyphIndexMap );
 
-			for ( var i = 0; i < unicodes.length; i ++ ) {
+			for ( let i = 0; i < unicodes.length; i ++ ) {
 
-				var unicode = unicodes[ i ];
-				var glyph = font.glyphs.glyphs[ glyphIndexMap[ unicode ] ];
+				const unicode = unicodes[ i ];
+				const glyph = font.glyphs.glyphs[ glyphIndexMap[ unicode ] ];
 
 				if ( unicode !== undefined ) {
 
-					var token = {
+					const token = {
 						ha: round( glyph.advanceWidth * scale ),
 						x_min: round( glyph.xMin * scale ),
 						x_max: round( glyph.xMax * scale ),
@@ -120,7 +152,19 @@ TTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					} );
 
-					glyphs[ String.fromCodePoint( glyph.unicode ) ] = token;
+					if ( Array.isArray( glyph.unicodes ) && glyph.unicodes.length > 0 ) {
+
+						glyph.unicodes.forEach( function ( unicode ) {
+
+							glyphs[ String.fromCodePoint( unicode ) ] = token;
+
+						} );
+
+					} else {
+
+						glyphs[ String.fromCodePoint( glyph.unicode ) ] = token;
+
+					}
 
 				}
 
@@ -147,8 +191,8 @@ TTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function reverseCommands( commands ) {
 
-			var paths = [];
-			var path;
+			const paths = [];
+			let path;
 
 			commands.forEach( function ( c ) {
 
@@ -165,11 +209,11 @@ TTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			} );
 
-			var reversed = [];
+			const reversed = [];
 
 			paths.forEach( function ( p ) {
 
-				var result = {
+				const result = {
 					type: 'm',
 					x: p[ p.length - 1 ].x,
 					y: p[ p.length - 1 ].y
@@ -177,10 +221,10 @@ TTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				reversed.push( result );
 
-				for ( var i = p.length - 1; i > 0; i -- ) {
+				for ( let i = p.length - 1; i > 0; i -- ) {
 
-					var command = p[ i ];
-					var result = { type: command.type };
+					const command = p[ i ];
+					const result = { type: command.type };
 
 					if ( command.x2 !== undefined && command.y2 !== undefined ) {
 
@@ -208,17 +252,10 @@ TTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		if ( typeof opentype === 'undefined' ) {
-
-			console.warn( 'THREE.TTFLoader: The loader requires opentype.js. Make sure it\'s included before using the loader.' );
-			return null;
-
-		}
-
-		return convert( opentype.parse( arraybuffer ), this.reversed ); // eslint-disable-line no-undef
+		return convert( opentype.parse( arraybuffer ), this.reversed );
 
 	}
 
-} );
+}
 
 export { TTFLoader };

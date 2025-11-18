@@ -4,95 +4,130 @@ import {
 	LineSegments,
 	LineBasicMaterial,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
-var _v1 = new Vector3();
-var _v2 = new Vector3();
+const _v1 = new Vector3();
+const _v2 = new Vector3();
 
-function VertexTangentsHelper( object, size, hex ) {
+/**
+ * Visualizes an object's vertex tangents.
+ *
+ * Requires that tangents have been specified in the geometry as a buffer attribute or
+ * have been calculated using {@link BufferGeometry#computeTangents}.
+ * ```js
+ * const helper = new VertexTangentsHelper( mesh, 1, 0xff0000 );
+ * scene.add( helper );
+ * ```
+ *
+ * @augments LineSegments
+ * @three_import import { VertexTangentsHelper } from 'three/addons/helpers/VertexTangentsHelper.js';
+ */
+class VertexTangentsHelper extends LineSegments {
 
-	this.object = object;
+	/**
+	 * Constructs a new vertex tangents helper.
+	 *
+	 * @param {Object3D} object - The object for which to visualize vertex tangents.
+	 * @param {number} [size=1] - The helper's size.
+	 * @param {number|Color|string} [color=0xff0000] - The helper's color.
+	 */
+	constructor( object, size = 1, color = 0x00ffff ) {
 
-	this.size = ( size !== undefined ) ? size : 1;
+		const geometry = new BufferGeometry();
 
-	var color = ( hex !== undefined ) ? hex : 0x00ffff;
+		const nTangents = object.geometry.attributes.tangent.count;
+		const positions = new Float32BufferAttribute( nTangents * 2 * 3, 3 );
 
-	//
+		geometry.setAttribute( 'position', positions );
 
-	var objGeometry = this.object.geometry;
+		super( geometry, new LineBasicMaterial( { color, toneMapped: false } ) );
 
-	if ( ! ( objGeometry && objGeometry.isBufferGeometry ) ) {
+		/**
+		 * The object for which to visualize vertex tangents.
+		 *
+		 * @type {Object3D}
+		 */
+		this.object = object;
 
-		console.error( 'THREE.VertexTangentsHelper: geometry not an instance of THREE.BufferGeometry.', objGeometry );
-		return;
+		/**
+		 * The helper's size.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.size = size;
+
+		this.type = 'VertexTangentsHelper';
+
+		/**
+		 * Overwritten and set to `false` since the object's world transformation
+		 * is encoded in the helper's geometry data.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.matrixAutoUpdate = false;
+
+		this.update();
 
 	}
 
-	var nTangents = objGeometry.attributes.tangent.count;
+	/**
+	 * Updates the vertex normals preview based on the object's world transform.
+	 */
+	update() {
 
-	//
+		this.object.updateMatrixWorld( true );
 
-	var geometry = new BufferGeometry();
+		const matrixWorld = this.object.matrixWorld;
 
-	var positions = new Float32BufferAttribute( nTangents * 2 * 3, 3 );
+		const position = this.geometry.attributes.position;
 
-	geometry.setAttribute( 'position', positions );
+		//
 
-	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
+		const objGeometry = this.object.geometry;
 
-	this.type = 'VertexTangentsHelper';
+		const objPos = objGeometry.attributes.position;
 
-	//
+		const objTan = objGeometry.attributes.tangent;
 
-	this.matrixAutoUpdate = false;
+		let idx = 0;
 
-	this.update();
+		// for simplicity, ignore index and drawcalls, and render every tangent
+
+		for ( let j = 0, jl = objPos.count; j < jl; j ++ ) {
+
+			_v1.fromBufferAttribute( objPos, j ).applyMatrix4( matrixWorld );
+
+			_v2.fromBufferAttribute( objTan, j );
+
+			_v2.transformDirection( matrixWorld ).multiplyScalar( this.size ).add( _v1 );
+
+			position.setXYZ( idx, _v1.x, _v1.y, _v1.z );
+
+			idx = idx + 1;
+
+			position.setXYZ( idx, _v2.x, _v2.y, _v2.z );
+
+			idx = idx + 1;
+
+		}
+
+		position.needsUpdate = true;
+
+	}
+
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
+
+	}
 
 }
-
-VertexTangentsHelper.prototype = Object.create( LineSegments.prototype );
-VertexTangentsHelper.prototype.constructor = VertexTangentsHelper;
-
-VertexTangentsHelper.prototype.update = function () {
-
-	this.object.updateMatrixWorld( true );
-
-	var matrixWorld = this.object.matrixWorld;
-
-	var position = this.geometry.attributes.position;
-
-	//
-
-	var objGeometry = this.object.geometry;
-
-	var objPos = objGeometry.attributes.position;
-
-	var objTan = objGeometry.attributes.tangent;
-
-	var idx = 0;
-
-	// for simplicity, ignore index and drawcalls, and render every tangent
-
-	for ( var j = 0, jl = objPos.count; j < jl; j ++ ) {
-
-		_v1.set( objPos.getX( j ), objPos.getY( j ), objPos.getZ( j ) ).applyMatrix4( matrixWorld );
-
-		_v2.set( objTan.getX( j ), objTan.getY( j ), objTan.getZ( j ) );
-
-		_v2.transformDirection( matrixWorld ).multiplyScalar( this.size ).add( _v1 );
-
-		position.setXYZ( idx, _v1.x, _v1.y, _v1.z );
-
-		idx = idx + 1;
-
-		position.setXYZ( idx, _v2.x, _v2.y, _v2.z );
-
-		idx = idx + 1;
-
-	}
-
-	position.needsUpdate = true;
-
-};
 
 export { VertexTangentsHelper };

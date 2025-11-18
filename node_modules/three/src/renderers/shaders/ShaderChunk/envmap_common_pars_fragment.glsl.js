@@ -3,13 +3,13 @@ export default /* glsl */`
 
 	uniform float envMapIntensity;
 	uniform float flipEnvMap;
-	uniform int maxMipLevel;
+	uniform mat3 envMapRotation;
 
 	#ifdef ENVMAP_TYPE_CUBE
 		uniform samplerCube envMap;
 	#else
 		uniform sampler2D envMap;
 	#endif
-	
+
 #endif
 `;

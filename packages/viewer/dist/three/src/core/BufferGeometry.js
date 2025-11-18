@@ -7,61 +7,208 @@ import { Sphere } from '../math/Sphere.js';
 import { Object3D } from './Object3D.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Matrix3 } from '../math/Matrix3.js';
-import { MathUtils } from '../math/MathUtils.js';
-import { arrayMax } from '../utils.js';
+import { generateUUID } from '../math/MathUtils.js';
+import { arrayNeedsUint32, warn, error } from '../utils.js';
 
 let _id = 0;
 
-const _m1 = new Matrix4();
-const _obj = new Object3D();
-const _offset = new Vector3();
-const _box = new Box3();
-const _boxMorphTargets = new Box3();
-const _vector = new Vector3();
+const _m1 = /*@__PURE__*/ new Matrix4();
+const _obj = /*@__PURE__*/ new Object3D();
+const _offset = /*@__PURE__*/ new Vector3();
+const _box = /*@__PURE__*/ new Box3();
+const _boxMorphTargets = /*@__PURE__*/ new Box3();
+const _vector = /*@__PURE__*/ new Vector3();
 
-function BufferGeometry() {
+/**
+ * A representation of mesh, line, or point geometry. Includes vertex
+ * positions, face indices, normals, colors, UVs, and custom attributes
+ * within buffers, reducing the cost of passing all this data to the GPU.
+ *
+ * ```js
+ * const geometry = new THREE.BufferGeometry();
+ * // create a simple square shape. We duplicate the top left and bottom right
+ * // vertices because each vertex needs to appear once per triangle.
+ * const vertices = new Float32Array( [
+ * 	-1.0, -1.0,  1.0, // v0
+ * 	 1.0, -1.0,  1.0, // v1
+ * 	 1.0,  1.0,  1.0, // v2
+ *
+ * 	 1.0,  1.0,  1.0, // v3
+ * 	-1.0,  1.0,  1.0, // v4
+ * 	-1.0, -1.0,  1.0  // v5
+ * ] );
+ * // itemSize = 3 because there are 3 values (components) per vertex
+ * geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+ * const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+ * const mesh = new THREE.Mesh( geometry, material );
+ * ```
+ *
+ * @augments EventDispatcher
+ */
+class BufferGeometry extends EventDispatcher {
 
-	Object.defineProperty( this, 'id', { value: _id ++ } );
+	/**
+	 * Constructs a new geometry.
+	 */
+	constructor() {
 
-	this.uuid = MathUtils.generateUUID();
+		super();
 
-	this.name = '';
-	this.type = 'BufferGeometry';
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isBufferGeometry = true;
 
-	this.index = null;
-	this.attributes = {};
+		/**
+		 * The ID of the geometry.
+		 *
+		 * @name BufferGeometry#id
+		 * @type {number}
+		 * @readonly
+		 */
+		Object.defineProperty( this, 'id', { value: _id ++ } );
 
-	this.morphAttributes = {};
-	this.morphTargetsRelative = false;
+		/**
+		 * The UUID of the geometry.
+		 *
+		 * @type {string}
+		 * @readonly
+		 */
+		this.uuid = generateUUID();
 
-	this.groups = [];
+		/**
+		 * The name of the geometry.
+		 *
+		 * @type {string}
+		 */
+		this.name = '';
+		this.type = 'BufferGeometry';
 
-	this.boundingBox = null;
-	this.boundingSphere = null;
+		/**
+		 * Allows for vertices to be re-used across multiple triangles; this is
+		 * called using "indexed triangles". Each triangle is associated with the
+		 * indices of three vertices. This attribute therefore stores the index of
+		 * each vertex for each triangular face. If this attribute is not set, the
+		 * renderer assumes that each three contiguous positions represent a single triangle.
+		 *
+		 * @type {?BufferAttribute}
+		 * @default null
+		 */
+		this.index = null;
 
-	this.drawRange = { start: 0, count: Infinity };
+		/**
+		 * A (storage) buffer attribute which was generated with a compute shader and
+		 * now defines indirect draw calls.
+		 *
+		 * Can only be used with {@link WebGPURenderer} and a WebGPU backend.
+		 *
+		 * @type {?BufferAttribute}
+		 * @default null
+		 */
+		this.indirect = null;
 
-	this.userData = {};
+		/**
+		 * This dictionary has as id the name of the attribute to be set and as value
+		 * the buffer attribute to set it to. Rather than accessing this property directly,
+		 * use `setAttribute()` and `getAttribute()` to access attributes of this geometry.
+		 *
+		 * @type {Object<string,(BufferAttribute|InterleavedBufferAttribute)>}
+		 */
+		this.attributes = {};
 
-}
+		/**
+		 * This dictionary holds the morph targets of the geometry.
+		 *
+		 * Note: Once the geometry has been rendered, the morph attribute data cannot
+		 * be changed. You will have to call `dispose()?, and create a new geometry instance.
+		 *
+		 * @type {Object}
+		 */
+		this.morphAttributes = {};
 
-BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+		/**
+		 * Used to control the morph target behavior; when set to `true`, the morph
+		 * target data is treated as relative offsets, rather than as absolute
+		 * positions/normals.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.morphTargetsRelative = false;
 
-	constructor: BufferGeometry,
+		/**
+		 * Split the geometry into groups, each of which will be rendered in a
+		 * separate draw call. This allows an array of materials to be used with the geometry.
+		 *
+		 * Use `addGroup()` and `clearGroups()` to edit groups, rather than modifying this array directly.
+		 *
+		 * Every vertex and index must belong to exactly one group — groups must not share vertices or
+		 * indices, and must not leave vertices or indices unused.
+		 *
+		 * @type {Array<Object>}
+		 */
+		this.groups = [];
 
-	isBufferGeometry: true,
+		/**
+		 * Bounding box for the geometry which can be calculated with `computeBoundingBox()`.
+		 *
+		 * @type {?Box3}
+		 * @default null
+		 */
+		this.boundingBox = null;
 
-	getIndex: function () {
+		/**
+		 * Bounding sphere for the geometry which can be calculated with `computeBoundingSphere()`.
+		 *
+		 * @type {?Sphere}
+		 * @default null
+		 */
+		this.boundingSphere = null;
+
+		/**
+		 * Determines the part of the geometry to render. This should not be set directly,
+		 * instead use `setDrawRange()`.
+		 *
+		 * @type {{start:number,count:number}}
+		 */
+		this.drawRange = { start: 0, count: Infinity };
+
+		/**
+		 * An object that can be used to store custom data about the geometry.
+		 * It should not hold references to functions as these will not be cloned.
+		 *
+		 * @type {Object}
+		 */
+		this.userData = {};
+
+	}
+
+	/**
+	 * Returns the index of this geometry.
+	 *
+	 * @return {?BufferAttribute} The index. Returns `null` if no index is defined.
+	 */
+	getIndex() {
 
 		return this.index;
 
-	},
+	}
 
-	setIndex: function ( index ) {
+	/**
+	 * Sets the given index to this geometry.
+	 *
+	 * @param {Array<number>|BufferAttribute} index - The index to set.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	setIndex( index ) {
 
 		if ( Array.isArray( index ) ) {
 
-			this.index = new ( arrayMax( index ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( index, 1 );
+			this.index = new ( arrayNeedsUint32( index ) ? Uint32BufferAttribute : Uint16BufferAttribute )( index, 1 );
 
 		} else {
 
@@ -71,37 +218,96 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	getAttribute: function ( name ) {
+	/**
+	 * Sets the given indirect attribute to this geometry.
+	 *
+	 * @param {BufferAttribute} indirect - The attribute holding indirect draw calls.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	setIndirect( indirect ) {
+
+		this.indirect = indirect;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns the indirect attribute of this geometry.
+	 *
+	 * @return {?BufferAttribute} The indirect attribute. Returns `null` if no indirect attribute is defined.
+	 */
+	getIndirect() {
+
+		return this.indirect;
+
+	}
+
+	/**
+	 * Returns the buffer attribute for the given name.
+	 *
+	 * @param {string} name - The attribute name.
+	 * @return {BufferAttribute|InterleavedBufferAttribute|undefined} The buffer attribute.
+	 * Returns `undefined` if not attribute has been found.
+	 */
+	getAttribute( name ) {
 
 		return this.attributes[ name ];
 
-	},
+	}
 
-	setAttribute: function ( name, attribute ) {
+	/**
+	 * Sets the given attribute for the given name.
+	 *
+	 * @param {string} name - The attribute name.
+	 * @param {BufferAttribute|InterleavedBufferAttribute} attribute - The attribute to set.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	setAttribute( name, attribute ) {
 
 		this.attributes[ name ] = attribute;
 
 		return this;
 
-	},
+	}
 
-	deleteAttribute: function ( name ) {
+	/**
+	 * Deletes the attribute for the given name.
+	 *
+	 * @param {string} name - The attribute name to delete.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	deleteAttribute( name ) {
 
 		delete this.attributes[ name ];
 
 		return this;
 
-	},
+	}
 
-	hasAttribute: function ( name ) {
+	/**
+	 * Returns `true` if this geometry has an attribute for the given name.
+	 *
+	 * @param {string} name - The attribute name.
+	 * @return {boolean} Whether this geometry has an attribute for the given name or not.
+	 */
+	hasAttribute( name ) {
 
 		return this.attributes[ name ] !== undefined;
 
-	},
+	}
 
-	addGroup: function ( start, count, materialIndex = 0 ) {
+	/**
+	 * Adds a group to this geometry.
+	 *
+	 * @param {number} start - The first element in this draw call. That is the first
+	 * vertex for non-indexed geometry, otherwise the first triangle index.
+	 * @param {number} count - Specifies how many vertices (or indices) are part of this group.
+	 * @param {number} [materialIndex=0] - The material array index to use.
+	 */
+	addGroup( start, count, materialIndex = 0 ) {
 
 		this.groups.push( {
 
@@ -111,22 +317,38 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		} );
 
-	},
+	}
 
-	clearGroups: function () {
+	/**
+	 * Clears all groups.
+	 */
+	clearGroups() {
 
 		this.groups = [];
 
-	},
+	}
 
-	setDrawRange: function ( start, count ) {
+	/**
+	 * Sets the draw range for this geometry.
+	 *
+	 * @param {number} start - The first vertex for non-indexed geometry, otherwise the first triangle index.
+	 * @param {number} count - For non-indexed BufferGeometry, `count` is the number of vertices to render.
+	 * For indexed BufferGeometry, `count` is the number of indices to render.
+	 */
+	setDrawRange( start, count ) {
 
 		this.drawRange.start = start;
 		this.drawRange.count = count;
 
-	},
+	}
 
-	applyMatrix4: function ( matrix ) {
+	/**
+	 * Applies the given 4x4 transformation matrix to the geometry.
+	 *
+	 * @param {Matrix4} matrix - The matrix to apply.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	applyMatrix4( matrix ) {
 
 		const position = this.attributes.position;
 
@@ -174,9 +396,33 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	rotateX: function ( angle ) {
+	/**
+	 * Applies the rotation represented by the Quaternion to the geometry.
+	 *
+	 * @param {Quaternion} q - The Quaternion to apply.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	applyQuaternion( q ) {
+
+		_m1.makeRotationFromQuaternion( q );
+
+		this.applyMatrix4( _m1 );
+
+		return this;
+
+	}
+
+	/**
+	 * Rotates the geometry about the X axis. This is typically done as a one time
+	 * operation, and not during a loop. Use {@link Object3D#rotation} for typical
+	 * real-time mesh rotation.
+	 *
+	 * @param {number} angle - The angle in radians.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	rotateX( angle ) {
 
 		// rotate geometry around world x-axis
 
@@ -186,9 +432,17 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	rotateY: function ( angle ) {
+	/**
+	 * Rotates the geometry about the Y axis. This is typically done as a one time
+	 * operation, and not during a loop. Use {@link Object3D#rotation} for typical
+	 * real-time mesh rotation.
+	 *
+	 * @param {number} angle - The angle in radians.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	rotateY( angle ) {
 
 		// rotate geometry around world y-axis
 
@@ -198,9 +452,17 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	rotateZ: function ( angle ) {
+	/**
+	 * Rotates the geometry about the Z axis. This is typically done as a one time
+	 * operation, and not during a loop. Use {@link Object3D#rotation} for typical
+	 * real-time mesh rotation.
+	 *
+	 * @param {number} angle - The angle in radians.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	rotateZ( angle ) {
 
 		// rotate geometry around world z-axis
 
@@ -210,9 +472,19 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	translate: function ( x, y, z ) {
+	/**
+	 * Translates the geometry. This is typically done as a one time
+	 * operation, and not during a loop. Use {@link Object3D#position} for typical
+	 * real-time mesh rotation.
+	 *
+	 * @param {number} x - The x offset.
+	 * @param {number} y - The y offset.
+	 * @param {number} z - The z offset.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	translate( x, y, z ) {
 
 		// translate geometry
 
@@ -222,9 +494,19 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	scale: function ( x, y, z ) {
+	/**
+	 * Scales the geometry. This is typically done as a one time
+	 * operation, and not during a loop. Use {@link Object3D#scale} for typical
+	 * real-time mesh rotation.
+	 *
+	 * @param {number} x - The x scale.
+	 * @param {number} y - The y scale.
+	 * @param {number} z - The z scale.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	scale( x, y, z ) {
 
 		// scale geometry
 
@@ -234,9 +516,17 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	lookAt: function ( vector ) {
+	/**
+	 * Rotates the geometry to face a point in 3D space. This is typically done as a one time
+	 * operation, and not during a loop. Use {@link Object3D#lookAt} for typical
+	 * real-time mesh rotation.
+	 *
+	 * @param {Vector3} vector - The target point.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	lookAt( vector ) {
 
 		_obj.lookAt( vector );
 
@@ -246,9 +536,14 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	center: function () {
+	/**
+	 * Center the geometry based on its bounding box.
+	 *
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	center() {
 
 		this.computeBoundingBox();
 
@@ -258,26 +553,67 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	setFromPoints: function ( points ) {
+	/**
+	 * Defines a geometry by creating a `position` attribute based on the given array of points. The array
+	 * can hold 2D or 3D vectors. When using two-dimensional data, the `z` coordinate for all vertices is
+	 * set to `0`.
+	 *
+	 * If the method is used with an existing `position` attribute, the vertex data are overwritten with the
+	 * data from the array. The length of the array must match the vertex count.
+	 *
+	 * @param {Array<Vector2>|Array<Vector3>} points - The points.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	setFromPoints( points ) {
 
-		const position = [];
+		const positionAttribute = this.getAttribute( 'position' );
 
-		for ( let i = 0, l = points.length; i < l; i ++ ) {
+		if ( positionAttribute === undefined ) {
 
-			const point = points[ i ];
-			position.push( point.x, point.y, point.z || 0 );
+			const position = [];
+
+			for ( let i = 0, l = points.length; i < l; i ++ ) {
+
+				const point = points[ i ];
+				position.push( point.x, point.y, point.z || 0 );
+
+			}
+
+			this.setAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
+
+		} else {
+
+			const l = Math.min( points.length, positionAttribute.count ); // make sure data do not exceed buffer size
+
+			for ( let i = 0; i < l; i ++ ) {
+
+				const point = points[ i ];
+				positionAttribute.setXYZ( i, point.x, point.y, point.z || 0 );
+
+			}
+
+			if ( points.length > positionAttribute.count ) {
+
+				warn( 'BufferGeometry: Buffer size too small for points data. Use .dispose() and create a new geometry.' );
+
+			}
+
+			positionAttribute.needsUpdate = true;
 
 		}
 
-		this.setAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
-
 		return this;
 
-	},
+	}
 
-	computeBoundingBox: function () {
+	/**
+	 * Computes the bounding box of the geometry, and updates the `boundingBox` member.
+	 * The bounding box is not computed by the engine; it must be computed by your app.
+	 * You may need to recompute the bounding box if the geometry vertices are modified.
+	 */
+	computeBoundingBox() {
 
 		if ( this.boundingBox === null ) {
 
@@ -290,7 +626,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( position && position.isGLBufferAttribute ) {
 
-			console.error( 'THREE.BufferGeometry.computeBoundingBox(): GLBufferAttribute requires a manual bounding box. Alternatively set "mesh.frustumCulled" to "false".', this );
+			error( 'BufferGeometry.computeBoundingBox(): GLBufferAttribute requires a manual bounding box.', this );
 
 			this.boundingBox.set(
 				new Vector3( - Infinity, - Infinity, - Infinity ),
@@ -341,13 +677,18 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
 
-			console.error( 'THREE.BufferGeometry.computeBoundingBox(): Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
+			error( 'BufferGeometry.computeBoundingBox(): Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
 
 		}
 
-	},
+	}
 
-	computeBoundingSphere: function () {
+	/**
+	 * Computes the bounding sphere of the geometry, and updates the `boundingSphere` member.
+	 * The engine automatically computes the bounding sphere when it is needed, e.g., for ray casting or view frustum culling.
+	 * You may need to recompute the bounding sphere if the geometry vertices are modified.
+	 */
+	computeBoundingSphere() {
 
 		if ( this.boundingSphere === null ) {
 
@@ -360,7 +701,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( position && position.isGLBufferAttribute ) {
 
-			console.error( 'THREE.BufferGeometry.computeBoundingSphere(): GLBufferAttribute requires a manual bounding sphere. Alternatively set "mesh.frustumCulled" to "false".', this );
+			error( 'BufferGeometry.computeBoundingSphere(): GLBufferAttribute requires a manual bounding sphere.', this );
 
 			this.boundingSphere.set( new Vector3(), Infinity );
 
@@ -451,21 +792,22 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			if ( isNaN( this.boundingSphere.radius ) ) {
 
-				console.error( 'THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.', this );
+				error( 'BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.', this );
 
 			}
 
 		}
 
-	},
+	}
 
-	computeFaceNormals: function () {
-
-		// backwards compatibility
-
-	},
-
-	computeTangents: function () {
+	/**
+	 * Calculates and adds a tangent attribute to this geometry.
+	 *
+	 * The computation is only supported for indexed geometries and if position, normal, and uv attributes
+	 * are defined. When using a tangent space normal map, prefer the MikkTSpace algorithm provided by
+	 * {@link BufferGeometryUtils#computeMikkTSpaceTangents} instead.
+	 */
+	computeTangents() {
 
 		const index = this.index;
 		const attributes = this.attributes;
@@ -478,29 +820,26 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 			 attributes.normal === undefined ||
 			 attributes.uv === undefined ) {
 
-			console.error( 'THREE.BufferGeometry: .computeTangents() failed. Missing required attributes (index, position, normal or uv)' );
+			error( 'BufferGeometry: .computeTangents() failed. Missing required attributes (index, position, normal or uv)' );
 			return;
 
 		}
 
-		const indices = index.array;
-		const positions = attributes.position.array;
-		const normals = attributes.normal.array;
-		const uvs = attributes.uv.array;
+		const positionAttribute = attributes.position;
+		const normalAttribute = attributes.normal;
+		const uvAttribute = attributes.uv;
 
-		const nVertices = positions.length / 3;
+		if ( this.hasAttribute( 'tangent' ) === false ) {
 
-		if ( attributes.tangent === undefined ) {
-
-			this.setAttribute( 'tangent', new BufferAttribute( new Float32Array( 4 * nVertices ), 4 ) );
+			this.setAttribute( 'tangent', new BufferAttribute( new Float32Array( 4 * positionAttribute.count ), 4 ) );
 
 		}
 
-		const tangents = attributes.tangent.array;
+		const tangentAttribute = this.getAttribute( 'tangent' );
 
 		const tan1 = [], tan2 = [];
 
-		for ( let i = 0; i < nVertices; i ++ ) {
+		for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
 			tan1[ i ] = new Vector3();
 			tan2[ i ] = new Vector3();
@@ -520,13 +859,13 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		function handleTriangle( a, b, c ) {
 
-			vA.fromArray( positions, a * 3 );
-			vB.fromArray( positions, b * 3 );
-			vC.fromArray( positions, c * 3 );
+			vA.fromBufferAttribute( positionAttribute, a );
+			vB.fromBufferAttribute( positionAttribute, b );
+			vC.fromBufferAttribute( positionAttribute, c );
 
-			uvA.fromArray( uvs, a * 2 );
-			uvB.fromArray( uvs, b * 2 );
-			uvC.fromArray( uvs, c * 2 );
+			uvA.fromBufferAttribute( uvAttribute, a );
+			uvB.fromBufferAttribute( uvAttribute, b );
+			uvC.fromBufferAttribute( uvAttribute, c );
 
 			vB.sub( vA );
 			vC.sub( vA );
@@ -559,7 +898,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			groups = [ {
 				start: 0,
-				count: indices.length
+				count: index.count
 			} ];
 
 		}
@@ -574,9 +913,9 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 			for ( let j = start, jl = start + count; j < jl; j += 3 ) {
 
 				handleTriangle(
-					indices[ j + 0 ],
-					indices[ j + 1 ],
-					indices[ j + 2 ]
+					index.getX( j + 0 ),
+					index.getX( j + 1 ),
+					index.getX( j + 2 )
 				);
 
 			}
@@ -588,7 +927,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		function handleVertex( v ) {
 
-			n.fromArray( normals, v * 3 );
+			n.fromBufferAttribute( normalAttribute, v );
 			n2.copy( n );
 
 			const t = tan1[ v ];
@@ -604,10 +943,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 			const test = tmp2.dot( tan2[ v ] );
 			const w = ( test < 0.0 ) ? - 1.0 : 1.0;
 
-			tangents[ v * 4 ] = tmp.x;
-			tangents[ v * 4 + 1 ] = tmp.y;
-			tangents[ v * 4 + 2 ] = tmp.z;
-			tangents[ v * 4 + 3 ] = w;
+			tangentAttribute.setXYZW( v, tmp.x, tmp.y, tmp.z, w );
 
 		}
 
@@ -620,17 +956,23 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			for ( let j = start, jl = start + count; j < jl; j += 3 ) {
 
-				handleVertex( indices[ j + 0 ] );
-				handleVertex( indices[ j + 1 ] );
-				handleVertex( indices[ j + 2 ] );
+				handleVertex( index.getX( j + 0 ) );
+				handleVertex( index.getX( j + 1 ) );
+				handleVertex( index.getX( j + 2 ) );
 
 			}
 
 		}
 
-	},
+	}
 
-	computeVertexNormals: function () {
+	/**
+	 * Computes vertex normals for the given vertex data. For indexed geometries, the method sets
+	 * each vertex normal to be the average of the face normals of the faces that share that vertex.
+	 * For non-indexed geometries, vertices are not shared, and the method sets each vertex normal
+	 * to be the same as the face normal.
+	 */
+	computeVertexNormals() {
 
 		const index = this.index;
 		const positionAttribute = this.getAttribute( 'position' );
@@ -720,56 +1062,13 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-	},
+	}
 
-	merge: function ( geometry, offset ) {
-
-		if ( ! ( geometry && geometry.isBufferGeometry ) ) {
-
-			console.error( 'THREE.BufferGeometry.merge(): geometry not an instance of THREE.BufferGeometry.', geometry );
-			return;
-
-		}
-
-		if ( offset === undefined ) {
-
-			offset = 0;
-
-			console.warn(
-				'THREE.BufferGeometry.merge(): Overwriting original geometry, starting at offset=0. '
-				+ 'Use BufferGeometryUtils.mergeBufferGeometries() for lossless merge.'
-			);
-
-		}
-
-		const attributes = this.attributes;
-
-		for ( const key in attributes ) {
-
-			if ( geometry.attributes[ key ] === undefined ) continue;
-
-			const attribute1 = attributes[ key ];
-			const attributeArray1 = attribute1.array;
-
-			const attribute2 = geometry.attributes[ key ];
-			const attributeArray2 = attribute2.array;
-
-			const attributeOffset = attribute2.itemSize * offset;
-			const length = Math.min( attributeArray2.length, attributeArray1.length - attributeOffset );
-
-			for ( let i = 0, j = attributeOffset; i < length; i ++, j ++ ) {
-
-				attributeArray1[ j ] = attributeArray2[ i ];
-
-			}
-
-		}
-
-		return this;
-
-	},
-
-	normalizeNormals: function () {
+	/**
+	 * Ensures every normal vector in a geometry will have a magnitude of `1`. This will
+	 * correct lighting on the geometry surfaces.
+	 */
+	normalizeNormals() {
 
 		const normals = this.attributes.normal;
 
@@ -783,9 +1082,15 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-	},
+	}
 
-	toNonIndexed: function () {
+	/**
+	 * Return a new non-index version of this indexed geometry. If the geometry
+	 * is already non-indexed, the method is a NOOP.
+	 *
+	 * @return {BufferGeometry} The non-indexed version of this indexed geometry.
+	 */
+	toNonIndexed() {
 
 		function convertBufferAttribute( attribute, indices ) {
 
@@ -799,7 +1104,15 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			for ( let i = 0, l = indices.length; i < l; i ++ ) {
 
-				index = indices[ i ] * itemSize;
+				if ( attribute.isInterleavedBufferAttribute ) {
+
+					index = indices[ i ] * attribute.data.stride + attribute.offset;
+
+				} else {
+
+					index = indices[ i ] * itemSize;
+
+				}
 
 				for ( let j = 0; j < itemSize; j ++ ) {
 
@@ -817,7 +1130,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( this.index === null ) {
 
-			console.warn( 'THREE.BufferGeometry.toNonIndexed(): BufferGeometry is already non-indexed.' );
+			warn( 'BufferGeometry.toNonIndexed(): BufferGeometry is already non-indexed.' );
 			return this;
 
 		}
@@ -877,13 +1190,18 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return geometry2;
 
-	},
+	}
 
-	toJSON: function () {
+	/**
+	 * Serializes the geometry into JSON.
+	 *
+	 * @return {Object} A JSON object representing the serialized geometry.
+	 */
+	toJSON() {
 
 		const data = {
 			metadata: {
-				version: 4.5,
+				version: 4.7,
 				type: 'BufferGeometry',
 				generator: 'BufferGeometry.toJSON'
 			}
@@ -981,48 +1299,32 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( boundingSphere !== null ) {
 
-			data.data.boundingSphere = {
-				center: boundingSphere.center.toArray(),
-				radius: boundingSphere.radius
-			};
+			data.data.boundingSphere = boundingSphere.toJSON();
 
 		}
 
 		return data;
 
-	},
+	}
 
-	clone: function () {
+	/**
+	 * Returns a new geometry with copied values from this instance.
+	 *
+	 * @return {BufferGeometry} A clone of this instance.
+	 */
+	clone() {
 
-		/*
-		 // Handle primitives
+		return new this.constructor().copy( this );
 
-		 const parameters = this.parameters;
+	}
 
-		 if ( parameters !== undefined ) {
-
-		 const values = [];
-
-		 for ( const key in parameters ) {
-
-		 values.push( parameters[ key ] );
-
-		 }
-
-		 const geometry = Object.create( this.constructor.prototype );
-		 this.constructor.apply( geometry, values );
-		 return geometry;
-
-		 }
-
-		 return new this.constructor().copy( this );
-		 */
-
-		return new BufferGeometry().copy( this );
-
-	},
-
-	copy: function ( source ) {
+	/**
+	 * Copies the values of the given geometry to this instance.
+	 *
+	 * @param {BufferGeometry} source - The geometry to copy.
+	 * @return {BufferGeometry} A reference to this instance.
+	 */
+	copy( source ) {
 
 		// reset
 
@@ -1047,7 +1349,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( index !== null ) {
 
-			this.setIndex( index.clone( data ) );
+			this.setIndex( index.clone() );
 
 		}
 
@@ -1125,15 +1427,20 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		return this;
 
-	},
+	}
 
-	dispose: function () {
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 *
+	 * @fires BufferGeometry#dispose
+	 */
+	dispose() {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 
-} );
-
+}
 
 export { BufferGeometry };

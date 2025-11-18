@@ -1,41 +1,107 @@
 import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
+import { warn } from '../utils.js';
 
-function ImageBitmapLoader( manager ) {
+const _errorMap = new WeakMap();
 
-	if ( typeof createImageBitmap === 'undefined' ) {
+/**
+ * A loader for loading images as an [ImageBitmap](https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap).
+ * An `ImageBitmap` provides an asynchronous and resource efficient pathway to prepare
+ * textures for rendering.
+ *
+ * Note that {@link Texture#flipY} and {@link Texture#premultiplyAlpha} are ignored with image bitmaps.
+ * They needs these configuration on bitmap creation unlike regular images need them on uploading to GPU.
+ *
+ * You need to set the equivalent options via {@link ImageBitmapLoader#setOptions} instead.
+ *
+ * Also note that unlike {@link FileLoader}, this loader avoids multiple concurrent requests to the same URL only if `Cache` is enabled.
+ *
+ * ```js
+ * const loader = new THREE.ImageBitmapLoader();
+ * loader.setOptions( { imageOrientation: 'flipY' } ); // set options if needed
+ * const imageBitmap = await loader.loadAsync( 'image.png' );
+ *
+ * const texture = new THREE.Texture( imageBitmap );
+ * texture.needsUpdate = true;
+ * ```
+ *
+ * @augments Loader
+ */
+class ImageBitmapLoader extends Loader {
 
-		console.warn( 'THREE.ImageBitmapLoader: createImageBitmap() not supported.' );
+	/**
+	 * Constructs a new image bitmap loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
+	constructor( manager ) {
+
+		super( manager );
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isImageBitmapLoader = true;
+
+		if ( typeof createImageBitmap === 'undefined' ) {
+
+			warn( 'ImageBitmapLoader: createImageBitmap() not supported.' );
+
+		}
+
+		if ( typeof fetch === 'undefined' ) {
+
+			warn( 'ImageBitmapLoader: fetch() not supported.' );
+
+		}
+
+		/**
+		 * Represents the loader options.
+		 *
+		 * @type {Object}
+		 * @default {premultiplyAlpha:'none'}
+		 */
+		this.options = { premultiplyAlpha: 'none' };
+
+		/**
+		 * Used for aborting requests.
+		 *
+		 * @private
+		 * @type {AbortController}
+		 */
+		this._abortController = new AbortController();
 
 	}
 
-	if ( typeof fetch === 'undefined' ) {
-
-		console.warn( 'THREE.ImageBitmapLoader: fetch() not supported.' );
-
-	}
-
-	Loader.call( this, manager );
-
-	this.options = { premultiplyAlpha: 'none' };
-
-}
-
-ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
-
-	constructor: ImageBitmapLoader,
-
-	isImageBitmapLoader: true,
-
-	setOptions: function setOptions( options ) {
+	/**
+	 * Sets the given loader options. The structure of the object must match the `options` parameter of
+	 * [createImageBitmap](https://developer.mozilla.org/en-US/docs/Web/API/Window/createImageBitmap).
+	 *
+	 * @param {Object} options - The loader options to set.
+	 * @return {ImageBitmapLoader} A reference to this image bitmap loader.
+	 */
+	setOptions( options ) {
 
 		this.options = options;
 
 		return this;
 
-	},
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	/**
+	 * Starts loading from the given URL and pass the loaded image bitmap to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(ImageBitmap)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Unsupported in this loader.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 * @return {ImageBitmap|undefined} The image bitmap.
+	 */
+	load( url, onLoad, onProgress, onError ) {
 
 		if ( url === undefined ) url = '';
 
@@ -45,12 +111,43 @@ ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 		const scope = this;
 
-		const cached = Cache.get( url );
+		const cached = Cache.get( `image-bitmap:${url}` );
 
 		if ( cached !== undefined ) {
 
 			scope.manager.itemStart( url );
 
+			// If cached is a promise, wait for it to resolve
+			if ( cached.then ) {
+
+				cached.then( imageBitmap => {
+
+					// check if there is an error for the cached promise
+
+					if ( _errorMap.has( cached ) === true ) {
+
+						if ( onError ) onError( _errorMap.get( cached ) );
+
+						scope.manager.itemError( url );
+						scope.manager.itemEnd( url );
+
+					} else {
+
+						if ( onLoad ) onLoad( imageBitmap );
+
+						scope.manager.itemEnd( url );
+
+						return imageBitmap;
+
+					}
+
+				} );
+
+				return;
+
+			}
+
+			// If cached is not a promise (i.e., it's already an imageBitmap)
 			setTimeout( function () {
 
 				if ( onLoad ) onLoad( cached );
@@ -66,8 +163,9 @@ ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 		const fetchOptions = {};
 		fetchOptions.credentials = ( this.crossOrigin === 'anonymous' ) ? 'same-origin' : 'include';
 		fetchOptions.headers = this.requestHeader;
+		fetchOptions.signal = ( typeof AbortSignal.any === 'function' ) ? AbortSignal.any( [ this._abortController.signal, this.manager.abortController.signal ] ) : this._abortController.signal;
 
-		fetch( url, fetchOptions ).then( function ( res ) {
+		const promise = fetch( url, fetchOptions ).then( function ( res ) {
 
 			return res.blob();
 
@@ -77,25 +175,46 @@ ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 		} ).then( function ( imageBitmap ) {
 
-			Cache.add( url, imageBitmap );
+			Cache.add( `image-bitmap:${url}`, imageBitmap );
 
 			if ( onLoad ) onLoad( imageBitmap );
 
 			scope.manager.itemEnd( url );
 
+			return imageBitmap;
+
 		} ).catch( function ( e ) {
 
 			if ( onError ) onError( e );
+
+			_errorMap.set( promise, e );
+
+			Cache.remove( `image-bitmap:${url}` );
 
 			scope.manager.itemError( url );
 			scope.manager.itemEnd( url );
 
 		} );
 
+		Cache.add( `image-bitmap:${url}`, promise );
 		scope.manager.itemStart( url );
 
 	}
 
-} );
+	/**
+	 * Aborts ongoing fetch requests.
+	 *
+	 * @return {ImageBitmapLoader} A reference to this instance.
+	 */
+	abort() {
+
+		this._abortController.abort();
+		this._abortController = new AbortController();
+
+		return this;
+
+	}
+
+}
 
 export { ImageBitmapLoader };

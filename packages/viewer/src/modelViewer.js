@@ -1,8 +1,9 @@
 /* eslint-disable import/no-unresolved */
 import * as THREE from './three/build/three.module.js';
 import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
-import { RGBELoader } from './three/examples/jsm/loaders/RGBELoader.js';
-import { VRButton } from './three/examples/jsm/webxr/VRButton.js';
+import { HDRLoader } from './three/examples/jsm/loaders/HDRLoader.js';
+// import { VRButton } from './three/examples/jsm/webxr/VRButton.js';
+import { XRButton } from './three/examples/jsm/webxr/XRButton.js';
 /* eslint-enable */
 
 import ManualControls from './manualControls.js';
@@ -68,7 +69,7 @@ function initializeVRController(index) {
       geometry.setAttribute('color', new THREE.Float32BufferAttribute([0.5, 0.5, 0.5, 0, 0, 0], 3));
 
       const material = new THREE.LineBasicMaterial({
-        vertexColors: THREE.VertexColors,
+        vertexColors: true,
         blending: THREE.AdditiveBlending
       });
 
@@ -133,7 +134,7 @@ function initializeThree() {
   three.scene.background = new THREE.Color(0x00aa44);
   three.renderer = new THREE.WebGLRenderer({ antialias: true });
   three.renderer.setSize(width, height);
-  three.renderer.outputEncoding = THREE.sRGBEncoding;
+  three.renderer.outputEncoding = THREE.SRGBColorSpace;
 
   // Set up the controls for moving the scene around
   three.cameraControls = new OrbitControls(three.camera, three.renderer.domElement);
@@ -143,8 +144,9 @@ function initializeThree() {
   three.cameraControls.enablePan = false;
   three.cameraControls.update();
 
-  // Add VR
-  canvasParentElement.appendChild(VRButton.createButton(three.renderer));
+  // Add XR
+  // canvasParentElement.appendChild(VRButton.createButton(three.renderer));
+  canvasParentElement.appendChild(XRButton.createButton(three.renderer));
   three.renderer.xr.enabled = true;
   three.renderer.xr.addEventListener('sessionstart', () => {
     vrProfilesElement.hidden = false;
@@ -152,6 +154,7 @@ function initializeThree() {
     isImmersive = true;
   });
   three.renderer.xr.addEventListener('sessionend', () => { isImmersive = false; });
+
   initializeVRController(0);
   initializeVRController(1);
 
@@ -190,16 +193,26 @@ async function onSelectionChange() {
 }
 
 async function onBackgroundChange() {
+  let hdrPath = backgroundSelector.backgroundPath;
+
+  if (hdrPath === '') {
+    // AR Passthroug mode selected
+    three.scene.background = null;
+    hdrPath = backgroundSelector.defaultBackground;
+  }
+
   const pmremGenerator = new THREE.PMREMGenerator(three.renderer);
   pmremGenerator.compileEquirectangularShader();
 
   await new Promise((resolve) => {
-    const rgbeLoader = new RGBELoader();
-    rgbeLoader.setDataType(THREE.UnsignedByteType);
-    rgbeLoader.setPath('backgrounds/');
-    rgbeLoader.load(backgroundSelector.backgroundPath, (texture) => {
+    const hdrLoader = new HDRLoader();
+    // hdrLoader.setDataType(THREE.UnsignedByteType);
+    hdrLoader.setPath('backgrounds/');
+    hdrLoader.load(hdrPath, (texture) => {
       three.environmentMap = pmremGenerator.fromEquirectangular(texture).texture;
-      three.scene.background = three.environmentMap;
+      if (backgroundSelector.backgroundPath !== '') {
+        three.scene.background = three.environmentMap;
+      }
 
       if (mockControllerModel) {
         mockControllerModel.environmentMap = three.environmentMap;

@@ -1,5 +1,24 @@
+/**
+ * A utility class for creating a button that allows to initiate
+ * immersive AR sessions based on WebXR. The button can be created
+ * with a factory method and then appended ot the website's DOM.
+ *
+ * ```js
+ * document.body.appendChild( ARButton.createButton( renderer ) );
+ * ```
+ *
+ * @hideconstructor
+ * @three_import import { ARButton } from 'three/addons/webxr/ARButton.js';
+ */
 class ARButton {
 
+	/**
+	 * Constructs a new AR button.
+	 *
+	 * @param {WebGLRenderer|WebGPURenderer} renderer - The renderer.
+	 * @param {XRSessionInit} [sessionInit] - The a configuration object for the AR session.
+	 * @return {HTMLElement} The button or an error message if `immersive-ar` isn't supported.
+	 */
 	static createButton( renderer, sessionInit = {} ) {
 
 		const button = document.createElement( 'button' );
@@ -8,11 +27,11 @@ class ARButton {
 
 			if ( sessionInit.domOverlay === undefined ) {
 
-				var overlay = document.createElement( 'div' );
+				const overlay = document.createElement( 'div' );
 				overlay.style.display = 'none';
 				document.body.appendChild( overlay );
 
-				var svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
+				const svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
 				svg.setAttribute( 'width', 38 );
 				svg.setAttribute( 'height', 38 );
 				svg.style.position = 'absolute';
@@ -25,7 +44,7 @@ class ARButton {
 				} );
 				overlay.appendChild( svg );
 
-				var path = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
+				const path = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
 				path.setAttribute( 'd', 'M 12,12 L 28,28 M 28,12 12,28' );
 				path.setAttribute( 'stroke', '#fff' );
 				path.setAttribute( 'stroke-width', 2 );
@@ -104,9 +123,33 @@ class ARButton {
 
 					currentSession.end();
 
+					if ( navigator.xr.offerSession !== undefined ) {
+
+						navigator.xr.offerSession( 'immersive-ar', sessionInit )
+							.then( onSessionStarted )
+							.catch( ( err ) => {
+
+								console.warn( err );
+
+							} );
+
+					}
+
 				}
 
 			};
+
+			if ( navigator.xr.offerSession !== undefined ) {
+
+				navigator.xr.offerSession( 'immersive-ar', sessionInit )
+					.then( onSessionStarted )
+					.catch( ( err ) => {
+
+						console.warn( err );
+
+					} );
+
+			}
 
 		}
 
@@ -130,6 +173,16 @@ class ARButton {
 			disableButton();
 
 			button.textContent = 'AR NOT SUPPORTED';
+
+		}
+
+		function showARNotAllowed( exception ) {
+
+			disableButton();
+
+			console.warn( 'Exception when trying to call xr.isSessionSupported', exception );
+
+			button.textContent = 'AR NOT ALLOWED';
 
 		}
 
@@ -161,7 +214,7 @@ class ARButton {
 
 				supported ? showStartAR() : showARNotSupported();
 
-			} ).catch( showARNotSupported );
+			} ).catch( showARNotAllowed );
 
 			return button;
 

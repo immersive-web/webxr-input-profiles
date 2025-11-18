@@ -1,26 +1,49 @@
 import {
 	WireframeGeometry
-} from '../../../build/three.module.js';
-import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry.js';
+} from 'three';
+import { LineSegmentsGeometry } from './LineSegmentsGeometry.js';
 
-var WireframeGeometry2 = function ( geometry ) {
+/**
+ * A special type of line segments geometry intended for wireframe rendering.
+ *
+ * This is used in {@link Wireframe} to describe the shape.
+ *
+ * ```js
+ * const geometry = new THREE.IcosahedronGeometry();
+ * const wireframeGeometry = new WireframeGeometry2( geo );
+ * ```
+ *
+ * @augments LineSegmentsGeometry
+ * @three_import import { WireframeGeometry2 } from 'three/addons/lines/WireframeGeometry2.js';
+ */
+class WireframeGeometry2 extends LineSegmentsGeometry {
 
-	LineSegmentsGeometry.call( this );
+	/**
+	 * Constructs a new wireframe geometry.
+	 *
+	 * @param {BufferGeometry} [geometry] - The geometry to render the wireframe for.
+	 */
+	constructor( geometry ) {
 
-	this.type = 'WireframeGeometry2';
+		super();
 
-	this.fromWireframeGeometry( new WireframeGeometry( geometry ) );
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isWireframeGeometry2 = true;
 
-	// set colors, maybe
+		this.type = 'WireframeGeometry2';
 
-};
+		this.fromWireframeGeometry( new WireframeGeometry( geometry ) );
 
-WireframeGeometry2.prototype = Object.assign( Object.create( LineSegmentsGeometry.prototype ), {
+		// set colors, maybe
 
-	constructor: WireframeGeometry2,
+	}
 
-	isWireframeGeometry2: true
-
-} );
+}
 
 export { WireframeGeometry2 };

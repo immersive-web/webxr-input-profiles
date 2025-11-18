@@ -1,78 +1,130 @@
+import { WebGLCoordinateSystem } from '../constants.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Object3D } from '../core/Object3D.js';
-import { Vector3 } from '../math/Vector3.js';
 
-function Camera() {
+/**
+ * Abstract base class for cameras. This class should always be inherited
+ * when you build a new camera.
+ *
+ * @abstract
+ * @augments Object3D
+ */
+class Camera extends Object3D {
 
-	Object3D.call( this );
+	/**
+	 * Constructs a new camera.
+	 */
+	constructor() {
 
-	this.type = 'Camera';
+		super();
 
-	this.matrixWorldInverse = new Matrix4();
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isCamera = true;
 
-	this.projectionMatrix = new Matrix4();
-	this.projectionMatrixInverse = new Matrix4();
+		this.type = 'Camera';
 
-}
+		/**
+		 * The inverse of the camera's world matrix.
+		 *
+		 * @type {Matrix4}
+		 */
+		this.matrixWorldInverse = new Matrix4();
 
-Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
+		/**
+		 * The camera's projection matrix.
+		 *
+		 * @type {Matrix4}
+		 */
+		this.projectionMatrix = new Matrix4();
 
-	constructor: Camera,
+		/**
+		 * The inverse of the camera's projection matrix.
+		 *
+		 * @type {Matrix4}
+		 */
+		this.projectionMatrixInverse = new Matrix4();
 
-	isCamera: true,
+		/**
+		 * The coordinate system in which the camera is used.
+		 *
+		 * @type {(WebGLCoordinateSystem|WebGPUCoordinateSystem)}
+		 */
+		this.coordinateSystem = WebGLCoordinateSystem;
 
-	copy: function ( source, recursive ) {
+		this._reversedDepth = false;
 
-		Object3D.prototype.copy.call( this, source, recursive );
+	}
+
+	/**
+	 * The flag that indicates whether the camera uses a reversed depth buffer.
+	 *
+	 * @type {boolean}
+	 * @default false
+	 */
+	get reversedDepth() {
+
+		return this._reversedDepth;
+
+	}
+
+	copy( source, recursive ) {
+
+		super.copy( source, recursive );
 
 		this.matrixWorldInverse.copy( source.matrixWorldInverse );
 
 		this.projectionMatrix.copy( source.projectionMatrix );
 		this.projectionMatrixInverse.copy( source.projectionMatrixInverse );
 
+		this.coordinateSystem = source.coordinateSystem;
+
 		return this;
 
-	},
+	}
 
-	getWorldDirection: function ( target ) {
+	/**
+	 * Returns a vector representing the ("look") direction of the 3D object in world space.
+	 *
+	 * This method is overwritten since cameras have a different forward vector compared to other
+	 * 3D objects. A camera looks down its local, negative z-axis by default.
+	 *
+	 * @param {Vector3} target - The target vector the result is stored to.
+	 * @return {Vector3} The 3D object's direction in world space.
+	 */
+	getWorldDirection( target ) {
 
-		if ( target === undefined ) {
+		return super.getWorldDirection( target ).negate();
 
-			console.warn( 'THREE.Camera: .getWorldDirection() target is now required' );
-			target = new Vector3();
+	}
 
-		}
+	updateMatrixWorld( force ) {
 
-		this.updateWorldMatrix( true, false );
-
-		const e = this.matrixWorld.elements;
-
-		return target.set( - e[ 8 ], - e[ 9 ], - e[ 10 ] ).normalize();
-
-	},
-
-	updateMatrixWorld: function ( force ) {
-
-		Object3D.prototype.updateMatrixWorld.call( this, force );
+		super.updateMatrixWorld( force );
 
 		this.matrixWorldInverse.copy( this.matrixWorld ).invert();
 
-	},
+	}
 
-	updateWorldMatrix: function ( updateParents, updateChildren ) {
+	updateWorldMatrix( updateParents, updateChildren ) {
 
-		Object3D.prototype.updateWorldMatrix.call( this, updateParents, updateChildren );
+		super.updateWorldMatrix( updateParents, updateChildren );
 
 		this.matrixWorldInverse.copy( this.matrixWorld ).invert();
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor().copy( this );
 
 	}
 
-} );
+}
 
 export { Camera };

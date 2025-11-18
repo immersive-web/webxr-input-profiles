@@ -1,51 +1,91 @@
 import {
 	StereoCamera,
 	Vector2
-} from '../../../build/three.module.js';
+} from 'three';
 
-var StereoEffect = function ( renderer ) {
+/**
+ * A class that creates an stereo effect.
+ *
+ * Note that this class can only be used with {@link WebGLRenderer}.
+ * When using {@link WebGPURenderer}, use {@link StereoPassNode}.
+ *
+ * @three_import import { StereoEffect } from 'three/addons/effects/StereoEffect.js';
+ */
+class StereoEffect {
 
-	var _stereo = new StereoCamera();
-	_stereo.aspect = 0.5;
-	var size = new Vector2();
+	/**
+	 * Constructs a new stereo effect.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 */
+	constructor( renderer ) {
 
-	this.setEyeSeparation = function ( eyeSep ) {
+		const _stereo = new StereoCamera();
+		_stereo.aspect = 0.5;
+		const size = new Vector2();
 
-		_stereo.eyeSep = eyeSep;
+		/**
+		 * Sets the given eye separation.
+		 *
+		 * @param {number} eyeSep - The eye separation to set.
+		 */
+		this.setEyeSeparation = function ( eyeSep ) {
 
-	};
+			_stereo.eyeSep = eyeSep;
 
-	this.setSize = function ( width, height ) {
+		};
 
-		renderer.setSize( width, height );
+		/**
+		 * Resizes the effect.
+		 *
+		 * @param {number} width - The width of the effect in logical pixels.
+		 * @param {number} height - The height of the effect in logical pixels.
+		 */
+		this.setSize = function ( width, height ) {
 
-	};
+			renderer.setSize( width, height );
 
-	this.render = function ( scene, camera ) {
+		};
 
-		scene.updateMatrixWorld();
+		/**
+		 * When using this effect, this method should be called instead of the
+		 * default {@link WebGLRenderer#render}.
+		 *
+		 * @param {Object3D} scene - The scene to render.
+		 * @param {Camera} camera - The camera.
+		 */
+		this.render = function ( scene, camera ) {
 
-		if ( camera.parent === null ) camera.updateMatrixWorld();
+			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
-		_stereo.update( camera );
+			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
-		renderer.getSize( size );
+			_stereo.update( camera );
 
-		if ( renderer.autoClear ) renderer.clear();
-		renderer.setScissorTest( true );
+			const currentAutoClear = renderer.autoClear;
+			renderer.getSize( size );
 
-		renderer.setScissor( 0, 0, size.width / 2, size.height );
-		renderer.setViewport( 0, 0, size.width / 2, size.height );
-		renderer.render( scene, _stereo.cameraL );
+			renderer.autoClear = false;
+			renderer.clear();
 
-		renderer.setScissor( size.width / 2, 0, size.width / 2, size.height );
-		renderer.setViewport( size.width / 2, 0, size.width / 2, size.height );
-		renderer.render( scene, _stereo.cameraR );
+			renderer.setScissorTest( true );
 
-		renderer.setScissorTest( false );
+			renderer.setScissor( 0, 0, size.width / 2, size.height );
+			renderer.setViewport( 0, 0, size.width / 2, size.height );
+			renderer.render( scene, _stereo.cameraL );
 
-	};
+			renderer.setScissor( size.width / 2, 0, size.width / 2, size.height );
+			renderer.setViewport( size.width / 2, 0, size.width / 2, size.height );
+			renderer.render( scene, _stereo.cameraR );
 
-};
+			renderer.setScissorTest( false );
+
+			renderer.autoClear = currentAutoClear;
+
+		};
+
+	}
+
+}
 
 export { StereoEffect };

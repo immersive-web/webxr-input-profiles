@@ -3,7 +3,7 @@ import {
 	MeshBasicMaterial,
 	Object3D,
 	SphereGeometry,
-} from '../../../build/three.module.js';
+} from 'three';
 
 import { GLTFLoader } from '../loaders/GLTFLoader.js';
 
@@ -16,20 +16,45 @@ import {
 const DEFAULT_PROFILES_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles';
 const DEFAULT_PROFILE = 'generic-trigger';
 
-function XRControllerModel( ) {
+/**
+ * Represents a XR controller model.
+ *
+ * @augments Object3D
+ */
+class XRControllerModel extends Object3D {
 
-	Object3D.call( this );
+	/**
+	 * Constructs a new XR controller model.
+	 */
+	constructor() {
 
-	this.motionController = null;
-	this.envMap = null;
+		super();
 
-}
+		/**
+		 * The motion controller.
+		 *
+		 * @type {?MotionController}
+		 * @default null
+		 */
+		this.motionController = null;
 
-XRControllerModel.prototype = Object.assign( Object.create( Object3D.prototype ), {
+		/**
+		 * The controller's environment map.
+		 *
+		 * @type {?Texture}
+		 * @default null
+		 */
+		this.envMap = null;
 
-	constructor: XRControllerModel,
+	}
 
-	setEnvironmentMap: function ( envMap ) {
+	/**
+	 * Sets an environment map that is applied to the controller model.
+	 *
+	 * @param {?Texture} envMap - The environment map to apply.
+	 * @return {XRControllerModel} A reference to this instance.
+	 */
+	setEnvironmentMap( envMap ) {
 
 		if ( this.envMap == envMap ) {
 
@@ -51,15 +76,18 @@ XRControllerModel.prototype = Object.assign( Object.create( Object3D.prototype )
 
 		return this;
 
-	},
+	}
 
 	/**
-	 * Polls data from the XRInputSource and updates the model's components to match
-	 * the real world data
+	 * Overwritten with a custom implementation. Polls data from the XRInputSource and updates the
+	 * model's components to match the real world data.
+	 *
+	 * @param {boolean} [force=false] - When set to `true`, a recomputation of world matrices is forced even
+	 * when {@link Object3D#matrixWorldAutoUpdate} is set to `false`.
 	 */
-	updateMatrixWorld: function ( force ) {
+	updateMatrixWorld( force ) {
 
-		Object3D.prototype.updateMatrixWorld.call( this, force );
+		super.updateMatrixWorld( force );
 
 		if ( ! this.motionController ) return;
 
@@ -105,12 +133,16 @@ XRControllerModel.prototype = Object.assign( Object.create( Object3D.prototype )
 
 	}
 
-} );
+}
 
 /**
  * Walks the model's tree to find the nodes needed to animate the components and
- * saves them to the motionContoller components for use in the frame loop. When
+ * saves them to the motionController components for use in the frame loop. When
  * touchpads are found, attaches a touch dot to them.
+ *
+ * @private
+ * @param {MotionController} motionController
+ * @param {Object3D} scene
  */
 function findNodes( motionController, scene ) {
 
@@ -206,13 +238,59 @@ function addAssetSceneToControllerModel( controllerModel, scene ) {
 
 }
 
-var XRControllerModelFactory = ( function () {
+/**
+ * Allows to create controller models for WebXR controllers that can be added as a visual
+ * representation to your scene. `XRControllerModelFactory` will automatically fetch controller
+ * models that match what the user is holding as closely as possible. The models should be
+ * attached to the object returned from getControllerGrip in order to match the orientation of
+ * the held device.
+ *
+ * This module depends on the [motion-controllers](https://github.com/immersive-web/webxr-input-profiles/blob/main/packages/motion-controllers/README.md)
+ * third-part library.
+ *
+ * ```js
+ * const controllerModelFactory = new XRControllerModelFactory();
+ *
+ * const controllerGrip = renderer.xr.getControllerGrip( 0 );
+ * controllerGrip.add( controllerModelFactory.createControllerModel( controllerGrip ) );
+ * scene.add( controllerGrip );
+ * ```
+ *
+ * @three_import import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
+ */
+class XRControllerModelFactory {
 
-	function XRControllerModelFactory( gltfLoader = null ) {
+	/**
+	 * Constructs a new XR controller model factory.
+	 *
+	 * @param {?GLTFLoader} [gltfLoader=null] - A glTF loader that is used to load controller models.
+	 * @param {?Function} [onLoad=null] - A callback that is executed when a controller model has been loaded.
+	 */
+	constructor( gltfLoader = null, onLoad = null ) {
 
+		/**
+		 * A glTF loader that is used to load controller models.
+		 *
+		 * @type {?GLTFLoader}
+		 * @default null
+		 */
 		this.gltfLoader = gltfLoader;
+
+		/**
+		 * The path to the model repository.
+		 *
+		 * @type {string}
+		 */
 		this.path = DEFAULT_PROFILES_PATH;
 		this._assetCache = {};
+
+		/**
+		 * A callback that is executed when a controller model has been loaded.
+		 *
+		 * @type {?Function}
+		 * @default null
+		 */
+		this.onLoad = onLoad;
 
 		// If a GLTFLoader wasn't supplied to the constructor create a new one.
 		if ( ! this.gltfLoader ) {
@@ -223,87 +301,103 @@ var XRControllerModelFactory = ( function () {
 
 	}
 
-	XRControllerModelFactory.prototype = {
+	/**
+	 * Sets the path to the model repository.
+	 *
+	 * @param {string} path - The path to set.
+	 * @return {XRControllerModelFactory} A reference to this instance.
+	 */
+	setPath( path ) {
 
-		constructor: XRControllerModelFactory,
+		this.path = path;
 
-		createControllerModel: function ( controller ) {
+		return this;
 
-			const controllerModel = new XRControllerModel();
-			let scene = null;
+	}
 
-			controller.addEventListener( 'connected', ( event ) => {
+	/**
+	 * Creates a controller model for the given WebXR controller.
+	 *
+	 * @param {Group} controller - The controller.
+	 * @return {XRControllerModel} The XR controller model.
+	 */
+	createControllerModel( controller ) {
 
-				const xrInputSource = event.data;
+		const controllerModel = new XRControllerModel();
+		let scene = null;
 
-				if ( xrInputSource.targetRayMode !== 'tracked-pointer' || ! xrInputSource.gamepad ) return;
+		controller.addEventListener( 'connected', ( event ) => {
 
-				fetchProfile( xrInputSource, this.path, DEFAULT_PROFILE ).then( ( { profile, assetPath } ) => {
+			const xrInputSource = event.data;
 
-					controllerModel.motionController = new MotionController(
-						xrInputSource,
-						profile,
-						assetPath
-					);
+			if ( xrInputSource.targetRayMode !== 'tracked-pointer' || ! xrInputSource.gamepad || xrInputSource.hand ) return;
 
-					const cachedAsset = this._assetCache[ controllerModel.motionController.assetUrl ];
-					if ( cachedAsset ) {
+			fetchProfile( xrInputSource, this.path, DEFAULT_PROFILE ).then( ( { profile, assetPath } ) => {
 
-						scene = cachedAsset.scene.clone();
+				controllerModel.motionController = new MotionController(
+					xrInputSource,
+					profile,
+					assetPath
+				);
 
-						addAssetSceneToControllerModel( controllerModel, scene );
+				const cachedAsset = this._assetCache[ controllerModel.motionController.assetUrl ];
+				if ( cachedAsset ) {
 
-					} else {
+					scene = cachedAsset.scene.clone();
 
-						if ( ! this.gltfLoader ) {
+					addAssetSceneToControllerModel( controllerModel, scene );
 
-							throw new Error( 'GLTFLoader not set.' );
+					if ( this.onLoad ) this.onLoad( scene );
 
-						}
+				} else {
 
-						this.gltfLoader.setPath( '' );
-						this.gltfLoader.load( controllerModel.motionController.assetUrl, ( asset ) => {
+					if ( ! this.gltfLoader ) {
 
-							this._assetCache[ controllerModel.motionController.assetUrl ] = asset;
-
-							scene = asset.scene.clone();
-
-							addAssetSceneToControllerModel( controllerModel, scene );
-
-						},
-						null,
-						() => {
-
-							throw new Error( `Asset ${controllerModel.motionController.assetUrl} missing or malformed.` );
-
-						} );
+						throw new Error( 'GLTFLoader not set.' );
 
 					}
 
-				} ).catch( ( err ) => {
+					this.gltfLoader.setPath( '' );
+					this.gltfLoader.load( controllerModel.motionController.assetUrl, ( asset ) => {
 
-					console.warn( err );
+						this._assetCache[ controllerModel.motionController.assetUrl ] = asset;
 
-				} );
+						scene = asset.scene.clone();
+
+						addAssetSceneToControllerModel( controllerModel, scene );
+
+						if ( this.onLoad ) this.onLoad( scene );
+
+					},
+					null,
+					() => {
+
+						throw new Error( `Asset ${controllerModel.motionController.assetUrl} missing or malformed.` );
+
+					} );
+
+				}
+
+			} ).catch( ( err ) => {
+
+				console.warn( err );
 
 			} );
 
-			controller.addEventListener( 'disconnected', () => {
+		} );
 
-				controllerModel.motionController = null;
-				controllerModel.remove( scene );
-				scene = null;
+		controller.addEventListener( 'disconnected', () => {
 
-			} );
+			controllerModel.motionController = null;
+			controllerModel.remove( scene );
+			scene = null;
 
-			return controllerModel;
+		} );
 
-		}
+		return controllerModel;
 
-	};
+	}
 
-	return XRControllerModelFactory;
-
-} )();
+}
 
 export { XRControllerModelFactory };

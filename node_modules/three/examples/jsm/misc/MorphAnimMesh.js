@@ -2,73 +2,118 @@ import {
 	AnimationClip,
 	AnimationMixer,
 	Mesh
-} from '../../../build/three.module.js';
+} from 'three';
 
-var MorphAnimMesh = function ( geometry, material ) {
+/**
+ * A special type of an animated mesh with a simple interface
+ * for animation playback. It allows to playback just one animation
+ * without any transitions or fading between animation changes.
+ *
+ * @augments Mesh
+ * @three_import import { MorphAnimMesh } from 'three/addons/misc/MorphAnimMesh.js';
+ */
+class MorphAnimMesh extends Mesh {
 
-	Mesh.call( this, geometry, material );
+	/**
+	 * Constructs a new morph anim mesh.
+	 *
+	 * @param {BufferGeometry} [geometry] - The mesh geometry.
+	 * @param {Material|Array<Material>} [material] - The mesh material.
+	 */
+	constructor( geometry, material ) {
 
-	this.type = 'MorphAnimMesh';
+		super( geometry, material );
 
-	this.mixer = new AnimationMixer( this );
-	this.activeAction = null;
+		this.type = 'MorphAnimMesh';
 
-};
+		/**
+		 * The internal animation mixer.
+		 *
+		 * @type {AnimationMixer}
+		 */
+		this.mixer = new AnimationMixer( this );
 
-MorphAnimMesh.prototype = Object.create( Mesh.prototype );
-MorphAnimMesh.prototype.constructor = MorphAnimMesh;
-
-MorphAnimMesh.prototype.setDirectionForward = function () {
-
-	this.mixer.timeScale = 1.0;
-
-};
-
-MorphAnimMesh.prototype.setDirectionBackward = function () {
-
-	this.mixer.timeScale = - 1.0;
-
-};
-
-MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
-
-	if ( this.activeAction ) {
-
-		this.activeAction.stop();
+		/**
+		 * The current active animation action.
+		 *
+		 * @type {?AnimationAction}
+		 * @default null
+		 */
 		this.activeAction = null;
 
 	}
 
-	var clip = AnimationClip.findByName( this, label );
+	/**
+	 * Sets the animation playback direction to "forward".
+	 */
+	setDirectionForward() {
 
-	if ( clip ) {
-
-		var action = this.mixer.clipAction( clip );
-		action.timeScale = ( clip.tracks.length * fps ) / clip.duration;
-		this.activeAction = action.play();
-
-	} else {
-
-		throw new Error( 'THREE.MorphAnimMesh: animations[' + label + '] undefined in .playAnimation()' );
+		this.mixer.timeScale = 1.0;
 
 	}
 
-};
+	/**
+	 * Sets the animation playback direction to "backward".
+	 */
+	setDirectionBackward() {
 
-MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
+		this.mixer.timeScale = - 1.0;
 
-	this.mixer.update( delta );
+	}
 
-};
+	/**
+	 * Plays the defined animation clip. The implementation assumes the animation
+	 * clips are stored in {@link Object3D#animations} or the geometry.
+	 *
+	 * @param {string} label - The name of the animation clip.
+	 * @param {number} fps - The FPS of the animation clip.
+	 */
+	playAnimation( label, fps ) {
 
-MorphAnimMesh.prototype.copy = function ( source ) {
+		if ( this.activeAction ) {
 
-	Mesh.prototype.copy.call( this, source );
+			this.activeAction.stop();
+			this.activeAction = null;
 
-	this.mixer = new AnimationMixer( this );
+		}
 
-	return this;
+		const clip = AnimationClip.findByName( this, label );
 
-};
+		if ( clip ) {
+
+			const action = this.mixer.clipAction( clip );
+			action.timeScale = ( clip.tracks.length * fps ) / clip.duration;
+			this.activeAction = action.play();
+
+		} else {
+
+			throw new Error( 'THREE.MorphAnimMesh: animations[' + label + '] undefined in .playAnimation()' );
+
+		}
+
+	}
+
+	/**
+	 * Updates the animations of the mesh. Must be called inside the animation loop.
+	 *
+	 * @param {number} delta - The delta time in seconds.
+	 */
+	updateAnimation( delta ) {
+
+		this.mixer.update( delta );
+
+	}
+
+	copy( source, recursive ) {
+
+		super.copy( source, recursive );
+
+		this.mixer = new AnimationMixer( this );
+
+		return this;
+
+	}
+
+}
 
 export { MorphAnimMesh };

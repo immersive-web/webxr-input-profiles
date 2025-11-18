@@ -1,4 +1,7 @@
-import { MathUtils } from './MathUtils.js';
+import { clamp, euclideanModulo, lerp } from './MathUtils.js';
+import { ColorManagement, SRGBToLinear, LinearToSRGB } from './ColorManagement.js';
+import { SRGBColorSpace } from '../constants.js';
+import { warn } from '../utils.js';
 
 const _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
 	'beige': 0xF5F5DC, 'bisque': 0xFFE4C4, 'black': 0x000000, 'blanchedalmond': 0xFFEBCD, 'blue': 0x0000FF, 'blueviolet': 0x8A2BE2,
@@ -39,46 +42,135 @@ function hue2rgb( p, q, t ) {
 
 }
 
-function SRGBToLinear( c ) {
-
-	return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
-
-}
-
-function LinearToSRGB( c ) {
-
-	return ( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055;
-
-}
-
+/**
+ * A Color instance is represented by RGB components in the linear <i>working
+ * color space</i>, which defaults to `LinearSRGBColorSpace`. Inputs
+ * conventionally using `SRGBColorSpace` (such as hexadecimals and CSS
+ * strings) are converted to the working color space automatically.
+ *
+ * ```js
+ * // converted automatically from SRGBColorSpace to LinearSRGBColorSpace
+ * const color = new THREE.Color().setHex( 0x112233 );
+ * ```
+ * Source color spaces may be specified explicitly, to ensure correct conversions.
+ * ```js
+ * // assumed already LinearSRGBColorSpace; no conversion
+ * const color = new THREE.Color().setRGB( 0.5, 0.5, 0.5 );
+ *
+ * // converted explicitly from SRGBColorSpace to LinearSRGBColorSpace
+ * const color = new THREE.Color().setRGB( 0.5, 0.5, 0.5, SRGBColorSpace );
+ * ```
+ * If THREE.ColorManagement is disabled, no conversions occur. For details,
+ * see <i>Color management</i>. Iterating through a Color instance will yield
+ * its components (r, g, b) in the corresponding order. A Color can be initialised
+ * in any of the following ways:
+ * ```js
+ * //empty constructor - will default white
+ * const color1 = new THREE.Color();
+ *
+ * //Hexadecimal color (recommended)
+ * const color2 = new THREE.Color( 0xff0000 );
+ *
+ * //RGB string
+ * const color3 = new THREE.Color("rgb(255, 0, 0)");
+ * const color4 = new THREE.Color("rgb(100%, 0%, 0%)");
+ *
+ * //X11 color name - all 140 color names are supported.
+ * //Note the lack of CamelCase in the name
+ * const color5 = new THREE.Color( 'skyblue' );
+ * //HSL string
+ * const color6 = new THREE.Color("hsl(0, 100%, 50%)");
+ *
+ * //Separate RGB values between 0 and 1
+ * const color7 = new THREE.Color( 1, 0, 0 );
+ * ```
+ */
 class Color {
 
+	/**
+	 * Constructs a new color.
+	 *
+	 * Note that standard method of specifying color in three.js is with a hexadecimal triplet,
+	 * and that method is used throughout the rest of the documentation.
+	 *
+	 * @param {(number|string|Color)} [r] - The red component of the color. If `g` and `b` are
+	 * not provided, it can be hexadecimal triplet, a CSS-style string or another `Color` instance.
+	 * @param {number} [g] - The green component.
+	 * @param {number} [b] - The blue component.
+	 */
 	constructor( r, g, b ) {
+
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isColor = true;
+
+		/**
+		 * The red component.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.r = 1;
+
+		/**
+		 * The green component.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.g = 1;
+
+		/**
+		 * The blue component.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.b = 1;
+
+		return this.set( r, g, b );
+
+	}
+
+	/**
+	 * Sets the colors's components from the given values.
+	 *
+	 * @param {(number|string|Color)} [r] - The red component of the color. If `g` and `b` are
+	 * not provided, it can be hexadecimal triplet, a CSS-style string or another `Color` instance.
+	 * @param {number} [g] - The green component.
+	 * @param {number} [b] - The blue component.
+	 * @return {Color} A reference to this color.
+	 */
+	set( r, g, b ) {
 
 		if ( g === undefined && b === undefined ) {
 
 			// r is THREE.Color, hex or string
-			return this.set( r );
 
-		}
+			const value = r;
 
-		return this.setRGB( r, g, b );
+			if ( value && value.isColor ) {
 
-	}
+				this.copy( value );
 
-	set( value ) {
+			} else if ( typeof value === 'number' ) {
 
-		if ( value && value.isColor ) {
+				this.setHex( value );
 
-			this.copy( value );
+			} else if ( typeof value === 'string' ) {
 
-		} else if ( typeof value === 'number' ) {
+				this.setStyle( value );
 
-			this.setHex( value );
+			}
 
-		} else if ( typeof value === 'string' ) {
+		} else {
 
-			this.setStyle( value );
+			this.setRGB( r, g, b );
 
 		}
 
@@ -86,6 +178,12 @@ class Color {
 
 	}
 
+	/**
+	 * Sets the colors's components to the given scalar value.
+	 *
+	 * @param {number} scalar - The scalar value.
+	 * @return {Color} A reference to this color.
+	 */
 	setScalar( scalar ) {
 
 		this.r = scalar;
@@ -96,7 +194,14 @@ class Color {
 
 	}
 
-	setHex( hex ) {
+	/**
+	 * Sets this color from a hexadecimal value.
+	 *
+	 * @param {number} hex - The hexadecimal value.
+	 * @param {string} [colorSpace=SRGBColorSpace] - The color space.
+	 * @return {Color} A reference to this color.
+	 */
+	setHex( hex, colorSpace = SRGBColorSpace ) {
 
 		hex = Math.floor( hex );
 
@@ -104,26 +209,48 @@ class Color {
 		this.g = ( hex >> 8 & 255 ) / 255;
 		this.b = ( hex & 255 ) / 255;
 
+		ColorManagement.colorSpaceToWorking( this, colorSpace );
+
 		return this;
 
 	}
 
-	setRGB( r, g, b ) {
+	/**
+	 * Sets this color from RGB values.
+	 *
+	 * @param {number} r - Red channel value between `0.0` and `1.0`.
+	 * @param {number} g - Green channel value between `0.0` and `1.0`.
+	 * @param {number} b - Blue channel value between `0.0` and `1.0`.
+	 * @param {string} [colorSpace=ColorManagement.workingColorSpace] - The color space.
+	 * @return {Color} A reference to this color.
+	 */
+	setRGB( r, g, b, colorSpace = ColorManagement.workingColorSpace ) {
 
 		this.r = r;
 		this.g = g;
 		this.b = b;
 
+		ColorManagement.colorSpaceToWorking( this, colorSpace );
+
 		return this;
 
 	}
 
-	setHSL( h, s, l ) {
+	/**
+	 * Sets this color from RGB values.
+	 *
+	 * @param {number} h - Hue value between `0.0` and `1.0`.
+	 * @param {number} s - Saturation value between `0.0` and `1.0`.
+	 * @param {number} l - Lightness value between `0.0` and `1.0`.
+	 * @param {string} [colorSpace=ColorManagement.workingColorSpace] - The color space.
+	 * @return {Color} A reference to this color.
+	 */
+	setHSL( h, s, l, colorSpace = ColorManagement.workingColorSpace ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
-		h = MathUtils.euclideanModulo( h, 1 );
-		s = MathUtils.clamp( s, 0, 1 );
-		l = MathUtils.clamp( l, 0, 1 );
+		h = euclideanModulo( h, 1 );
+		s = clamp( s, 0, 1 );
+		l = clamp( l, 0, 1 );
 
 		if ( s === 0 ) {
 
@@ -140,11 +267,23 @@ class Color {
 
 		}
 
+		ColorManagement.colorSpaceToWorking( this, colorSpace );
+
 		return this;
 
 	}
 
-	setStyle( style ) {
+	/**
+	 * Sets this color from a CSS-style string. For example, `rgb(250, 0,0)`,
+	 * `rgb(100%, 0%, 0%)`, `hsl(0, 100%, 50%)`, `#ff0000`, `#f00`, or `red` ( or
+	 * any [X11 color name](https://en.wikipedia.org/wiki/X11_color_names#Color_name_chart) -
+	 * all 140 color names are supported).
+	 *
+	 * @param {string} style - Color as a CSS-style string.
+	 * @param {string} [colorSpace=SRGBColorSpace] - The color space.
+	 * @return {Color} A reference to this color.
+	 */
+	setStyle( style, colorSpace = SRGBColorSpace ) {
 
 		function handleAlpha( string ) {
 
@@ -152,7 +291,7 @@ class Color {
 
 			if ( parseFloat( string ) < 1 ) {
 
-				console.warn( 'THREE.Color: Alpha component of ' + style + ' will be ignored.' );
+				warn( 'Color: Alpha component of ' + style + ' will be ignored.' );
 
 			}
 
@@ -161,7 +300,7 @@ class Color {
 
 		let m;
 
-		if ( m = /^((?:rgb|hsl)a?)\(([^\)]*)\)/.exec( style ) ) {
+		if ( m = /^(\w+)\(([^\)]*)\)/.exec( style ) ) {
 
 			// rgb / hsl
 
@@ -177,26 +316,30 @@ class Color {
 					if ( color = /^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 						// rgb(255,0,0) rgba(255,0,0,0.5)
-						this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
-						this.g = Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255;
-						this.b = Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255;
 
 						handleAlpha( color[ 4 ] );
 
-						return this;
+						return this.setRGB(
+							Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255,
+							Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255,
+							Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255,
+							colorSpace
+						);
 
 					}
 
 					if ( color = /^\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 						// rgb(100%,0%,0%) rgba(100%,0%,0%,0.5)
-						this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
-						this.g = Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100;
-						this.b = Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100;
 
 						handleAlpha( color[ 4 ] );
 
-						return this;
+						return this.setRGB(
+							Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100,
+							Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100,
+							Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100,
+							colorSpace
+						);
 
 					}
 
@@ -205,20 +348,26 @@ class Color {
 				case 'hsl':
 				case 'hsla':
 
-					if ( color = /^\s*(\d*\.?\d+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
+					if ( color = /^\s*(\d*\.?\d+)\s*,\s*(\d*\.?\d+)\%\s*,\s*(\d*\.?\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 						// hsl(120,50%,50%) hsla(120,50%,50%,0.5)
-						const h = parseFloat( color[ 1 ] ) / 360;
-						const s = parseInt( color[ 2 ], 10 ) / 100;
-						const l = parseInt( color[ 3 ], 10 ) / 100;
 
 						handleAlpha( color[ 4 ] );
 
-						return this.setHSL( h, s, l );
+						return this.setHSL(
+							parseFloat( color[ 1 ] ) / 360,
+							parseFloat( color[ 2 ] ) / 100,
+							parseFloat( color[ 3 ] ) / 100,
+							colorSpace
+						);
 
 					}
 
 					break;
+
+				default:
+
+					warn( 'Color: Unknown color model ' + style );
 
 			}
 
@@ -232,28 +381,27 @@ class Color {
 			if ( size === 3 ) {
 
 				// #ff0
-				this.r = parseInt( hex.charAt( 0 ) + hex.charAt( 0 ), 16 ) / 255;
-				this.g = parseInt( hex.charAt( 1 ) + hex.charAt( 1 ), 16 ) / 255;
-				this.b = parseInt( hex.charAt( 2 ) + hex.charAt( 2 ), 16 ) / 255;
-
-				return this;
+				return this.setRGB(
+					parseInt( hex.charAt( 0 ), 16 ) / 15,
+					parseInt( hex.charAt( 1 ), 16 ) / 15,
+					parseInt( hex.charAt( 2 ), 16 ) / 15,
+					colorSpace
+				);
 
 			} else if ( size === 6 ) {
 
 				// #ff0000
-				this.r = parseInt( hex.charAt( 0 ) + hex.charAt( 1 ), 16 ) / 255;
-				this.g = parseInt( hex.charAt( 2 ) + hex.charAt( 3 ), 16 ) / 255;
-				this.b = parseInt( hex.charAt( 4 ) + hex.charAt( 5 ), 16 ) / 255;
+				return this.setHex( parseInt( hex, 16 ), colorSpace );
 
-				return this;
+			} else {
+
+				warn( 'Color: Invalid hex color ' + style );
 
 			}
 
-		}
+		} else if ( style && style.length > 0 ) {
 
-		if ( style && style.length > 0 ) {
-
-			return this.setColorName( style );
+			return this.setColorName( style, colorSpace );
 
 		}
 
@@ -261,20 +409,33 @@ class Color {
 
 	}
 
-	setColorName( style ) {
+	/**
+	 * Sets this color from a color name. Faster than {@link Color#setStyle} if
+	 * you don't need the other CSS-style formats.
+	 *
+	 * For convenience, the list of names is exposed in `Color.NAMES` as a hash.
+	 * ```js
+	 * Color.NAMES.aliceblue // returns 0xF0F8FF
+	 * ```
+	 *
+	 * @param {string} style - The color name.
+	 * @param {string} [colorSpace=SRGBColorSpace] - The color space.
+	 * @return {Color} A reference to this color.
+	 */
+	setColorName( style, colorSpace = SRGBColorSpace ) {
 
 		// color keywords
-		const hex = _colorKeywords[ style ];
+		const hex = _colorKeywords[ style.toLowerCase() ];
 
 		if ( hex !== undefined ) {
 
 			// red
-			this.setHex( hex );
+			this.setHex( hex, colorSpace );
 
 		} else {
 
 			// unknown color
-			console.warn( 'THREE.Color: Unknown color ' + style );
+			warn( 'Color: Unknown color ' + style );
 
 		}
 
@@ -282,12 +443,23 @@ class Color {
 
 	}
 
+	/**
+	 * Returns a new color with copied values from this instance.
+	 *
+	 * @return {Color} A clone of this instance.
+	 */
 	clone() {
 
 		return new this.constructor( this.r, this.g, this.b );
 
 	}
 
+	/**
+	 * Copies the values of the given color to this instance.
+	 *
+	 * @param {Color} color - The color to copy.
+	 * @return {Color} A reference to this color.
+	 */
 	copy( color ) {
 
 		this.r = color.r;
@@ -298,44 +470,13 @@ class Color {
 
 	}
 
-	copyGammaToLinear( color, gammaFactor = 2.0 ) {
-
-		this.r = Math.pow( color.r, gammaFactor );
-		this.g = Math.pow( color.g, gammaFactor );
-		this.b = Math.pow( color.b, gammaFactor );
-
-		return this;
-
-	}
-
-	copyLinearToGamma( color, gammaFactor = 2.0 ) {
-
-		const safeInverse = ( gammaFactor > 0 ) ? ( 1.0 / gammaFactor ) : 1.0;
-
-		this.r = Math.pow( color.r, safeInverse );
-		this.g = Math.pow( color.g, safeInverse );
-		this.b = Math.pow( color.b, safeInverse );
-
-		return this;
-
-	}
-
-	convertGammaToLinear( gammaFactor ) {
-
-		this.copyGammaToLinear( this, gammaFactor );
-
-		return this;
-
-	}
-
-	convertLinearToGamma( gammaFactor ) {
-
-		this.copyLinearToGamma( this, gammaFactor );
-
-		return this;
-
-	}
-
+	/**
+	 * Copies the given color into this color, and then converts this color from
+	 * `SRGBColorSpace` to `LinearSRGBColorSpace`.
+	 *
+	 * @param {Color} color - The color to copy/convert.
+	 * @return {Color} A reference to this color.
+	 */
 	copySRGBToLinear( color ) {
 
 		this.r = SRGBToLinear( color.r );
@@ -346,6 +487,13 @@ class Color {
 
 	}
 
+	/**
+	 * Copies the given color into this color, and then converts this color from
+	 * `LinearSRGBColorSpace` to `SRGBColorSpace`.
+	 *
+	 * @param {Color} color - The color to copy/convert.
+	 * @return {Color} A reference to this color.
+	 */
 	copyLinearToSRGB( color ) {
 
 		this.r = LinearToSRGB( color.r );
@@ -356,6 +504,11 @@ class Color {
 
 	}
 
+	/**
+	 * Converts this color from `SRGBColorSpace` to `LinearSRGBColorSpace`.
+	 *
+	 * @return {Color} A reference to this color.
+	 */
 	convertSRGBToLinear() {
 
 		this.copySRGBToLinear( this );
@@ -364,6 +517,11 @@ class Color {
 
 	}
 
+	/**
+	 * Converts this color from `LinearSRGBColorSpace` to `SRGBColorSpace`.
+	 *
+	 * @return {Color} A reference to this color.
+	 */
 	convertLinearToSRGB() {
 
 		this.copyLinearToSRGB( this );
@@ -372,30 +530,47 @@ class Color {
 
 	}
 
-	getHex() {
+	/**
+	 * Returns the hexadecimal value of this color.
+	 *
+	 * @param {string} [colorSpace=SRGBColorSpace] - The color space.
+	 * @return {number} The hexadecimal value.
+	 */
+	getHex( colorSpace = SRGBColorSpace ) {
 
-		return ( this.r * 255 ) << 16 ^ ( this.g * 255 ) << 8 ^ ( this.b * 255 ) << 0;
+		ColorManagement.workingToColorSpace( _color.copy( this ), colorSpace );
+
+		return Math.round( clamp( _color.r * 255, 0, 255 ) ) * 65536 + Math.round( clamp( _color.g * 255, 0, 255 ) ) * 256 + Math.round( clamp( _color.b * 255, 0, 255 ) );
 
 	}
 
-	getHexString() {
+	/**
+	 * Returns the hexadecimal value of this color as a string (for example, 'FFFFFF').
+	 *
+	 * @param {string} [colorSpace=SRGBColorSpace] - The color space.
+	 * @return {string} The hexadecimal value as a string.
+	 */
+	getHexString( colorSpace = SRGBColorSpace ) {
 
-		return ( '000000' + this.getHex().toString( 16 ) ).slice( - 6 );
+		return ( '000000' + this.getHex( colorSpace ).toString( 16 ) ).slice( - 6 );
 
 	}
 
-	getHSL( target ) {
+	/**
+	 * Converts the colors RGB values into the HSL format and stores them into the
+	 * given target object.
+	 *
+	 * @param {{h:number,s:number,l:number}} target - The target object that is used to store the method's result.
+	 * @param {string} [colorSpace=ColorManagement.workingColorSpace] - The color space.
+	 * @return {{h:number,s:number,l:number}} The HSL representation of this color.
+	 */
+	getHSL( target, colorSpace = ColorManagement.workingColorSpace ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
 
-		if ( target === undefined ) {
+		ColorManagement.workingToColorSpace( _color.copy( this ), colorSpace );
 
-			console.warn( 'THREE.Color: .getHSL() target is now required' );
-			target = { h: 0, s: 0, l: 0 };
-
-		}
-
-		const r = this.r, g = this.g, b = this.b;
+		const r = _color.r, g = _color.g, b = _color.b;
 
 		const max = Math.max( r, g, b );
 		const min = Math.min( r, g, b );
@@ -434,24 +609,72 @@ class Color {
 
 	}
 
-	getStyle() {
+	/**
+	 * Returns the RGB values of this color and stores them into the given target object.
+	 *
+	 * @param {Color} target - The target color that is used to store the method's result.
+	 * @param {string} [colorSpace=ColorManagement.workingColorSpace] - The color space.
+	 * @return {Color} The RGB representation of this color.
+	 */
+	getRGB( target, colorSpace = ColorManagement.workingColorSpace ) {
 
-		return 'rgb(' + ( ( this.r * 255 ) | 0 ) + ',' + ( ( this.g * 255 ) | 0 ) + ',' + ( ( this.b * 255 ) | 0 ) + ')';
+		ColorManagement.workingToColorSpace( _color.copy( this ), colorSpace );
+
+		target.r = _color.r;
+		target.g = _color.g;
+		target.b = _color.b;
+
+		return target;
 
 	}
 
+	/**
+	 * Returns the value of this color as a CSS style string. Example: `rgb(255,0,0)`.
+	 *
+	 * @param {string} [colorSpace=SRGBColorSpace] - The color space.
+	 * @return {string} The CSS representation of this color.
+	 */
+	getStyle( colorSpace = SRGBColorSpace ) {
+
+		ColorManagement.workingToColorSpace( _color.copy( this ), colorSpace );
+
+		const r = _color.r, g = _color.g, b = _color.b;
+
+		if ( colorSpace !== SRGBColorSpace ) {
+
+			// Requires CSS Color Module Level 4 (https://www.w3.org/TR/css-color-4/).
+			return `color(${ colorSpace } ${ r.toFixed( 3 ) } ${ g.toFixed( 3 ) } ${ b.toFixed( 3 ) })`;
+
+		}
+
+		return `rgb(${ Math.round( r * 255 ) },${ Math.round( g * 255 ) },${ Math.round( b * 255 ) })`;
+
+	}
+
+	/**
+	 * Adds the given HSL values to this color's values.
+	 * Internally, this converts the color's RGB values to HSL, adds HSL
+	 * and then converts the color back to RGB.
+	 *
+	 * @param {number} h - Hue value between `0.0` and `1.0`.
+	 * @param {number} s - Saturation value between `0.0` and `1.0`.
+	 * @param {number} l - Lightness value between `0.0` and `1.0`.
+	 * @return {Color} A reference to this color.
+	 */
 	offsetHSL( h, s, l ) {
 
 		this.getHSL( _hslA );
 
-		_hslA.h += h; _hslA.s += s; _hslA.l += l;
-
-		this.setHSL( _hslA.h, _hslA.s, _hslA.l );
-
-		return this;
+		return this.setHSL( _hslA.h + h, _hslA.s + s, _hslA.l + l );
 
 	}
 
+	/**
+	 * Adds the RGB values of the given color to the RGB values of this color.
+	 *
+	 * @param {Color} color - The color to add.
+	 * @return {Color} A reference to this color.
+	 */
 	add( color ) {
 
 		this.r += color.r;
@@ -462,6 +685,13 @@ class Color {
 
 	}
 
+	/**
+	 * Adds the RGB values of the given colors and stores the result in this instance.
+	 *
+	 * @param {Color} color1 - The first color.
+	 * @param {Color} color2 - The second color.
+	 * @return {Color} A reference to this color.
+	 */
 	addColors( color1, color2 ) {
 
 		this.r = color1.r + color2.r;
@@ -472,6 +702,12 @@ class Color {
 
 	}
 
+	/**
+	 * Adds the given scalar value to the RGB values of this color.
+	 *
+	 * @param {number} s - The scalar to add.
+	 * @return {Color} A reference to this color.
+	 */
 	addScalar( s ) {
 
 		this.r += s;
@@ -482,6 +718,12 @@ class Color {
 
 	}
 
+	/**
+	 * Subtracts the RGB values of the given color from the RGB values of this color.
+	 *
+	 * @param {Color} color - The color to subtract.
+	 * @return {Color} A reference to this color.
+	 */
 	sub( color ) {
 
 		this.r = Math.max( 0, this.r - color.r );
@@ -492,6 +734,12 @@ class Color {
 
 	}
 
+	/**
+	 * Multiplies the RGB values of the given color with the RGB values of this color.
+	 *
+	 * @param {Color} color - The color to multiply.
+	 * @return {Color} A reference to this color.
+	 */
 	multiply( color ) {
 
 		this.r *= color.r;
@@ -502,6 +750,12 @@ class Color {
 
 	}
 
+	/**
+	 * Multiplies the given scalar value with the RGB values of this color.
+	 *
+	 * @param {number} s - The scalar to multiply.
+	 * @return {Color} A reference to this color.
+	 */
 	multiplyScalar( s ) {
 
 		this.r *= s;
@@ -512,6 +766,15 @@ class Color {
 
 	}
 
+	/**
+	 * Linearly interpolates this color's RGB values toward the RGB values of the
+	 * given color. The alpha argument can be thought of as the ratio between
+	 * the two colors, where `0.0` is this color and `1.0` is the first argument.
+	 *
+	 * @param {Color} color - The color to converge on.
+	 * @param {number} alpha - The interpolation factor in the closed interval `[0,1]`.
+	 * @return {Color} A reference to this color.
+	 */
 	lerp( color, alpha ) {
 
 		this.r += ( color.r - this.r ) * alpha;
@@ -522,6 +785,16 @@ class Color {
 
 	}
 
+	/**
+	 * Linearly interpolates between the given colors and stores the result in this instance.
+	 * The alpha argument can be thought of as the ratio between the two colors, where `0.0`
+	 * is the first and `1.0` is the second color.
+	 *
+	 * @param {Color} color1 - The first color.
+	 * @param {Color} color2 - The second color.
+	 * @param {number} alpha - The interpolation factor in the closed interval `[0,1]`.
+	 * @return {Color} A reference to this color.
+	 */
 	lerpColors( color1, color2, alpha ) {
 
 		this.r = color1.r + ( color2.r - color1.r ) * alpha;
@@ -532,14 +805,25 @@ class Color {
 
 	}
 
+	/**
+	 * Linearly interpolates this color's HSL values toward the HSL values of the
+	 * given color. It differs from {@link Color#lerp} by not interpolating straight
+	 * from one color to the other, but instead going through all the hues in between
+	 * those two colors. The alpha argument can be thought of as the ratio between
+	 * the two colors, where 0.0 is this color and 1.0 is the first argument.
+	 *
+	 * @param {Color} color - The color to converge on.
+	 * @param {number} alpha - The interpolation factor in the closed interval `[0,1]`.
+	 * @return {Color} A reference to this color.
+	 */
 	lerpHSL( color, alpha ) {
 
 		this.getHSL( _hslA );
 		color.getHSL( _hslB );
 
-		const h = MathUtils.lerp( _hslA.h, _hslB.h, alpha );
-		const s = MathUtils.lerp( _hslA.s, _hslB.s, alpha );
-		const l = MathUtils.lerp( _hslA.l, _hslB.l, alpha );
+		const h = lerp( _hslA.h, _hslB.h, alpha );
+		const s = lerp( _hslA.s, _hslB.s, alpha );
+		const l = lerp( _hslA.l, _hslB.l, alpha );
 
 		this.setHSL( h, s, l );
 
@@ -547,12 +831,60 @@ class Color {
 
 	}
 
+	/**
+	 * Sets the color's RGB components from the given 3D vector.
+	 *
+	 * @param {Vector3} v - The vector to set.
+	 * @return {Color} A reference to this color.
+	 */
+	setFromVector3( v ) {
+
+		this.r = v.x;
+		this.g = v.y;
+		this.b = v.z;
+
+		return this;
+
+	}
+
+	/**
+	 * Transforms this color with the given 3x3 matrix.
+	 *
+	 * @param {Matrix3} m - The matrix.
+	 * @return {Color} A reference to this color.
+	 */
+	applyMatrix3( m ) {
+
+		const r = this.r, g = this.g, b = this.b;
+		const e = m.elements;
+
+		this.r = e[ 0 ] * r + e[ 3 ] * g + e[ 6 ] * b;
+		this.g = e[ 1 ] * r + e[ 4 ] * g + e[ 7 ] * b;
+		this.b = e[ 2 ] * r + e[ 5 ] * g + e[ 8 ] * b;
+
+		return this;
+
+	}
+
+	/**
+	 * Returns `true` if this color is equal with the given one.
+	 *
+	 * @param {Color} c - The color to test for equality.
+	 * @return {boolean} Whether this bounding color is equal with the given one.
+	 */
 	equals( c ) {
 
 		return ( c.r === this.r ) && ( c.g === this.g ) && ( c.b === this.b );
 
 	}
 
+	/**
+	 * Sets this color's RGB components from the given array.
+	 *
+	 * @param {Array<number>} array - An array holding the RGB values.
+	 * @param {number} [offset=0] - The offset into the array.
+	 * @return {Color} A reference to this color.
+	 */
 	fromArray( array, offset = 0 ) {
 
 		this.r = array[ offset ];
@@ -563,6 +895,14 @@ class Color {
 
 	}
 
+	/**
+	 * Writes the RGB components of this color to the given array. If no array is provided,
+	 * the method returns a new instance.
+	 *
+	 * @param {Array<number>} [array=[]] - The target array holding the color components.
+	 * @param {number} [offset=0] - Index of the first element in the array.
+	 * @return {Array<number>} The color components.
+	 */
 	toArray( array = [], offset = 0 ) {
 
 		array[ offset ] = this.r;
@@ -573,39 +913,55 @@ class Color {
 
 	}
 
+	/**
+	 * Sets the components of this color from the given buffer attribute.
+	 *
+	 * @param {BufferAttribute} attribute - The buffer attribute holding color data.
+	 * @param {number} index - The index into the attribute.
+	 * @return {Color} A reference to this color.
+	 */
 	fromBufferAttribute( attribute, index ) {
 
 		this.r = attribute.getX( index );
 		this.g = attribute.getY( index );
 		this.b = attribute.getZ( index );
 
-		if ( attribute.normalized === true ) {
-
-			// assuming Uint8Array
-
-			this.r /= 255;
-			this.g /= 255;
-			this.b /= 255;
-
-		}
-
 		return this;
 
 	}
 
+	/**
+	 * This methods defines the serialization result of this class. Returns the color
+	 * as a hexadecimal value.
+	 *
+	 * @return {number} The hexadecimal value.
+	 */
 	toJSON() {
 
 		return this.getHex();
 
 	}
 
+	*[ Symbol.iterator ]() {
+
+		yield this.r;
+		yield this.g;
+		yield this.b;
+
+	}
+
 }
 
-Color.NAMES = _colorKeywords;
+const _color = /*@__PURE__*/ new Color();
 
-Color.prototype.isColor = true;
-Color.prototype.r = 1;
-Color.prototype.g = 1;
-Color.prototype.b = 1;
+/**
+ * A dictionary with X11 color names.
+ *
+ * Note that multiple words such as Dark Orange become the string 'darkorange'.
+ *
+ * @static
+ * @type {Object}
+ */
+Color.NAMES = _colorKeywords;
 
 export { Color };

@@ -6,79 +6,113 @@ import {
 	LineBasicMaterial,
 	Mesh,
 	MeshBasicMaterial
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
- *  This helper must be added as a child of the light
+ * Creates a visual aid for rect area lights.
+ *
+ * `RectAreaLightHelper` must be added as a child of the light.
+ *
+ * ```js
+ * const light = new THREE.RectAreaLight( 0xffffbb, 1.0, 5, 5 );
+ * const helper = new RectAreaLightHelper( light );
+ * light.add( helper );
+ * ```
+ *
+ * @augments Line
+ * @three_import import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
  */
+class RectAreaLightHelper extends Line {
 
-function RectAreaLightHelper( light, color ) {
+	/**
+	 * Constructs a new rect area light helper.
+	 *
+	 * @param {RectAreaLight} light - The light to visualize.
+	 * @param {number|Color|string} [color] - The helper's color.
+	 * If this is not the set, the helper will take the color of the light.
+	 */
+	constructor( light, color ) {
 
-	this.light = light;
+		const positions = [ 1, 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, - 1, 0, 1, 1, 0 ];
 
-	this.color = color; // optional hardwired color for the helper
+		const geometry = new BufferGeometry();
+		geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+		geometry.computeBoundingSphere();
 
-	var positions = [ 1, 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, - 1, 0, 1, 1, 0 ];
+		const material = new LineBasicMaterial( { fog: false } );
 
-	var geometry = new BufferGeometry();
-	geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
-	geometry.computeBoundingSphere();
+		super( geometry, material );
 
-	var material = new LineBasicMaterial( { fog: false } );
+		/**
+		 * The light to visualize.
+		 *
+		 * @type {RectAreaLight}
+		 */
+		this.light = light;
 
-	Line.call( this, geometry, material );
+		/**
+		 * The helper's color. If `undefined`, the helper will take the color of the light.
+		 *
+		 * @type {number|Color|string|undefined}
+		 */
+		this.color = color;
 
-	this.type = 'RectAreaLightHelper';
+		this.type = 'RectAreaLightHelper';
 
-	//
+		//
 
-	var positions2 = [ 1, 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, 1, 0, - 1, - 1, 0, 1, - 1, 0 ];
+		const positions2 = [ 1, 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, 1, 0, - 1, - 1, 0, 1, - 1, 0 ];
 
-	var geometry2 = new BufferGeometry();
-	geometry2.setAttribute( 'position', new Float32BufferAttribute( positions2, 3 ) );
-	geometry2.computeBoundingSphere();
+		const geometry2 = new BufferGeometry();
+		geometry2.setAttribute( 'position', new Float32BufferAttribute( positions2, 3 ) );
+		geometry2.computeBoundingSphere();
 
-	this.add( new Mesh( geometry2, new MeshBasicMaterial( { side: BackSide, fog: false } ) ) );
-
-}
-
-RectAreaLightHelper.prototype = Object.create( Line.prototype );
-RectAreaLightHelper.prototype.constructor = RectAreaLightHelper;
-
-RectAreaLightHelper.prototype.updateMatrixWorld = function () {
-
-	this.scale.set( 0.5 * this.light.width, 0.5 * this.light.height, 1 );
-
-	if ( this.color !== undefined ) {
-
-		this.material.color.set( this.color );
-		this.children[ 0 ].material.color.set( this.color );
-
-	} else {
-
-		this.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
-
-		// prevent hue shift
-		var c = this.material.color;
-		var max = Math.max( c.r, c.g, c.b );
-		if ( max > 1 ) c.multiplyScalar( 1 / max );
-
-		this.children[ 0 ].material.color.copy( this.material.color );
+		this.add( new Mesh( geometry2, new MeshBasicMaterial( { side: BackSide, fog: false } ) ) );
 
 	}
 
-	this.matrixWorld.copy( this.light.matrixWorld ).scale( this.scale );
-	this.children[ 0 ].matrixWorld.copy( this.matrixWorld );
+	updateMatrixWorld() {
 
-};
+		this.scale.set( 0.5 * this.light.width, 0.5 * this.light.height, 1 );
 
-RectAreaLightHelper.prototype.dispose = function () {
+		if ( this.color !== undefined ) {
 
-	this.geometry.dispose();
-	this.material.dispose();
-	this.children[ 0 ].geometry.dispose();
-	this.children[ 0 ].material.dispose();
+			this.material.color.set( this.color );
+			this.children[ 0 ].material.color.set( this.color );
 
-};
+		} else {
+
+			this.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+
+			// prevent hue shift
+			const c = this.material.color;
+			const max = Math.max( c.r, c.g, c.b );
+			if ( max > 1 ) c.multiplyScalar( 1 / max );
+
+			this.children[ 0 ].material.color.copy( this.material.color );
+
+		}
+
+		// ignore world scale on light
+		this.matrixWorld.extractRotation( this.light.matrixWorld ).scale( this.scale ).copyPosition( this.light.matrixWorld );
+
+		this.children[ 0 ].matrixWorld.copy( this.matrixWorld );
+
+	}
+
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
+		this.children[ 0 ].geometry.dispose();
+		this.children[ 0 ].material.dispose();
+
+	}
+
+}
 
 export { RectAreaLightHelper };

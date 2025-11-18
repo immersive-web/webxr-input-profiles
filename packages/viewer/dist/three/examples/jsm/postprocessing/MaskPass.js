@@ -1,27 +1,86 @@
-import { Pass } from '../postprocessing/Pass.js';
+import { Pass } from './Pass.js';
 
-var MaskPass = function ( scene, camera ) {
+/**
+ * This pass can be used to define a mask during post processing.
+ * Meaning only areas of subsequent post processing are affected
+ * which lie in the masking area of this pass. Internally, the masking
+ * is implemented with the stencil buffer.
+ *
+ * ```js
+ * const maskPass = new MaskPass( scene, camera );
+ * composer.addPass( maskPass );
+ * ```
+ *
+ * @augments Pass
+ * @three_import import { MaskPass } from 'three/addons/postprocessing/MaskPass.js';
+ */
+class MaskPass extends Pass {
 
-	Pass.call( this );
+	/**
+	 * Constructs a new mask pass.
+	 *
+	 * @param {Scene} scene - The 3D objects in this scene will define the mask.
+	 * @param {Camera} camera - The camera.
+	 */
+	constructor( scene, camera ) {
 
-	this.scene = scene;
-	this.camera = camera;
+		super();
 
-	this.clear = true;
-	this.needsSwap = false;
+		/**
+		 * The scene that defines the mask.
+		 *
+		 * @type {Scene}
+		 */
+		this.scene = scene;
 
-	this.inverse = false;
+		/**
+		 * The camera.
+		 *
+		 * @type {Camera}
+		 */
+		this.camera = camera;
 
-};
+		/**
+		 * Overwritten to perform a clear operation by default.
+		 *
+		 * @type {boolean}
+		 * @default true
+		 */
+		this.clear = true;
 
-MaskPass.prototype = Object.assign( Object.create( Pass.prototype ), {
+		/**
+		 * Overwritten to disable the swap.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.needsSwap = false;
 
-	constructor: MaskPass,
+		/**
+		 * Whether to inverse the mask or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.inverse = false;
 
-	render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
+	}
 
-		var context = renderer.getContext();
-		var state = renderer.state;
+	/**
+	 * Performs a mask pass with the configured scene and camera.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {WebGLRenderTarget} writeBuffer - The write buffer. This buffer is intended as the rendering
+	 * destination for the pass.
+	 * @param {WebGLRenderTarget} readBuffer - The read buffer. The pass can access the result from the
+	 * previous pass from this buffer.
+	 * @param {number} deltaTime - The delta time in seconds.
+	 * @param {boolean} maskActive - Whether masking is active or not.
+	 */
+	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
+
+		const context = renderer.getContext();
+		const state = renderer.state;
 
 		// don't update color or depth
 
@@ -35,7 +94,7 @@ MaskPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		// set up stencil
 
-		var writeValue, clearValue;
+		let writeValue, clearValue;
 
 		if ( this.inverse ) {
 
@@ -65,10 +124,13 @@ MaskPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		if ( this.clear ) renderer.clear();
 		renderer.render( this.scene, this.camera );
 
-		// unlock color and depth buffer for subsequent rendering
+		// unlock color and depth buffer and make them writable for subsequent rendering/clearing
 
 		state.buffers.color.setLocked( false );
 		state.buffers.depth.setLocked( false );
+
+		state.buffers.color.setMask( true );
+		state.buffers.depth.setMask( true );
 
 		// only render where stencil is set to 1
 
@@ -79,28 +141,55 @@ MaskPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 	}
 
-} );
+}
 
+/**
+ * This pass can be used to clear a mask previously defined with {@link MaskPass}.
+ *
+ * ```js
+ * const clearPass = new ClearMaskPass();
+ * composer.addPass( clearPass );
+ * ```
+ *
+ * @augments Pass
+ */
+class ClearMaskPass extends Pass {
 
-var ClearMaskPass = function () {
+	/**
+	 * Constructs a new clear mask pass.
+	 */
+	constructor() {
 
-	Pass.call( this );
+		super();
 
-	this.needsSwap = false;
+		/**
+		 * Overwritten to disable the swap.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.needsSwap = false;
 
-};
+	}
 
-ClearMaskPass.prototype = Object.create( Pass.prototype );
-
-Object.assign( ClearMaskPass.prototype, {
-
-	render: function ( renderer /*, writeBuffer, readBuffer, deltaTime, maskActive */ ) {
+	/**
+	 * Performs the clear of the currently defined mask.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {WebGLRenderTarget} writeBuffer - The write buffer. This buffer is intended as the rendering
+	 * destination for the pass.
+	 * @param {WebGLRenderTarget} readBuffer - The read buffer. The pass can access the result from the
+	 * previous pass from this buffer.
+	 * @param {number} deltaTime - The delta time in seconds.
+	 * @param {boolean} maskActive - Whether masking is active or not.
+	 */
+	render( renderer /*, writeBuffer, readBuffer, deltaTime, maskActive */ ) {
 
 		renderer.state.buffers.stencil.setLocked( false );
 		renderer.state.buffers.stencil.setTest( false );
 
 	}
 
-} );
+}
 
 export { MaskPass, ClearMaskPass };

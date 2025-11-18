@@ -1,14 +1,51 @@
 import { Vector3 } from './Vector3.js';
 
+/**
+ * Represents an axis-aligned bounding box (AABB) in 3D space.
+ */
 class Box3 {
 
+	/**
+	 * Constructs a new bounding box.
+	 *
+	 * @param {Vector3} [min=(Infinity,Infinity,Infinity)] - A vector representing the lower boundary of the box.
+	 * @param {Vector3} [max=(-Infinity,-Infinity,-Infinity)] - A vector representing the upper boundary of the box.
+	 */
 	constructor( min = new Vector3( + Infinity, + Infinity, + Infinity ), max = new Vector3( - Infinity, - Infinity, - Infinity ) ) {
 
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isBox3 = true;
+
+		/**
+		 * The lower boundary of the box.
+		 *
+		 * @type {Vector3}
+		 */
 		this.min = min;
+
+		/**
+		 * The upper boundary of the box.
+		 *
+		 * @type {Vector3}
+		 */
 		this.max = max;
 
 	}
 
+	/**
+	 * Sets the lower and upper boundaries of this box.
+	 * Please note that this method only copies the values from the given objects.
+	 *
+	 * @param {Vector3} min - The lower boundary of the box.
+	 * @param {Vector3} max - The upper boundary of the box.
+	 * @return {Box3} A reference to this bounding box.
+	 */
 	set( min, max ) {
 
 		this.min.copy( min );
@@ -18,72 +55,55 @@ class Box3 {
 
 	}
 
+	/**
+	 * Sets the upper and lower bounds of this box so it encloses the position data
+	 * in the given array.
+	 *
+	 * @param {Array<number>} array - An array holding 3D position data.
+	 * @return {Box3} A reference to this bounding box.
+	 */
 	setFromArray( array ) {
 
-		let minX = + Infinity;
-		let minY = + Infinity;
-		let minZ = + Infinity;
+		this.makeEmpty();
 
-		let maxX = - Infinity;
-		let maxY = - Infinity;
-		let maxZ = - Infinity;
+		for ( let i = 0, il = array.length; i < il; i += 3 ) {
 
-		for ( let i = 0, l = array.length; i < l; i += 3 ) {
-
-			const x = array[ i ];
-			const y = array[ i + 1 ];
-			const z = array[ i + 2 ];
-
-			if ( x < minX ) minX = x;
-			if ( y < minY ) minY = y;
-			if ( z < minZ ) minZ = z;
-
-			if ( x > maxX ) maxX = x;
-			if ( y > maxY ) maxY = y;
-			if ( z > maxZ ) maxZ = z;
+			this.expandByPoint( _vector.fromArray( array, i ) );
 
 		}
-
-		this.min.set( minX, minY, minZ );
-		this.max.set( maxX, maxY, maxZ );
 
 		return this;
 
 	}
 
+	/**
+	 * Sets the upper and lower bounds of this box so it encloses the position data
+	 * in the given buffer attribute.
+	 *
+	 * @param {BufferAttribute} attribute - A buffer attribute holding 3D position data.
+	 * @return {Box3} A reference to this bounding box.
+	 */
 	setFromBufferAttribute( attribute ) {
 
-		let minX = + Infinity;
-		let minY = + Infinity;
-		let minZ = + Infinity;
+		this.makeEmpty();
 
-		let maxX = - Infinity;
-		let maxY = - Infinity;
-		let maxZ = - Infinity;
+		for ( let i = 0, il = attribute.count; i < il; i ++ ) {
 
-		for ( let i = 0, l = attribute.count; i < l; i ++ ) {
-
-			const x = attribute.getX( i );
-			const y = attribute.getY( i );
-			const z = attribute.getZ( i );
-
-			if ( x < minX ) minX = x;
-			if ( y < minY ) minY = y;
-			if ( z < minZ ) minZ = z;
-
-			if ( x > maxX ) maxX = x;
-			if ( y > maxY ) maxY = y;
-			if ( z > maxZ ) maxZ = z;
+			this.expandByPoint( _vector.fromBufferAttribute( attribute, i ) );
 
 		}
-
-		this.min.set( minX, minY, minZ );
-		this.max.set( maxX, maxY, maxZ );
 
 		return this;
 
 	}
 
+	/**
+	 * Sets the upper and lower bounds of this box so it encloses the position data
+	 * in the given array.
+	 *
+	 * @param {Array<Vector3>} points - An array holding 3D position data as instances of {@link Vector3}.
+	 * @return {Box3} A reference to this bounding box.
+	 */
 	setFromPoints( points ) {
 
 		this.makeEmpty();
@@ -98,6 +118,14 @@ class Box3 {
 
 	}
 
+	/**
+	 * Centers this box on the given center vector and sets this box's width, height and
+	 * depth to the given size values.
+	 *
+	 * @param {Vector3} center - The center of the box.
+	 * @param {Vector3} size - The x, y and z dimensions of the box.
+	 * @return {Box3} A reference to this bounding box.
+	 */
 	setFromCenterAndSize( center, size ) {
 
 		const halfSize = _vector.copy( size ).multiplyScalar( 0.5 );
@@ -109,20 +137,41 @@ class Box3 {
 
 	}
 
-	setFromObject( object ) {
+	/**
+	 * Computes the world-axis-aligned bounding box for the given 3D object
+	 * (including its children), accounting for the object's, and children's,
+	 * world transforms. The function may result in a larger box than strictly necessary.
+	 *
+	 * @param {Object3D} object - The 3D object to compute the bounding box for.
+	 * @param {boolean} [precise=false] - If set to `true`, the method computes the smallest
+	 * world-axis-aligned bounding box at the expense of more computation.
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	setFromObject( object, precise = false ) {
 
 		this.makeEmpty();
 
-		return this.expandByObject( object );
+		return this.expandByObject( object, precise );
 
 	}
 
+	/**
+	 * Returns a new box with copied values from this instance.
+	 *
+	 * @return {Box3} A clone of this instance.
+	 */
 	clone() {
 
 		return new this.constructor().copy( this );
 
 	}
 
+	/**
+	 * Copies the values of the given box to this instance.
+	 *
+	 * @param {Box3} box - The box to copy.
+	 * @return {Box3} A reference to this bounding box.
+	 */
 	copy( box ) {
 
 		this.min.copy( box.min );
@@ -132,6 +181,11 @@ class Box3 {
 
 	}
 
+	/**
+	 * Makes this box empty which means in encloses a zero space in 3D.
+	 *
+	 * @return {Box3} A reference to this bounding box.
+	 */
 	makeEmpty() {
 
 		this.min.x = this.min.y = this.min.z = + Infinity;
@@ -141,6 +195,13 @@ class Box3 {
 
 	}
 
+	/**
+	 * Returns true if this box includes zero points within its bounds.
+	 * Note that a box with equal lower and upper bounds still includes one
+	 * point, the one both bounds share.
+	 *
+	 * @return {boolean} Whether this box is empty or not.
+	 */
 	isEmpty() {
 
 		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
@@ -149,32 +210,36 @@ class Box3 {
 
 	}
 
+	/**
+	 * Returns the center point of this box.
+	 *
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3} The center point.
+	 */
 	getCenter( target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Box3: .getCenter() target is now required' );
-			target = new Vector3();
-
-		}
 
 		return this.isEmpty() ? target.set( 0, 0, 0 ) : target.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
 	}
 
+	/**
+	 * Returns the dimensions of this box.
+	 *
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3} The size.
+	 */
 	getSize( target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Box3: .getSize() target is now required' );
-			target = new Vector3();
-
-		}
 
 		return this.isEmpty() ? target.set( 0, 0, 0 ) : target.subVectors( this.max, this.min );
 
 	}
 
+	/**
+	 * Expands the boundaries of this box to include the given point.
+	 *
+	 * @param {Vector3} point - The point that should be included by the bounding box.
+	 * @return {Box3} A reference to this bounding box.
+	 */
 	expandByPoint( point ) {
 
 		this.min.min( point );
@@ -184,6 +249,16 @@ class Box3 {
 
 	}
 
+	/**
+	 * Expands this box equilaterally by the given vector. The width of this
+	 * box will be expanded by the x component of the vector in both
+	 * directions. The height of this box will be expanded by the y component of
+	 * the vector in both directions. The depth of this box will be
+	 * expanded by the z component of the vector in both directions.
+	 *
+	 * @param {Vector3} vector - The vector that should expand the bounding box.
+	 * @return {Box3} A reference to this bounding box.
+	 */
 	expandByVector( vector ) {
 
 		this.min.sub( vector );
@@ -193,6 +268,13 @@ class Box3 {
 
 	}
 
+	/**
+	 * Expands each dimension of the box by the given scalar. If negative, the
+	 * dimensions of the box will be contracted.
+	 *
+	 * @param {number} scalar - The scalar value that should expand the bounding box.
+	 * @return {Box3} A reference to this bounding box.
+	 */
 	expandByScalar( scalar ) {
 
 		this.min.addScalar( - scalar );
@@ -202,7 +284,18 @@ class Box3 {
 
 	}
 
-	expandByObject( object ) {
+	/**
+	 * Expands the boundaries of this box to include the given 3D object and
+	 * its children, accounting for the object's, and children's, world
+	 * transforms. The function may result in a larger box than strictly
+	 * necessary (unless the precise parameter is set to true).
+	 *
+	 * @param {Object3D} object - The 3D object that should expand the bounding box.
+	 * @param {boolean} precise - If set to `true`, the method expands the bounding box
+	 * as little as necessary at the expense of more computation.
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	expandByObject( object, precise = false ) {
 
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
@@ -213,16 +306,64 @@ class Box3 {
 
 		if ( geometry !== undefined ) {
 
-			if ( geometry.boundingBox === null ) {
+			const positionAttribute = geometry.getAttribute( 'position' );
 
-				geometry.computeBoundingBox();
+			// precise AABB computation based on vertex data requires at least a position attribute.
+			// instancing isn't supported so far and uses the normal (conservative) code path.
+
+			if ( precise === true && positionAttribute !== undefined && object.isInstancedMesh !== true ) {
+
+				for ( let i = 0, l = positionAttribute.count; i < l; i ++ ) {
+
+					if ( object.isMesh === true ) {
+
+						object.getVertexPosition( i, _vector );
+
+					} else {
+
+						_vector.fromBufferAttribute( positionAttribute, i );
+
+					}
+
+					_vector.applyMatrix4( object.matrixWorld );
+					this.expandByPoint( _vector );
+
+				}
+
+			} else {
+
+				if ( object.boundingBox !== undefined ) {
+
+					// object-level bounding box
+
+					if ( object.boundingBox === null ) {
+
+						object.computeBoundingBox();
+
+					}
+
+					_box.copy( object.boundingBox );
+
+
+				} else {
+
+					// geometry-level bounding box
+
+					if ( geometry.boundingBox === null ) {
+
+						geometry.computeBoundingBox();
+
+					}
+
+					_box.copy( geometry.boundingBox );
+
+				}
+
+				_box.applyMatrix4( object.matrixWorld );
+
+				this.union( _box );
 
 			}
-
-			_box.copy( geometry.boundingBox );
-			_box.applyMatrix4( object.matrixWorld );
-
-			this.union( _box );
 
 		}
 
@@ -230,7 +371,7 @@ class Box3 {
 
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-			this.expandByObject( children[ i ] );
+			this.expandByObject( children[ i ], precise );
 
 		}
 
@@ -238,14 +379,27 @@ class Box3 {
 
 	}
 
+	/**
+	 * Returns `true` if the given point lies within or on the boundaries of this box.
+	 *
+	 * @param {Vector3} point - The point to test.
+	 * @return {boolean} Whether the bounding box contains the given point or not.
+	 */
 	containsPoint( point ) {
 
-		return point.x < this.min.x || point.x > this.max.x ||
-			point.y < this.min.y || point.y > this.max.y ||
-			point.z < this.min.z || point.z > this.max.z ? false : true;
+		return point.x >= this.min.x && point.x <= this.max.x &&
+			point.y >= this.min.y && point.y <= this.max.y &&
+			point.z >= this.min.z && point.z <= this.max.z;
 
 	}
 
+	/**
+	 * Returns `true` if this bounding box includes the entirety of the given bounding box.
+	 * If this box and the given one are identical, this function also returns `true`.
+	 *
+	 * @param {Box3} box - The bounding box to test.
+	 * @return {boolean} Whether the bounding box contains the given bounding box or not.
+	 */
 	containsBox( box ) {
 
 		return this.min.x <= box.min.x && box.max.x <= this.max.x &&
@@ -254,17 +408,17 @@ class Box3 {
 
 	}
 
+	/**
+	 * Returns a point as a proportion of this box's width, height and depth.
+	 *
+	 * @param {Vector3} point - A point in 3D space.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3} A point as a proportion of this box's width, height and depth.
+	 */
 	getParameter( point, target ) {
 
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Box3: .getParameter() target is now required' );
-			target = new Vector3();
-
-		}
 
 		return target.set(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
@@ -274,15 +428,27 @@ class Box3 {
 
 	}
 
+	/**
+	 * Returns `true` if the given bounding box intersects with this bounding box.
+	 *
+	 * @param {Box3} box - The bounding box to test.
+	 * @return {boolean} Whether the given bounding box intersects with this bounding box.
+	 */
 	intersectsBox( box ) {
 
 		// using 6 splitting planes to rule out intersections.
-		return box.max.x < this.min.x || box.min.x > this.max.x ||
-			box.max.y < this.min.y || box.min.y > this.max.y ||
-			box.max.z < this.min.z || box.min.z > this.max.z ? false : true;
+		return box.max.x >= this.min.x && box.min.x <= this.max.x &&
+			box.max.y >= this.min.y && box.min.y <= this.max.y &&
+			box.max.z >= this.min.z && box.min.z <= this.max.z;
 
 	}
 
+	/**
+	 * Returns `true` if the given bounding sphere intersects with this bounding box.
+	 *
+	 * @param {Sphere} sphere - The bounding sphere to test.
+	 * @return {boolean} Whether the given bounding sphere intersects with this bounding box.
+	 */
 	intersectsSphere( sphere ) {
 
 		// Find the point on the AABB closest to the sphere center.
@@ -293,6 +459,12 @@ class Box3 {
 
 	}
 
+	/**
+	 * Returns `true` if the given plane intersects with this bounding box.
+	 *
+	 * @param {Plane} plane - The plane to test.
+	 * @return {boolean} Whether the given plane intersects with this bounding box.
+	 */
 	intersectsPlane( plane ) {
 
 		// We compute the minimum and maximum dot product values. If those values
@@ -340,6 +512,12 @@ class Box3 {
 
 	}
 
+	/**
+	 * Returns `true` if the given triangle intersects with this bounding box.
+	 *
+	 * @param {Triangle} triangle - The triangle to test.
+	 * @return {boolean} Whether the given triangle intersects with this bounding box.
+	 */
 	intersectsTriangle( triangle ) {
 
 		if ( this.isEmpty() ) {
@@ -393,44 +571,65 @@ class Box3 {
 
 	}
 
+	/**
+	 * Clamps the given point within the bounds of this box.
+	 *
+	 * @param {Vector3} point - The point to clamp.
+	 * @param {Vector3} target - The target vector that is used to store the method's result.
+	 * @return {Vector3} The clamped point.
+	 */
 	clampPoint( point, target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Box3: .clampPoint() target is now required' );
-			target = new Vector3();
-
-		}
 
 		return target.copy( point ).clamp( this.min, this.max );
 
 	}
 
+	/**
+	 * Returns the euclidean distance from any edge of this box to the specified point. If
+	 * the given point lies inside of this box, the distance will be `0`.
+	 *
+	 * @param {Vector3} point - The point to compute the distance to.
+	 * @return {number} The euclidean distance.
+	 */
 	distanceToPoint( point ) {
 
-		const clampedPoint = _vector.copy( point ).clamp( this.min, this.max );
-
-		return clampedPoint.sub( point ).length();
+		return this.clampPoint( point, _vector ).distanceTo( point );
 
 	}
 
+	/**
+	 * Returns a bounding sphere that encloses this bounding box.
+	 *
+	 * @param {Sphere} target - The target sphere that is used to store the method's result.
+	 * @return {Sphere} The bounding sphere that encloses this bounding box.
+	 */
 	getBoundingSphere( target ) {
 
-		if ( target === undefined ) {
+		if ( this.isEmpty() ) {
 
-			console.error( 'THREE.Box3: .getBoundingSphere() target is now required' );
-			//target = new Sphere(); // removed to avoid cyclic dependency
+			target.makeEmpty();
+
+		} else {
+
+			this.getCenter( target.center );
+
+			target.radius = this.getSize( _vector ).length() * 0.5;
 
 		}
-
-		this.getCenter( target.center );
-
-		target.radius = this.getSize( _vector ).length() * 0.5;
 
 		return target;
 
 	}
 
+	/**
+	 * Computes the intersection of this bounding box and the given one, setting the upper
+	 * bound of this box to the lesser of the two boxes' upper bounds and the
+	 * lower bound of this box to the greater of the two boxes' lower bounds. If
+	 * there's no overlap, makes this box empty.
+	 *
+	 * @param {Box3} box - The bounding box to intersect with.
+	 * @return {Box3} A reference to this bounding box.
+	 */
 	intersect( box ) {
 
 		this.min.max( box.min );
@@ -443,6 +642,14 @@ class Box3 {
 
 	}
 
+	/**
+	 * Computes the union of this box and another and the given one, setting the upper
+	 * bound of this box to the greater of the two boxes' upper bounds and the
+	 * lower bound of this box to the lesser of the two boxes' lower bounds.
+	 *
+	 * @param {Box3} box - The bounding box that will be unioned with this instance.
+	 * @return {Box3} A reference to this bounding box.
+	 */
 	union( box ) {
 
 		this.min.min( box.min );
@@ -452,6 +659,12 @@ class Box3 {
 
 	}
 
+	/**
+	 * Transforms this bounding box by the given 4x4 transformation matrix.
+	 *
+	 * @param {Matrix4} matrix - The transformation matrix.
+	 * @return {Box3} A reference to this bounding box.
+	 */
 	applyMatrix4( matrix ) {
 
 		// transform of empty box is an empty box.
@@ -473,6 +686,13 @@ class Box3 {
 
 	}
 
+	/**
+	 * Adds the given offset to both the upper and lower bounds of this bounding box,
+	 * effectively moving it in 3D space.
+	 *
+	 * @param {Vector3} offset - The offset that should be used to translate the bounding box.
+	 * @return {Box3} A reference to this bounding box.
+	 */
 	translate( offset ) {
 
 		this.min.add( offset );
@@ -482,15 +702,47 @@ class Box3 {
 
 	}
 
+	/**
+	 * Returns `true` if this bounding box is equal with the given one.
+	 *
+	 * @param {Box3} box - The box to test for equality.
+	 * @return {boolean} Whether this bounding box is equal with the given one.
+	 */
 	equals( box ) {
 
 		return box.min.equals( this.min ) && box.max.equals( this.max );
 
 	}
 
-}
+	/**
+	 * Returns a serialized structure of the bounding box.
+	 *
+	 * @return {Object} Serialized structure with fields representing the object state.
+	 */
+	toJSON() {
 
-Box3.prototype.isBox3 = true;
+		return {
+			min: this.min.toArray(),
+			max: this.max.toArray()
+		};
+
+	}
+
+	/**
+	 * Returns a serialized structure of the bounding box.
+	 *
+	 * @param {Object} json - The serialized json to set the box from.
+	 * @return {Box3} A reference to this bounding box.
+	 */
+	fromJSON( json ) {
+
+		this.min.fromArray( json.min );
+		this.max.fromArray( json.max );
+		return this;
+
+	}
+
+}
 
 const _points = [
 	/*@__PURE__*/ new Vector3(),
@@ -529,9 +781,9 @@ function satForAxes( axes, v0, v1, v2, extents ) {
 	for ( let i = 0, j = axes.length - 3; i <= j; i += 3 ) {
 
 		_testAxis.fromArray( axes, i );
-		// project the aabb onto the seperating axis
+		// project the aabb onto the separating axis
 		const r = extents.x * Math.abs( _testAxis.x ) + extents.y * Math.abs( _testAxis.y ) + extents.z * Math.abs( _testAxis.z );
-		// project all 3 vertices of the triangle onto the seperating axis
+		// project all 3 vertices of the triangle onto the separating axis
 		const p0 = v0.dot( _testAxis );
 		const p1 = v1.dot( _testAxis );
 		const p2 = v2.dot( _testAxis );
@@ -539,7 +791,7 @@ function satForAxes( axes, v0, v1, v2, extents ) {
 		if ( Math.max( - Math.max( p0, p1, p2 ), Math.min( p0, p1, p2 ) ) > r ) {
 
 			// points of the projected triangle are outside the projected half-length of the aabb
-			// the axis is seperating and we can exit
+			// the axis is separating and we can exit
 			return false;
 
 		}

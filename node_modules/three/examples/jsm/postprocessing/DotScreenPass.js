@@ -1,42 +1,83 @@
 import {
 	ShaderMaterial,
 	UniformsUtils
-} from '../../../build/three.module.js';
-import { Pass } from '../postprocessing/Pass.js';
+} from 'three';
+import { Pass, FullScreenQuad } from './Pass.js';
 import { DotScreenShader } from '../shaders/DotScreenShader.js';
 
-var DotScreenPass = function ( center, angle, scale ) {
+/**
+ * Pass for creating a dot-screen effect.
+ *
+ * ```js
+ * const pass = new DotScreenPass( new THREE.Vector2( 0, 0 ), 0.5, 0.8 );
+ * composer.addPass( pass );
+ * ```
+ *
+ * @augments Pass
+ * @three_import import { DotScreenPass } from 'three/addons/postprocessing/DotScreenPass.js';
+ */
+class DotScreenPass extends Pass {
 
-	Pass.call( this );
+	/**
+	 * Constructs a new dot screen pass.
+	 *
+	 * @param {Vector2} center - The center point.
+	 * @param {number} angle - The rotation of the effect in radians.
+	 * @param {number} scale - The scale of the effect. A higher value means smaller dots.
+	 */
+	constructor( center, angle, scale ) {
 
-	if ( DotScreenShader === undefined )
-		console.error( 'THREE.DotScreenPass relies on DotScreenShader' );
+		super();
 
-	var shader = DotScreenShader;
+		/**
+		 * The pass uniforms. Use this object if you want to update the
+		 * `center`, `angle` or `scale` values at runtime.
+		 * ```js
+		 * pass.uniforms.center.value.copy( center );
+		 * pass.uniforms.angle.value = 0;
+		 * pass.uniforms.scale.value = 0.5;
+		 * ```
+		 *
+		 * @type {Object}
+		 */
+		this.uniforms = UniformsUtils.clone( DotScreenShader.uniforms );
 
-	this.uniforms = UniformsUtils.clone( shader.uniforms );
+		if ( center !== undefined ) this.uniforms[ 'center' ].value.copy( center );
+		if ( angle !== undefined ) this.uniforms[ 'angle' ].value = angle;
+		if ( scale !== undefined ) this.uniforms[ 'scale' ].value = scale;
 
-	if ( center !== undefined ) this.uniforms[ 'center' ].value.copy( center );
-	if ( angle !== undefined ) this.uniforms[ 'angle' ].value = angle;
-	if ( scale !== undefined ) this.uniforms[ 'scale' ].value = scale;
+		/**
+		 * The pass material.
+		 *
+		 * @type {ShaderMaterial}
+		 */
+		this.material = new ShaderMaterial( {
 
-	this.material = new ShaderMaterial( {
+			name: DotScreenShader.name,
+			uniforms: this.uniforms,
+			vertexShader: DotScreenShader.vertexShader,
+			fragmentShader: DotScreenShader.fragmentShader
 
-		uniforms: this.uniforms,
-		vertexShader: shader.vertexShader,
-		fragmentShader: shader.fragmentShader
+		} );
 
-	} );
+		// internals
 
-	this.fsQuad = new Pass.FullScreenQuad( this.material );
+		this._fsQuad = new FullScreenQuad( this.material );
 
-};
+	}
 
-DotScreenPass.prototype = Object.assign( Object.create( Pass.prototype ), {
-
-	constructor: DotScreenPass,
-
-	render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
+	/**
+	 * Performs the dot screen pass.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {WebGLRenderTarget} writeBuffer - The write buffer. This buffer is intended as the rendering
+	 * destination for the pass.
+	 * @param {WebGLRenderTarget} readBuffer - The read buffer. The pass can access the result from the
+	 * previous pass from this buffer.
+	 * @param {number} deltaTime - The delta time in seconds.
+	 * @param {boolean} maskActive - Whether masking is active or not.
+	 */
+	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
 		this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
 		this.uniforms[ 'tSize' ].value.set( readBuffer.width, readBuffer.height );
@@ -44,18 +85,30 @@ DotScreenPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			this.fsQuad.render( renderer );
+			this._fsQuad.render( renderer );
 
 		} else {
 
 			renderer.setRenderTarget( writeBuffer );
 			if ( this.clear ) renderer.clear();
-			this.fsQuad.render( renderer );
+			this._fsQuad.render( renderer );
 
 		}
 
 	}
 
-} );
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever the pass is no longer used in your app.
+	 */
+	dispose() {
+
+		this.material.dispose();
+
+		this._fsQuad.dispose();
+
+	}
+
+}
 
 export { DotScreenPass };

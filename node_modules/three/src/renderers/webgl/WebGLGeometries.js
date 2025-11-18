@@ -1,5 +1,5 @@
 import { Uint16BufferAttribute, Uint32BufferAttribute } from '../../core/BufferAttribute.js';
-import { arrayMax } from '../../utils.js';
+import { arrayNeedsUint32 } from '../../utils.js';
 
 function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
@@ -75,22 +75,6 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 		}
 
-		// morph targets
-
-		const morphAttributes = geometry.morphAttributes;
-
-		for ( const name in morphAttributes ) {
-
-			const array = morphAttributes[ name ];
-
-			for ( let i = 0, l = array.length; i < l; i ++ ) {
-
-				attributes.update( array[ i ], gl.ARRAY_BUFFER );
-
-			}
-
-		}
-
 	}
 
 	function updateWireframeAttribute( geometry ) {
@@ -116,7 +100,7 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 			}
 
-		} else {
+		} else if ( geometryPosition !== undefined ) {
 
 			const array = geometryPosition.array;
 			version = geometryPosition.version;
@@ -131,9 +115,13 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 			}
 
+		} else {
+
+			return;
+
 		}
 
-		const attribute = new ( arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
+		const attribute = new ( arrayNeedsUint32( indices ) ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 		attribute.version = version;
 
 		// Updating index buffer in VAO now. See WebGLBindingStates

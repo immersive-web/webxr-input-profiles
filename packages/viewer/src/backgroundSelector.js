@@ -32,6 +32,10 @@ export default class BackgroundSelector extends EventTarget {
     this.dispatchEvent(new Event('selectionchange'));
   }
 
+  get defaultBackground() {
+    return this.backgroundList[defaultBackground];
+  }
+
   get backgroundPath() {
     return this.backgroundList[this.selectedBackground];
   }

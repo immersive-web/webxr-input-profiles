@@ -1,27 +1,76 @@
 import {
 	Color
-} from '../../../build/three.module.js';
-import { Pass } from '../postprocessing/Pass.js';
+} from 'three';
+import { Pass } from './Pass.js';
 
-var ClearPass = function ( clearColor, clearAlpha ) {
+/**
+ * This class can be used to force a clear operation for the current read or
+ * default framebuffer (when rendering to screen).
+ *
+ * ```js
+ * const clearPass = new ClearPass();
+ * composer.addPass( clearPass );
+ * ```
+ *
+ * @augments Pass
+ * @three_import import { ClearPass } from 'three/addons/postprocessing/ClearPass.js';
+ */
+class ClearPass extends Pass {
 
-	Pass.call( this );
+	/**
+	 * Constructs a new clear pass.
+	 *
+	 * @param {(number|Color|string)} [clearColor=0x000000] - The clear color.
+	 * @param {number} [clearAlpha=0] - The clear alpha.
+	 */
+	constructor( clearColor = 0x000000, clearAlpha = 0 ) {
 
-	this.needsSwap = false;
+		super();
 
-	this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
-	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
-	this._oldClearColor = new Color();
+		/**
+		 * Overwritten to disable the swap.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.needsSwap = false;
 
-};
+		/**
+		 * The clear color.
+		 *
+		 * @type {(number|Color|string)}
+		 * @default 0x000000
+		 */
+		this.clearColor = clearColor;
 
-ClearPass.prototype = Object.assign( Object.create( Pass.prototype ), {
+		/**
+		 * The clear alpha.
+		 *
+		 * @type {number}
+		 * @default 0
+		 */
+		this.clearAlpha = clearAlpha;
 
-	constructor: ClearPass,
+		// internals
 
-	render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
+		this._oldClearColor = new Color();
 
-		var oldClearAlpha;
+	}
+
+	/**
+	 * Performs the clear operation. This affects the current read or the default framebuffer.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {WebGLRenderTarget} writeBuffer - The write buffer. This buffer is intended as the rendering
+	 * destination for the pass.
+	 * @param {WebGLRenderTarget} readBuffer - The read buffer. The pass can access the result from the
+	 * previous pass from this buffer.
+	 * @param {number} deltaTime - The delta time in seconds.
+	 * @param {boolean} maskActive - Whether masking is active or not.
+	 */
+	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
+
+		let oldClearAlpha;
 
 		if ( this.clearColor ) {
 
@@ -43,6 +92,6 @@ ClearPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 	}
 
-} );
+}
 
 export { ClearPass };

@@ -6,41 +6,173 @@ import {
 	Object3D,
 	TextureLoader,
 	UVMapping,
-	sRGBEncoding
-} from '../../../build/three.module.js';
+	SRGBColorSpace
+} from 'three';
 import { MD2Loader } from '../loaders/MD2Loader.js';
 
-var MD2Character = function () {
+/**
+ * This class represents a management component for animated MD2
+ * character assets.
+ *
+ * @three_import import { MD2Character } from 'three/addons/misc/MD2Character.js';
+ */
+class MD2Character {
 
-	var scope = this;
+	/**
+	 * Constructs a new MD2 character.
+	 */
+	constructor() {
 
-	this.scale = 1;
-	this.animationFPS = 6;
+		/**
+		 * The mesh scale.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.scale = 1;
 
-	this.root = new Object3D();
+		/**
+		 * The FPS
+		 *
+		 * @type {number}
+		 * @default 6
+		 */
+		this.animationFPS = 6;
 
-	this.meshBody = null;
-	this.meshWeapon = null;
+		/**
+		 * The root 3D object
+		 *
+		 * @type {Object3D}
+		 */
+		this.root = new Object3D();
 
-	this.skinsBody = [];
-	this.skinsWeapon = [];
+		/**
+		 * The body mesh.
+		 *
+		 * @type {?Mesh}
+		 * @default null
+		 */
+		this.meshBody = null;
 
-	this.weapons = [];
+		/**
+		 * The weapon mesh.
+		 *
+		 * @type {?Mesh}
+		 * @default null
+		 */
+		this.meshWeapon = null;
 
-	this.activeAnimation = null;
+		/**
+		 * The body skins.
+		 *
+		 * @type {Array<Texture>}
+		 */
+		this.skinsBody = [];
 
-	this.mixer = null;
+		/**
+		 * The weapon skins.
+		 *
+		 * @type {Array<Texture>}
+		 */
+		this.skinsWeapon = [];
 
-	this.onLoadComplete = function () {};
+		/**
+		 * The weapon meshes.
+		 *
+		 * @type {Array<Mesh>}
+		 */
+		this.weapons = [];
 
-	this.loadCounter = 0;
+		/**
+		 * The name of the active animation clip.
+		 *
+		 * @type {?string}
+		 * @default null
+		 */
+		this.activeAnimationClipName = null;
 
-	this.loadParts = function ( config ) {
+		/**
+		 * The animation mixer.
+		 *
+		 * @type {?AnimationMixer}
+		 * @default null
+		 */
+		this.mixer = null;
+
+		/**
+		 * The `onLoad` callback function.
+		 *
+		 * @type {Function}
+		 */
+		this.onLoadComplete = function () {};
+
+		// internal
+
+		this.loadCounter = 0;
+
+	}
+
+	/**
+	 * Loads the character model for the given config.
+	 *
+	 * @param {Object} config - The config which defines the model and textures paths.
+	 */
+	loadParts( config ) {
+
+		const scope = this;
+
+		function createPart( geometry, skinMap ) {
+
+			const materialWireframe = new MeshLambertMaterial( { color: 0xffaa00, wireframe: true } );
+			const materialTexture = new MeshLambertMaterial( { color: 0xffffff, wireframe: false, map: skinMap } );
+
+			//
+
+			const mesh = new Mesh( geometry, materialTexture );
+			mesh.rotation.y = - Math.PI / 2;
+
+			mesh.castShadow = true;
+			mesh.receiveShadow = true;
+
+			//
+
+			mesh.materialTexture = materialTexture;
+			mesh.materialWireframe = materialWireframe;
+
+			return mesh;
+
+		}
+
+		function loadTextures( baseUrl, textureUrls ) {
+
+			const textureLoader = new TextureLoader();
+			const textures = [];
+
+			for ( let i = 0; i < textureUrls.length; i ++ ) {
+
+				textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], checkLoadingComplete );
+				textures[ i ].mapping = UVMapping;
+				textures[ i ].name = textureUrls[ i ];
+				textures[ i ].colorSpace = SRGBColorSpace;
+
+			}
+
+			return textures;
+
+		}
+
+		function checkLoadingComplete() {
+
+			scope.loadCounter -= 1;
+
+			if ( scope.loadCounter === 0 ) scope.onLoadComplete();
+
+		}
 
 		this.loadCounter = config.weapons.length * 2 + config.skins.length + 1;
 
-		var weaponsTextures = [];
-		for ( var i = 0; i < config.weapons.length; i ++ ) weaponsTextures[ i ] = config.weapons[ i ][ 1 ];
+		const weaponsTextures = [];
+		for ( let i = 0; i < config.weapons.length; i ++ ) weaponsTextures[ i ] = config.weapons[ i ][ 1 ];
 		// SKINS
 
 		this.skinsBody = loadTextures( config.baseUrl + 'skins/', config.skins );
@@ -48,16 +180,16 @@ var MD2Character = function () {
 
 		// BODY
 
-		var loader = new MD2Loader();
+		const loader = new MD2Loader();
 
 		loader.load( config.baseUrl + config.body, function ( geo ) {
 
-			var boundingBox = new Box3();
+			const boundingBox = new Box3();
 			boundingBox.setFromBufferAttribute( geo.attributes.position );
 
 			scope.root.position.y = - scope.scale * boundingBox.min.y;
 
-			var mesh = createPart( geo, scope.skinsBody[ 0 ] );
+			const mesh = createPart( geo, scope.skinsBody[ 0 ] );
 			mesh.scale.set( scope.scale, scope.scale, scope.scale );
 
 			scope.root.add( mesh );
@@ -75,11 +207,11 @@ var MD2Character = function () {
 
 		// WEAPONS
 
-		var generateCallback = function ( index, name ) {
+		const generateCallback = function ( index, name ) {
 
 			return function ( geo ) {
 
-				var mesh = createPart( geo, scope.skinsWeapon[ index ] );
+				const mesh = createPart( geo, scope.skinsWeapon[ index ] );
 				mesh.scale.set( scope.scale, scope.scale, scope.scale );
 				mesh.visible = false;
 
@@ -96,15 +228,20 @@ var MD2Character = function () {
 
 		};
 
-		for ( var i = 0; i < config.weapons.length; i ++ ) {
+		for ( let i = 0; i < config.weapons.length; i ++ ) {
 
 			loader.load( config.baseUrl + config.weapons[ i ][ 0 ], generateCallback( i, config.weapons[ i ][ 0 ] ) );
 
 		}
 
-	};
+	}
 
-	this.setPlaybackRate = function ( rate ) {
+	/**
+	 * Sets the animation playback rate.
+	 *
+	 * @param {number} rate - The playback rate to set.
+	 */
+	setPlaybackRate( rate ) {
 
 		if ( rate !== 0 ) {
 
@@ -116,9 +253,14 @@ var MD2Character = function () {
 
 		}
 
-	};
+	}
 
-	this.setWireframe = function ( wireframeEnabled ) {
+	/**
+	 * Sets the wireframe material flag.
+	 *
+	 * @param {boolean} wireframeEnabled - Whether to enable wireframe rendering or not.
+	 */
+	setWireframe( wireframeEnabled ) {
 
 		if ( wireframeEnabled ) {
 
@@ -132,9 +274,15 @@ var MD2Character = function () {
 
 		}
 
-	};
+	}
 
-	this.setSkin = function ( index ) {
+	/**
+	 * Sets the skin defined by the given skin index. This will result in a different texture
+	 * for the body mesh.
+	 *
+	 * @param {number} index - The skin index.
+	 */
+	setSkin( index ) {
 
 		if ( this.meshBody && this.meshBody.material.wireframe === false ) {
 
@@ -142,26 +290,37 @@ var MD2Character = function () {
 
 		}
 
-	};
+	}
 
-	this.setWeapon = function ( index ) {
+	/**
+	 * Sets the weapon defined by the given weapon index. This will result in a different weapon
+	 * hold by the character.
+	 *
+	 * @param {number} index - The weapon index.
+	 */
+	setWeapon( index ) {
 
-		for ( var i = 0; i < this.weapons.length; i ++ ) this.weapons[ i ].visible = false;
+		for ( let i = 0; i < this.weapons.length; i ++ ) this.weapons[ i ].visible = false;
 
-		var activeWeapon = this.weapons[ index ];
+		const activeWeapon = this.weapons[ index ];
 
 		if ( activeWeapon ) {
 
 			activeWeapon.visible = true;
 			this.meshWeapon = activeWeapon;
 
-			scope.syncWeaponAnimation();
+			this.syncWeaponAnimation();
 
 		}
 
-	};
+	}
 
-	this.setAnimation = function ( clipName ) {
+	/**
+	 * Sets the defined animation clip as the active animation.
+	 *
+	 * @param {string} clipName - The name of the animation clip.
+	 */
+	setAnimation( clipName ) {
 
 		if ( this.meshBody ) {
 
@@ -172,7 +331,7 @@ var MD2Character = function () {
 
 			}
 
-			var action = this.mixer.clipAction( clipName, this.meshBody );
+			const action = this.mixer.clipAction( clipName, this.meshBody );
 
 			if ( action ) {
 
@@ -182,17 +341,20 @@ var MD2Character = function () {
 
 		}
 
-		scope.activeClipName = clipName;
+		this.activeClipName = clipName;
 
-		scope.syncWeaponAnimation();
+		this.syncWeaponAnimation();
 
-	};
+	}
 
-	this.syncWeaponAnimation = function () {
+	/**
+	 * Synchronizes the weapon with the body animation.
+	 */
+	syncWeaponAnimation() {
 
-		var clipName = scope.activeClipName;
+		const clipName = this.activeClipName;
 
-		if ( scope.meshWeapon ) {
+		if ( this.meshWeapon ) {
 
 			if ( this.meshWeapon.activeAction ) {
 
@@ -201,7 +363,7 @@ var MD2Character = function () {
 
 			}
 
-			var action = this.mixer.clipAction( clipName, this.meshWeapon );
+			const action = this.mixer.clipAction( clipName, this.meshWeapon );
 
 			if ( action ) {
 
@@ -211,62 +373,19 @@ var MD2Character = function () {
 
 		}
 
-	};
+	}
 
-	this.update = function ( delta ) {
+	/**
+	 * Updates the animations of the mesh. Must be called inside the animation loop.
+	 *
+	 * @param {number} delta - The delta time in seconds.
+	 */
+	update( delta ) {
 
 		if ( this.mixer ) this.mixer.update( delta );
 
-	};
-
-	function loadTextures( baseUrl, textureUrls ) {
-
-		var textureLoader = new TextureLoader();
-		var textures = [];
-
-		for ( var i = 0; i < textureUrls.length; i ++ ) {
-
-			textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], checkLoadingComplete );
-			textures[ i ].mapping = UVMapping;
-			textures[ i ].name = textureUrls[ i ];
-			textures[ i ].encoding = sRGBEncoding;
-
-		}
-
-		return textures;
-
 	}
 
-	function createPart( geometry, skinMap ) {
-
-		var materialWireframe = new MeshLambertMaterial( { color: 0xffaa00, wireframe: true, morphTargets: true, morphNormals: true } );
-		var materialTexture = new MeshLambertMaterial( { color: 0xffffff, wireframe: false, map: skinMap, morphTargets: true, morphNormals: true } );
-
-		//
-
-		var mesh = new Mesh( geometry, materialTexture );
-		mesh.rotation.y = - Math.PI / 2;
-
-		mesh.castShadow = true;
-		mesh.receiveShadow = true;
-
-		//
-
-		mesh.materialTexture = materialTexture;
-		mesh.materialWireframe = materialWireframe;
-
-		return mesh;
-
-	}
-
-	function checkLoadingComplete() {
-
-		scope.loadCounter -= 1;
-
-		if ( scope.loadCounter === 0 ) scope.onLoadComplete();
-
-	}
-
-};
+}
 
 export { MD2Character };

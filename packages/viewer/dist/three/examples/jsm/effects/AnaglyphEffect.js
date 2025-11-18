@@ -1,167 +1,179 @@
 import {
 	LinearFilter,
 	Matrix3,
-	Mesh,
 	NearestFilter,
-	OrthographicCamera,
-	PlaneGeometry,
 	RGBAFormat,
-	Scene,
 	ShaderMaterial,
 	StereoCamera,
 	WebGLRenderTarget
-} from '../../../build/three.module.js';
+} from 'three';
+import { FullScreenQuad } from '../postprocessing/Pass.js';
 
-var AnaglyphEffect = function ( renderer, width, height ) {
+/**
+ * A class that creates an anaglyph effect.
+ *
+ * Note that this class can only be used with {@link WebGLRenderer}.
+ * When using {@link WebGPURenderer}, use {@link AnaglyphPassNode}.
+ *
+ * @three_import import { AnaglyphEffect } from 'three/addons/effects/AnaglyphEffect.js';
+ */
+class AnaglyphEffect {
 
-	// Dubois matrices from https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.7.6968&rep=rep1&type=pdf#page=4
+	/**
+	 * Constructs a new anaglyph effect.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {number} width - The width of the effect in physical pixels.
+	 * @param {number} height - The height of the effect in physical pixels.
+	 */
+	constructor( renderer, width = 512, height = 512 ) {
 
-	this.colorMatrixLeft = new Matrix3().fromArray( [
-		0.456100, - 0.0400822, - 0.0152161,
-		0.500484, - 0.0378246, - 0.0205971,
-		0.176381, - 0.0157589, - 0.00546856
-	] );
+		// Dubois matrices from https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.7.6968&rep=rep1&type=pdf#page=4
 
-	this.colorMatrixRight = new Matrix3().fromArray( [
-		- 0.0434706, 0.378476, - 0.0721527,
-		- 0.0879388, 0.73364, - 0.112961,
-		- 0.00155529, - 0.0184503, 1.2264
-	] );
+		this.colorMatrixLeft = new Matrix3().fromArray( [
+			0.456100, - 0.0400822, - 0.0152161,
+			0.500484, - 0.0378246, - 0.0205971,
+			0.176381, - 0.0157589, - 0.00546856
+		] );
 
-	var _camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+		this.colorMatrixRight = new Matrix3().fromArray( [
+			- 0.0434706, 0.378476, - 0.0721527,
+			- 0.0879388, 0.73364, - 0.112961,
+			- 0.00155529, - 0.0184503, 1.2264
+		] );
 
-	var _scene = new Scene();
+		const _stereo = new StereoCamera();
 
-	var _stereo = new StereoCamera();
+		const _params = { minFilter: LinearFilter, magFilter: NearestFilter, format: RGBAFormat };
 
-	var _params = { minFilter: LinearFilter, magFilter: NearestFilter, format: RGBAFormat };
+		const _renderTargetL = new WebGLRenderTarget( width, height, _params );
+		const _renderTargetR = new WebGLRenderTarget( width, height, _params );
 
-	if ( width === undefined ) width = 512;
-	if ( height === undefined ) height = 512;
+		const _material = new ShaderMaterial( {
 
-	var _renderTargetL = new WebGLRenderTarget( width, height, _params );
-	var _renderTargetR = new WebGLRenderTarget( width, height, _params );
+			uniforms: {
 
-	var _material = new ShaderMaterial( {
+				'mapLeft': { value: _renderTargetL.texture },
+				'mapRight': { value: _renderTargetR.texture },
 
-		uniforms: {
+				'colorMatrixLeft': { value: this.colorMatrixLeft },
+				'colorMatrixRight': { value: this.colorMatrixRight }
 
-			'mapLeft': { value: _renderTargetL.texture },
-			'mapRight': { value: _renderTargetR.texture },
+			},
 
-			'colorMatrixLeft': { value: this.colorMatrixLeft },
-			'colorMatrixRight': { value: this.colorMatrixRight }
+			vertexShader: [
 
-		},
+				'varying vec2 vUv;',
 
-		vertexShader: [
+				'void main() {',
 
-			'varying vec2 vUv;',
+				'	vUv = vec2( uv.x, uv.y );',
+				'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 
-			'void main() {',
+				'}'
 
-			'	vUv = vec2( uv.x, uv.y );',
-			'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+			].join( '\n' ),
 
-			'}'
+			fragmentShader: [
 
-		].join( '\n' ),
+				'uniform sampler2D mapLeft;',
+				'uniform sampler2D mapRight;',
+				'varying vec2 vUv;',
 
-		fragmentShader: [
+				'uniform mat3 colorMatrixLeft;',
+				'uniform mat3 colorMatrixRight;',
 
-			'uniform sampler2D mapLeft;',
-			'uniform sampler2D mapRight;',
-			'varying vec2 vUv;',
+				'void main() {',
 
-			'uniform mat3 colorMatrixLeft;',
-			'uniform mat3 colorMatrixRight;',
+				'	vec2 uv = vUv;',
 
-			// These functions implement sRGB linearization and gamma correction
+				'	vec4 colorL = texture2D( mapLeft, uv );',
+				'	vec4 colorR = texture2D( mapRight, uv );',
 
-			'float lin( float c ) {',
-			'	return c <= 0.04045 ? c * 0.0773993808 :',
-			'			pow( c * 0.9478672986 + 0.0521327014, 2.4 );',
-			'}',
+				'	vec3 color = clamp(',
+				'			colorMatrixLeft * colorL.rgb +',
+				'			colorMatrixRight * colorR.rgb, 0., 1. );',
 
-			'vec4 lin( vec4 c ) {',
-			'	return vec4( lin( c.r ), lin( c.g ), lin( c.b ), c.a );',
-			'}',
+				'	gl_FragColor = vec4(',
+				'			color.r, color.g, color.b,',
+				'			max( colorL.a, colorR.a ) );',
 
-			'float dev( float c ) {',
-			'	return c <= 0.0031308 ? c * 12.92',
-			'			: pow( c, 0.41666 ) * 1.055 - 0.055;',
-			'}',
+				'	#include <tonemapping_fragment>',
+				'	#include <colorspace_fragment>',
 
+				'}'
 
-			'void main() {',
+			].join( '\n' )
 
-			'	vec2 uv = vUv;',
+		} );
 
-			'	vec4 colorL = lin( texture2D( mapLeft, uv ) );',
-			'	vec4 colorR = lin( texture2D( mapRight, uv ) );',
+		const _quad = new FullScreenQuad( _material );
 
-			'	vec3 color = clamp(',
-			'			colorMatrixLeft * colorL.rgb +',
-			'			colorMatrixRight * colorR.rgb, 0., 1. );',
+		/**
+		 * Resizes the effect.
+		 *
+		 * @param {number} width - The width of the effect in logical pixels.
+		 * @param {number} height - The height of the effect in logical pixels.
+		 */
+		this.setSize = function ( width, height ) {
 
-			'	gl_FragColor = vec4(',
-			'			dev( color.r ), dev( color.g ), dev( color.b ),',
-			'			max( colorL.a, colorR.a ) );',
+			renderer.setSize( width, height );
 
-			'}'
+			const pixelRatio = renderer.getPixelRatio();
 
-		].join( '\n' )
+			_renderTargetL.setSize( width * pixelRatio, height * pixelRatio );
+			_renderTargetR.setSize( width * pixelRatio, height * pixelRatio );
 
-	} );
+		};
 
-	var _mesh = new Mesh( new PlaneGeometry( 2, 2 ), _material );
-	_scene.add( _mesh );
+		/**
+		 * When using this effect, this method should be called instead of the
+		 * default {@link WebGLRenderer#render}.
+		 *
+		 * @param {Object3D} scene - The scene to render.
+		 * @param {Camera} camera - The camera.
+		 */
+		this.render = function ( scene, camera ) {
 
-	this.setSize = function ( width, height ) {
+			const currentRenderTarget = renderer.getRenderTarget();
 
-		renderer.setSize( width, height );
+			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
-		var pixelRatio = renderer.getPixelRatio();
+			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
-		_renderTargetL.setSize( width * pixelRatio, height * pixelRatio );
-		_renderTargetR.setSize( width * pixelRatio, height * pixelRatio );
+			_stereo.update( camera );
 
-	};
+			renderer.setRenderTarget( _renderTargetL );
+			renderer.clear();
+			renderer.render( scene, _stereo.cameraL );
 
-	this.render = function ( scene, camera ) {
+			renderer.setRenderTarget( _renderTargetR );
+			renderer.clear();
+			renderer.render( scene, _stereo.cameraR );
 
-		var currentRenderTarget = renderer.getRenderTarget();
+			renderer.setRenderTarget( null );
+			_quad.render( renderer );
 
-		scene.updateMatrixWorld();
+			renderer.setRenderTarget( currentRenderTarget );
 
-		if ( camera.parent === null ) camera.updateMatrixWorld();
+		};
 
-		_stereo.update( camera );
+		/**
+		 * Frees internal resources. This method should be called
+		 * when the effect is no longer required.
+		 */
+		this.dispose = function () {
 
-		renderer.setRenderTarget( _renderTargetL );
-		renderer.clear();
-		renderer.render( scene, _stereo.cameraL );
+			_renderTargetL.dispose();
+			_renderTargetR.dispose();
 
-		renderer.setRenderTarget( _renderTargetR );
-		renderer.clear();
-		renderer.render( scene, _stereo.cameraR );
+			_material.dispose();
+			_quad.dispose();
 
-		renderer.setRenderTarget( null );
-		renderer.render( _scene, _camera );
+		};
 
-		renderer.setRenderTarget( currentRenderTarget );
+	}
 
-	};
-
-	this.dispose = function () {
-
-		if ( _renderTargetL ) _renderTargetL.dispose();
-		if ( _renderTargetR ) _renderTargetR.dispose();
-		if ( _mesh ) _mesh.geometry.dispose();
-		if ( _material ) _material.dispose();
-
-	};
-
-};
+}
 
 export { AnaglyphEffect };

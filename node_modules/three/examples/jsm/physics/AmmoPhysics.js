@@ -1,3 +1,19 @@
+/**
+ * @classdesc Can be used to include Ammo.js as a Physics engine into
+ * `three.js` apps. Make sure to include `ammo.wasm.js` first:
+ * ```
+ * <script src="jsm/libs/ammo.wasm.js"></script>
+ * ```
+ * It is then possible to initialize the API via:
+ * ```js
+ * const physics = await AmmoPhysics();
+ * ```
+ *
+ * @name AmmoPhysics
+ * @class
+ * @hideconstructor
+ * @three_import import { AmmoPhysics } from 'three/addons/physics/AmmoPhysics.js';
+ */
 async function AmmoPhysics() {
 
 	if ( 'Ammo' in window === false ) {
@@ -56,6 +72,26 @@ async function AmmoPhysics() {
 
 	const meshes = [];
 	const meshMap = new WeakMap();
+
+	function addScene( scene ) {
+
+		scene.traverse( function ( child ) {
+
+			if ( child.isMesh ) {
+
+				const physics = child.userData.physics;
+
+				if ( physics ) {
+
+					addMesh( child, physics.mass );
+
+				}
+
+			}
+
+		} );
+
+	}
 
 	function addMesh( mesh, mass = 0 ) {
 
@@ -137,7 +173,6 @@ async function AmmoPhysics() {
 
 		if ( mass > 0 ) {
 
-			mesh.instanceMatrix.setUsage( 35048 ); // THREE.DynamicDrawUsage = 35048
 			meshes.push( mesh );
 
 			meshMap.set( mesh, bodies );
@@ -189,56 +224,55 @@ async function AmmoPhysics() {
 
 			const delta = ( time - lastTime ) / 1000;
 
-			// console.time( 'world.step' );
 			world.stepSimulation( delta, 10 );
-			// console.timeEnd( 'world.step' );
 
-		}
+			//
 
-		lastTime = time;
+			for ( let i = 0, l = meshes.length; i < l; i ++ ) {
 
-		//
+				const mesh = meshes[ i ];
 
-		for ( let i = 0, l = meshes.length; i < l; i ++ ) {
+				if ( mesh.isInstancedMesh ) {
 
-			const mesh = meshes[ i ];
+					const array = mesh.instanceMatrix.array;
+					const bodies = meshMap.get( mesh );
 
-			if ( mesh.isInstancedMesh ) {
+					for ( let j = 0; j < bodies.length; j ++ ) {
 
-				const array = mesh.instanceMatrix.array;
-				const bodies = meshMap.get( mesh );
+						const body = bodies[ j ];
 
-				for ( let j = 0; j < bodies.length; j ++ ) {
+						const motionState = body.getMotionState();
+						motionState.getWorldTransform( worldTransform );
 
-					const body = bodies[ j ];
+						const position = worldTransform.getOrigin();
+						const quaternion = worldTransform.getRotation();
+
+						compose( position, quaternion, array, j * 16 );
+
+					}
+
+					mesh.instanceMatrix.needsUpdate = true;
+					mesh.computeBoundingSphere();
+
+				} else if ( mesh.isMesh ) {
+
+					const body = meshMap.get( mesh );
 
 					const motionState = body.getMotionState();
 					motionState.getWorldTransform( worldTransform );
 
 					const position = worldTransform.getOrigin();
 					const quaternion = worldTransform.getRotation();
-
-					compose( position, quaternion, array, j * 16 );
+					mesh.position.set( position.x(), position.y(), position.z() );
+					mesh.quaternion.set( quaternion.x(), quaternion.y(), quaternion.z(), quaternion.w() );
 
 				}
-
-				mesh.instanceMatrix.needsUpdate = true;
-
-			} else if ( mesh.isMesh ) {
-
-				const body = meshMap.get( mesh );
-
-				const motionState = body.getMotionState();
-				motionState.getWorldTransform( worldTransform );
-
-				const position = worldTransform.getOrigin();
-				const quaternion = worldTransform.getRotation();
-				mesh.position.set( position.x(), position.y(), position.z() );
-				mesh.quaternion.set( quaternion.x(), quaternion.y(), quaternion.z(), quaternion.w() );
 
 			}
 
 		}
+
+		lastTime = time;
 
 	}
 
@@ -247,7 +281,40 @@ async function AmmoPhysics() {
 	setInterval( step, 1000 / frameRate );
 
 	return {
+		/**
+		 * Adds the given scene to this physics simulation. Only meshes with a
+		 * `physics` object in their {@link Object3D#userData} field will be honored.
+		 * The object can be used to store the mass of the mesh. E.g.:
+		 * ```js
+		 * box.userData.physics = { mass: 1 };
+		 * ```
+		 *
+		 * @method
+		 * @name AmmoPhysics#addScene
+		 * @param {Object3D} scene The scene or any type of 3D object to add.
+		 */
+		addScene: addScene,
+
+		/**
+		 * Adds the given mesh to this physics simulation.
+		 *
+		 * @method
+		 * @name AmmoPhysics#addMesh
+		 * @param {Mesh} mesh The mesh to add.
+		 * @param {number} [mass=0] The mass in kg of the mesh.
+		 */
 		addMesh: addMesh,
+
+		/**
+		 * Set the position of the given mesh which is part of the physics simulation. Calling this
+		 * method will reset the current simulated velocity of the mesh.
+		 *
+		 * @method
+		 * @name AmmoPhysics#setMeshPosition
+		 * @param {Mesh} mesh The mesh to update the position for.
+		 * @param {Vector3} position - The new position.
+		 * @param {number} [index=0] - If the mesh is instanced, the index represents the instanced ID.
+		 */
 		setMeshPosition: setMeshPosition
 		// addCompoundMesh
 	};

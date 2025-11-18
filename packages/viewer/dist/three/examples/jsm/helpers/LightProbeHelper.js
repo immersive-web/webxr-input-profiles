@@ -2,130 +2,164 @@ import {
 	Mesh,
 	ShaderMaterial,
 	SphereGeometry
-} from '../../../build/three.module.js';
+} from 'three';
 
-function LightProbeHelper( lightProbe, size ) {
+/**
+ * Renders a sphere to visualize a light probe in the scene.
+ *
+ * This helper can only be used with {@link WebGLRenderer}.
+ * When using {@link WebGPURenderer}, import from `LightProbeHelperGPU.js`.
+ *
+ * ```js
+ * const helper = new LightProbeHelper( lightProbe );
+ * scene.add( helper );
+ * ```
+ *
+ * @augments Mesh
+ * @three_import import { LightProbeHelper } from 'three/addons/helpers/LightProbeHelper.js';
+ */
+class LightProbeHelper extends Mesh {
 
-	this.lightProbe = lightProbe;
+	/**
+	 * Constructs a new light probe helper.
+	 *
+	 * @param {LightProbe} lightProbe - The light probe to visualize.
+	 * @param {number} [size=1] - The size of the helper.
+	 */
+	constructor( lightProbe, size = 1 ) {
 
-	this.size = size;
+		const material = new ShaderMaterial( {
 
-	var material = new ShaderMaterial( {
+			type: 'LightProbeHelperMaterial',
 
-		type: 'LightProbeHelperMaterial',
+			uniforms: {
 
-		uniforms: {
+				sh: { value: lightProbe.sh.coefficients }, // by reference
 
-			sh: { value: this.lightProbe.sh.coefficients }, // by reference
+				intensity: { value: lightProbe.intensity }
 
-			intensity: { value: this.lightProbe.intensity }
+			},
 
-		},
+			vertexShader: /* glsl */`
 
-		vertexShader: [
+				varying vec3 vNormal;
 
-			'varying vec3 vNormal;',
+				void main() {
 
-			'void main() {',
+					vNormal = normalize( normalMatrix * normal );
 
-			'	vNormal = normalize( normalMatrix * normal );',
+					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-			'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+				}
 
-			'}',
+			`,
 
-		].join( '\n' ),
+			fragmentShader: /* glsl */`
 
-		fragmentShader: [
+				#define RECIPROCAL_PI 0.318309886
 
-			'#define RECIPROCAL_PI 0.318309886',
+				vec3 inverseTransformDirection( in vec3 normal, in mat4 matrix ) {
 
-			'vec3 inverseTransformDirection( in vec3 normal, in mat4 matrix ) {',
+					// matrix is assumed to be orthogonal
 
-			'	// matrix is assumed to be orthogonal',
+					return normalize( ( vec4( normal, 0.0 ) * matrix ).xyz );
 
-			'	return normalize( ( vec4( normal, 0.0 ) * matrix ).xyz );',
+				}
 
-			'}',
+				// source: https://graphics.stanford.edu/papers/envmap/envmap.pdf,
+				vec3 shGetIrradianceAt( in vec3 normal, in vec3 shCoefficients[ 9 ] ) {
 
-			'// source: https://graphics.stanford.edu/papers/envmap/envmap.pdf',
-			'vec3 shGetIrradianceAt( in vec3 normal, in vec3 shCoefficients[ 9 ] ) {',
+					// normal is assumed to have unit length,
 
-			'	// normal is assumed to have unit length',
+					float x = normal.x, y = normal.y, z = normal.z;
 
-			'	float x = normal.x, y = normal.y, z = normal.z;',
+					// band 0,
+					vec3 result = shCoefficients[ 0 ] * 0.886227;
 
-			'	// band 0',
-			'	vec3 result = shCoefficients[ 0 ] * 0.886227;',
+					// band 1,
+					result += shCoefficients[ 1 ] * 2.0 * 0.511664 * y;
+					result += shCoefficients[ 2 ] * 2.0 * 0.511664 * z;
+					result += shCoefficients[ 3 ] * 2.0 * 0.511664 * x;
 
-			'	// band 1',
-			'	result += shCoefficients[ 1 ] * 2.0 * 0.511664 * y;',
-			'	result += shCoefficients[ 2 ] * 2.0 * 0.511664 * z;',
-			'	result += shCoefficients[ 3 ] * 2.0 * 0.511664 * x;',
+					// band 2,
+					result += shCoefficients[ 4 ] * 2.0 * 0.429043 * x * y;
+					result += shCoefficients[ 5 ] * 2.0 * 0.429043 * y * z;
+					result += shCoefficients[ 6 ] * ( 0.743125 * z * z - 0.247708 );
+					result += shCoefficients[ 7 ] * 2.0 * 0.429043 * x * z;
+					result += shCoefficients[ 8 ] * 0.429043 * ( x * x - y * y );
+					return result;
 
-			'	// band 2',
-			'	result += shCoefficients[ 4 ] * 2.0 * 0.429043 * x * y;',
-			'	result += shCoefficients[ 5 ] * 2.0 * 0.429043 * y * z;',
-			'	result += shCoefficients[ 6 ] * ( 0.743125 * z * z - 0.247708 );',
-			'	result += shCoefficients[ 7 ] * 2.0 * 0.429043 * x * z;',
-			'	result += shCoefficients[ 8 ] * 0.429043 * ( x * x - y * y );',
+				}
 
-			'	return result;',
+				uniform vec3 sh[ 9 ]; // sh coefficients
 
-			'}',
+				uniform float intensity; // light probe intensity
 
-			'uniform vec3 sh[ 9 ]; // sh coefficients',
+				varying vec3 vNormal;
 
-			'uniform float intensity; // light probe intensity',
+				void main() {
 
-			'varying vec3 vNormal;',
+					vec3 normal = normalize( vNormal );
 
-			'void main() {',
+					vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );
 
-			'	vec3 normal = normalize( vNormal );',
+					vec3 irradiance = shGetIrradianceAt( worldNormal, sh );
 
-			'	vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );',
+					vec3 outgoingLight = RECIPROCAL_PI * irradiance * intensity;
 
-			'	vec3 irradiance = shGetIrradianceAt( worldNormal, sh );',
+					gl_FragColor = linearToOutputTexel( vec4( outgoingLight, 1.0 ) );
 
-			'	vec3 outgoingLight = RECIPROCAL_PI * irradiance * intensity;',
+				}
 
-			'	gl_FragColor = linearToOutputTexel( vec4( outgoingLight, 1.0 ) );',
+			`,
 
-			'}'
+		} );
 
-		].join( '\n' )
+		const geometry = new SphereGeometry( 1, 32, 16 );
 
-	} );
+		super( geometry, material );
 
-	var geometry = new SphereGeometry( 1, 32, 16 );
+		/**
+		 * The light probe to visualize.
+		 *
+		 * @type {LightProbe}
+		 */
+		this.lightProbe = lightProbe;
 
-	Mesh.call( this, geometry, material );
+		/**
+		 * The size of the helper.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.size = size;
+		this.type = 'LightProbeHelper';
 
-	this.type = 'LightProbeHelper';
+		this.onBeforeRender();
 
-	this.onBeforeRender();
+	}
+
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever this instance is no longer used in your app.
+	 */
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
+
+	}
+
+	onBeforeRender() {
+
+		this.position.copy( this.lightProbe.position );
+
+		this.scale.set( 1, 1, 1 ).multiplyScalar( this.size );
+
+		this.material.uniforms.intensity.value = this.lightProbe.intensity;
+
+	}
 
 }
-
-LightProbeHelper.prototype = Object.create( Mesh.prototype );
-LightProbeHelper.prototype.constructor = LightProbeHelper;
-
-LightProbeHelper.prototype.dispose = function () {
-
-	this.geometry.dispose();
-	this.material.dispose();
-
-};
-
-LightProbeHelper.prototype.onBeforeRender = function () {
-
-	this.position.copy( this.lightProbe.position );
-
-	this.scale.set( 1, 1, 1 ).multiplyScalar( this.size );
-
-	this.material.uniforms.intensity.value = this.lightProbe.intensity;
-
-};
 
 export { LightProbeHelper };

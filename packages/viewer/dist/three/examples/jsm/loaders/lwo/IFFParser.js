@@ -32,22 +32,19 @@
  *
  **/
 
-import { LoaderUtils } from '../../../../build/three.module.js';
 import { LWO2Parser } from './LWO2Parser.js';
 import { LWO3Parser } from './LWO3Parser.js';
 
-function IFFParser( ) {
+class IFFParser {
 
-	this.debugger = new Debugger();
-	// this.debugger.enable(); // un-comment to log IFF hierarchy.
+	constructor() {
 
-}
+		this.debugger = new Debugger();
+		// this.debugger.enable(); // un-comment to log IFF hierarchy.
 
-IFFParser.prototype = {
+	}
 
-	constructor: IFFParser,
-
-	parse: function ( buffer ) {
+	parse( buffer ) {
 
 		this.reader = new DataViewReader( buffer );
 
@@ -83,13 +80,13 @@ IFFParser.prototype = {
 
 		return this.tree;
 
-	},
+	}
 
 	parseTopForm() {
 
 		this.debugger.offset = this.reader.offset;
 
-		var topForm = this.reader.getIDTag();
+		const topForm = this.reader.getIDTag();
 
 		if ( topForm !== 'FORM' ) {
 
@@ -98,12 +95,12 @@ IFFParser.prototype = {
 
 		}
 
-		var length = this.reader.getUint32();
+		const length = this.reader.getUint32();
 
 		this.debugger.dataOffset = this.reader.offset;
 		this.debugger.length = length;
 
-		var type = this.reader.getIDTag();
+		const type = this.reader.getIDTag();
 
 		if ( type === 'LWO2' ) {
 
@@ -121,7 +118,7 @@ IFFParser.prototype = {
 
 		return;
 
-	},
+	}
 
 
 	///
@@ -132,7 +129,7 @@ IFFParser.prototype = {
 	// FORM ::= 'FORM'[ID4], length[U4], type[ID4], ( chunk[CHUNK] | form[FORM] ) * }
 	parseForm( length ) {
 
-		var type = this.reader.getIDTag();
+		const type = this.reader.getIDTag();
 
 		switch ( type ) {
 
@@ -307,7 +304,7 @@ IFFParser.prototype = {
 		this.debugger.nodeID = type;
 		this.debugger.log();
 
-	},
+	}
 
 	setupForm( type, length ) {
 
@@ -332,13 +329,13 @@ IFFParser.prototype = {
 		}
 
 
-	},
+	}
 
 	skipForm( length ) {
 
 		this.reader.skip( length - 4 );
 
-	},
+	}
 
 	parseUnknownForm( type, length ) {
 
@@ -347,15 +344,15 @@ IFFParser.prototype = {
 		printBuffer( this.reader.dv.buffer, this.reader.offset, length - 4 );
 		this.reader.skip( length - 4 );
 
-	},
+	}
 
 	parseSurfaceForm( length ) {
 
 		this.reader.skip( 8 ); // unknown Uint32 x2
 
-		var name = this.reader.getString();
+		const name = this.reader.getString();
 
-		var surface = {
+		const surface = {
 			attributes: {}, // LWO2 style non-node attributes will go here
 			connections: {},
 			name: name,
@@ -371,13 +368,13 @@ IFFParser.prototype = {
 		this.currentForm = surface;
 		this.currentFormEnd = this.reader.offset + length;
 
-	},
+	}
 
 	parseSurfaceLwo2( length ) {
 
-		var name = this.reader.getString();
+		const name = this.reader.getString();
 
-		var surface = {
+		const surface = {
 			attributes: {}, // LWO2 style non-node attributes will go here
 			connections: {},
 			name: name,
@@ -392,7 +389,7 @@ IFFParser.prototype = {
 		this.currentForm = surface;
 		this.currentFormEnd = this.reader.offset + length;
 
-	},
+	}
 
 	parseSubNode( length ) {
 
@@ -401,9 +398,9 @@ IFFParser.prototype = {
 		// some subnodes can be renamed, but Input and Surface cannot
 
 		this.reader.skip( 8 ); // NRNM + length
-		var name = this.reader.getString();
+		const name = this.reader.getString();
 
-		var node = {
+		const node = {
 			name: name
 		};
 		this.currentForm = node;
@@ -412,7 +409,7 @@ IFFParser.prototype = {
 		this.currentFormEnd = this.reader.offset + length;
 
 
-	},
+	}
 
 	// collect attributes from all nodes at the top level of a surface
 	parseConnections( length ) {
@@ -422,18 +419,18 @@ IFFParser.prototype = {
 
 		this.currentForm = this.currentSurface.connections;
 
-	},
+	}
 
 	// surface node attribute data, e.g. specular, roughness etc
 	parseEntryForm( length ) {
 
 		this.reader.skip( 8 ); // NAME + length
-		var name = this.reader.getString();
+		const name = this.reader.getString();
 		this.currentForm = this.currentNode.attributes;
 
 		this.setupForm( name, length );
 
-	},
+	}
 
 	// parse values from material - doesn't match up to other LWO3 data types
 	// sub form of entry form
@@ -441,7 +438,7 @@ IFFParser.prototype = {
 
 		this.reader.skip( 8 ); // unknown + length
 
-		var valueType = this.reader.getString();
+		const valueType = this.reader.getString();
 
 		if ( valueType === 'double' ) {
 
@@ -463,17 +460,17 @@ IFFParser.prototype = {
 
 		}
 
-	},
+	}
 
 	// holds various data about texture node image state
-	// Data other thanmipMapLevel unknown
+	// Data other than mipMapLevel unknown
 	parseImageStateForm() {
 
 		this.reader.skip( 8 ); // unknown
 
 		this.currentForm.mipMapLevel = this.reader.getFloat32();
 
-	},
+	}
 
 	// LWO2 style image data node OR LWO3 textures defined at top level in editor (not as SURF node)
 	parseImageMap( length ) {
@@ -483,13 +480,13 @@ IFFParser.prototype = {
 
 		if ( ! this.currentForm.maps ) this.currentForm.maps = [];
 
-		var map = {};
+		const map = {};
 		this.currentForm.maps.push( map );
 		this.currentForm = map;
 
 		this.reader.skip( 10 ); // unknown, could be an issue if it contains a VX
 
-	},
+	}
 
 	parseTextureNodeAttribute( type ) {
 
@@ -527,14 +524,14 @@ IFFParser.prototype = {
 		this.reader.skip( 2 ); // unknown
 
 
-	},
+	}
 
 	// ENVL forms are currently ignored
 	parseEnvelope( length ) {
 
 		this.reader.skip( length - 4 ); // skipping  entirely for now
 
-	},
+	}
 
 	///
 	// CHUNK PARSING METHODS
@@ -544,7 +541,7 @@ IFFParser.prototype = {
 	// level and they have a different format in each case
 	parseClip( length ) {
 
-		var tag = this.reader.getIDTag();
+		const tag = this.reader.getIDTag();
 
 		// inside surface node
 		if ( tag === 'FORM' ) {
@@ -565,26 +562,26 @@ IFFParser.prototype = {
 
 		this.reader.skip( 8 ); // unknown
 
-		var texture = {
+		const texture = {
 			index: this.reader.getUint32()
 		};
 		this.tree.textures.push( texture );
 		this.currentForm = texture;
 
-	},
+	}
 
 	parseClipLwo2( length ) {
 
-		var texture = {
+		const texture = {
 			index: this.reader.getUint32(),
 			fileName: ''
 		};
 
-		// seach STIL block
+		// search STIL block
 		while ( true ) {
 
-			var tag = this.reader.getIDTag();
-			var n_length = this.reader.getUint16();
+			const tag = this.reader.getIDTag();
+			const n_length = this.reader.getUint16();
 			if ( tag === 'STIL' ) {
 
 				texture.fileName = this.reader.getString();
@@ -603,29 +600,29 @@ IFFParser.prototype = {
 		this.tree.textures.push( texture );
 		this.currentForm = texture;
 
-	},
+	}
 
 	parseImage() {
 
 		this.reader.skip( 8 ); // unknown
 		this.currentForm.fileName = this.reader.getString();
 
-	},
+	}
 
 	parseXVAL( type, length ) {
 
-		var endOffset = this.reader.offset + length - 4;
+		const endOffset = this.reader.offset + length - 4;
 		this.reader.skip( 8 );
 
 		this.currentForm[ type ] = this.reader.getFloat32();
 
 		this.reader.setOffset( endOffset ); // set end offset directly to skip optional envelope
 
-	},
+	}
 
 	parseXVAL3( type, length ) {
 
-		var endOffset = this.reader.offset + length - 4;
+		const endOffset = this.reader.offset + length - 4;
 		this.reader.skip( 8 );
 
 		this.currentForm[ type ] = {
@@ -636,7 +633,7 @@ IFFParser.prototype = {
 
 		this.reader.setOffset( endOffset );
 
-	},
+	}
 
 	// Tags associated with an object
 	// OTAG { type[ID4], tag-string[S0] }
@@ -648,28 +645,31 @@ IFFParser.prototype = {
 			tagString: this.reader.getString()
 		};
 
-	},
+	}
 
 	// Signals the start of a new layer. All the data chunks which follow will be included in this layer until another layer chunk is encountered.
 	// LAYR: number[U2], flags[U2], pivot[VEC12], name[S0], parent[U2]
 	parseLayer( length ) {
 
-		var layer = {
-			number: this.reader.getUint16(),
-			flags: this.reader.getUint16(), // If the least significant bit of flags is set, the layer is hidden.
-			pivot: this.reader.getFloat32Array( 3 ), // Note: this seems to be superflous, as the geometry is translated when pivot is present
+		const number = this.reader.getUint16();
+		const flags = this.reader.getUint16(); // If the least significant bit of flags is set, the layer is hidden.
+		const pivot = this.reader.getFloat32Array( 3 ); // Note: this seems to be superfluous, as the geometry is translated when pivot is present
+		const layer = {
+			number: number,
+			flags: flags, // If the least significant bit of flags is set, the layer is hidden.
+			pivot: [ - pivot[ 0 ], pivot[ 1 ], pivot[ 2 ] ], // Note: this seems to be superfluous, as the geometry is translated when pivot is present
 			name: this.reader.getString(),
 		};
 
 		this.tree.layers.push( layer );
 		this.currentLayer = layer;
 
-		var parsedLength = 16 + stringOffset( this.currentLayer.name ); // index ( 2 ) + flags( 2 ) + pivot( 12 ) + stringlength
+		const parsedLength = 16 + stringOffset( this.currentLayer.name ); // index ( 2 ) + flags( 2 ) + pivot( 12 ) + stringlength
 
 		// if we have not reached then end of the layer block, there must be a parent defined
 		this.currentLayer.parent = ( parsedLength < length ) ? this.reader.getUint16() : - 1; // omitted or -1 for no parent
 
-	},
+	}
 
 	// VEC12 * ( F4 + F4 + F4 ) array of x,y,z vectors
 	// Converting from left to right handed coordinate system:
@@ -677,14 +677,14 @@ IFFParser.prototype = {
 	parsePoints( length ) {
 
 		this.currentPoints = [];
-		for ( var i = 0; i < length / 4; i += 3 ) {
+		for ( let i = 0; i < length / 4; i += 3 ) {
 
-			// z -> -z to match three.js right handed coords
-			this.currentPoints.push( this.reader.getFloat32(), this.reader.getFloat32(), - this.reader.getFloat32() );
+			// x -> -x to match three.js right handed coords
+			this.currentPoints.push( - this.reader.getFloat32(), this.reader.getFloat32(), this.reader.getFloat32() );
 
 		}
 
-	},
+	}
 
 	// parse VMAP or VMAD
 	// Associates a set of floating-point vectors with a set of points.
@@ -698,9 +698,9 @@ IFFParser.prototype = {
 	// VMAD { type[ID4], dimension[U2], name[S0], ( vert[VX], poly[VX], value[F4] # dimension ) * }
 	parseVertexMapping( length, discontinuous ) {
 
-		var finalOffset = this.reader.offset + length;
+		const finalOffset = this.reader.offset + length;
 
-		var channelName = this.reader.getString();
+		const channelName = this.reader.getString();
 
 		if ( this.reader.offset === finalOffset ) {
 
@@ -713,12 +713,12 @@ IFFParser.prototype = {
 		// otherwise reset to initial length and parse normal VMAP CHUNK
 		this.reader.setOffset( this.reader.offset - stringOffset( channelName ) );
 
-		var type = this.reader.getIDTag();
+		const type = this.reader.getIDTag();
 
 		this.reader.getUint16(); // dimension
-		var name = this.reader.getString();
+		const name = this.reader.getString();
 
-		var remainingLength = length - 6 - stringOffset( name );
+		const remainingLength = length - 6 - stringOffset( name );
 
 		switch ( type ) {
 
@@ -745,13 +745,13 @@ IFFParser.prototype = {
 
 		}
 
-	},
+	}
 
 	parseUVMapping( name, finalOffset, discontinuous ) {
 
-		var uvIndices = [];
-		var polyIndices = [];
-		var uvs = [];
+		const uvIndices = [];
+		const polyIndices = [];
+		const uvs = [];
 
 		while ( this.reader.offset < finalOffset ) {
 
@@ -784,12 +784,12 @@ IFFParser.prototype = {
 
 		}
 
-	},
+	}
 
 	parseMorphTargets( name, finalOffset, type ) {
 
-		var indices = [];
-		var points = [];
+		const indices = [];
+		const points = [];
 
 		type = ( type === 'MORF' ) ? 'relative' : 'absolute';
 
@@ -809,33 +809,33 @@ IFFParser.prototype = {
 			type: type,
 		};
 
-	},
+	}
 
 	// A list of polygons for the current layer.
 	// POLS { type[ID4], ( numvert+flags[U2], vert[VX] # numvert ) * }
 	parsePolygonList( length ) {
 
-		var finalOffset = this.reader.offset + length;
-		var type = this.reader.getIDTag();
+		const finalOffset = this.reader.offset + length;
+		const type = this.reader.getIDTag();
 
-		var indices = [];
+		const indices = [];
 
 		// hold a list of polygon sizes, to be split up later
-		var polygonDimensions = [];
+		const polygonDimensions = [];
 
 		while ( this.reader.offset < finalOffset ) {
 
-			var numverts = this.reader.getUint16();
+			let numverts = this.reader.getUint16();
 
-			//var flags = numverts & 64512; // 6 high order bits are flags - ignoring for now
+			//const flags = numverts & 64512; // 6 high order bits are flags - ignoring for now
 			numverts = numverts & 1023; // remaining ten low order bits are vertex num
 			polygonDimensions.push( numverts );
 
-			for ( var j = 0; j < numverts; j ++ ) indices.push( this.reader.getVariableLengthIndex() );
+			for ( let j = 0; j < numverts; j ++ ) indices.push( this.reader.getVariableLengthIndex() );
 
 		}
 
-		var geometryData = {
+		const geometryData = {
 			type: type,
 			vertexIndices: indices,
 			polygonDimensions: polygonDimensions,
@@ -848,7 +848,7 @@ IFFParser.prototype = {
 
 		this.currentLayer.geometry = geometryData;
 
-	},
+	}
 
 	// Lists the tag strings that can be associated with polygons by the PTAG chunk.
 	// TAGS { tag-string[S0] * }
@@ -856,14 +856,14 @@ IFFParser.prototype = {
 
 		this.tree.tags = this.reader.getStringArray( length );
 
-	},
+	}
 
 	// Associates tags of a given type with polygons in the most recent POLS chunk.
 	// PTAG { type[ID4], ( poly[VX], tag[U2] ) * }
 	parsePolygonTagMapping( length ) {
 
-		var finalOffset = this.reader.offset + length;
-		var type = this.reader.getIDTag();
+		const finalOffset = this.reader.offset + length;
+		const type = this.reader.getIDTag();
 		if ( type === 'SURF' ) this.parseMaterialIndices( finalOffset );
 		else { //PART, SMGP, COLR not supported
 
@@ -871,7 +871,7 @@ IFFParser.prototype = {
 
 		}
 
-	},
+	}
 
 	parseMaterialIndices( finalOffset ) {
 
@@ -880,14 +880,14 @@ IFFParser.prototype = {
 
 		while ( this.reader.offset < finalOffset ) {
 
-			var polygonIndex = this.reader.getVariableLengthIndex();
-			var materialIndex = this.reader.getUint16();
+			const polygonIndex = this.reader.getVariableLengthIndex();
+			const materialIndex = this.reader.getUint16();
 
 			this.currentLayer.geometry.materialIndices.push( polygonIndex, materialIndex );
 
 		}
 
-	},
+	}
 
 	parseUnknownCHUNK( blockID, length ) {
 
@@ -896,30 +896,31 @@ IFFParser.prototype = {
 		// print the chunk plus some bytes padding either side
 		// printBuffer( this.reader.dv.buffer, this.reader.offset - 20, length + 40 );
 
-		var data = this.reader.getString( length );
+		const data = this.reader.getString( length );
 
 		this.currentForm[ blockID ] = data;
 
 	}
 
-};
-
-function DataViewReader( buffer ) {
-
-	this.dv = new DataView( buffer );
-	this.offset = 0;
-
 }
 
-DataViewReader.prototype = {
 
-	constructor: DataViewReader,
+class DataViewReader {
 
-	size: function () {
+	constructor( buffer ) {
+
+		this.dv = new DataView( buffer );
+		this.offset = 0;
+		this._textDecoder = new TextDecoder();
+		this._bytes = new Uint8Array( buffer );
+
+	}
+
+	size() {
 
 		return this.dv.buffer.byteLength;
 
-	},
+	}
 
 	setOffset( offset ) {
 
@@ -933,76 +934,74 @@ DataViewReader.prototype = {
 
 		}
 
-	},
+	}
 
-	endOfFile: function () {
+	endOfFile() {
 
 		if ( this.offset >= this.size() ) return true;
 		return false;
 
-	},
+	}
 
-	skip: function ( length ) {
+	skip( length ) {
 
 		this.offset += length;
 
-	},
+	}
 
-	getUint8: function () {
+	getUint8() {
 
-		var value = this.dv.getUint8( this.offset );
+		const value = this.dv.getUint8( this.offset );
 		this.offset += 1;
 		return value;
 
-	},
+	}
 
-	getUint16: function () {
+	getUint16() {
 
-		var value = this.dv.getUint16( this.offset );
+		const value = this.dv.getUint16( this.offset );
 		this.offset += 2;
 		return value;
 
-	},
+	}
 
-	getInt32: function () {
+	getInt32() {
 
-		var value = this.dv.getInt32( this.offset, false );
+		const value = this.dv.getInt32( this.offset, false );
 		this.offset += 4;
 		return value;
 
-	},
+	}
 
-	getUint32: function () {
+	getUint32() {
 
-		var value = this.dv.getUint32( this.offset, false );
+		const value = this.dv.getUint32( this.offset, false );
 		this.offset += 4;
 		return value;
 
-	},
+	}
 
-	getUint64: function () {
+	getUint64() {
 
-		var low, high;
-
-		high = this.getUint32();
-		low = this.getUint32();
+		const low = this.getUint32();
+		const high = this.getUint32();
 		return high * 0x100000000 + low;
 
-	},
+	}
 
-	getFloat32: function () {
+	getFloat32() {
 
-		var value = this.dv.getFloat32( this.offset, false );
+		const value = this.dv.getFloat32( this.offset, false );
 		this.offset += 4;
 		return value;
 
-	},
+	}
 
-	getFloat32Array: function ( size ) {
+	getFloat32Array( size ) {
 
-		var a = [];
+		const a = [];
 
-		for ( var i = 0; i < size; i ++ ) {
+		for ( let i = 0; i < size; i ++ ) {
 
 			a.push( this.getFloat32() );
 
@@ -1010,21 +1009,21 @@ DataViewReader.prototype = {
 
 		return a;
 
-	},
+	}
 
-	getFloat64: function () {
+	getFloat64() {
 
-		var value = this.dv.getFloat64( this.offset, this.littleEndian );
+		const value = this.dv.getFloat64( this.offset );
 		this.offset += 8;
 		return value;
 
-	},
+	}
 
-	getFloat64Array: function ( size ) {
+	getFloat64Array( size ) {
 
-		var a = [];
+		const a = [];
 
-		for ( var i = 0; i < size; i ++ ) {
+		for ( let i = 0; i < size; i ++ ) {
 
 			a.push( this.getFloat64() );
 
@@ -1032,7 +1031,7 @@ DataViewReader.prototype = {
 
 		return a;
 
-	},
+	}
 
 	// get variable-length index data type
 	// VX ::= index[U2] | (index + 0xFF000000)[U4]
@@ -1042,7 +1041,7 @@ DataViewReader.prototype = {
 	// the four-byte form is being used and the first byte should be discarded or masked out.
 	getVariableLengthIndex() {
 
-		var firstByte = this.getUint8();
+		const firstByte = this.getUint8();
 
 		if ( firstByte === 255 ) {
 
@@ -1052,87 +1051,93 @@ DataViewReader.prototype = {
 
 		return firstByte * 256 + this.getUint8();
 
-	},
+	}
 
 	// An ID tag is a sequence of 4 bytes containing 7-bit ASCII values
 	getIDTag() {
 
 		return this.getString( 4 );
 
-	},
+	}
 
-	getString: function ( size ) {
+	getString( size ) {
 
 		if ( size === 0 ) return;
 
-		// note: safari 9 doesn't support Uint8Array.indexOf; create intermediate array instead
-		var a = [];
+		const start = this.offset;
+
+		let result;
+		let length;
 
 		if ( size ) {
 
-			for ( var i = 0; i < size; i ++ ) {
-
-				a[ i ] = this.getUint8();
-
-			}
+			length = size;
+			result = this._textDecoder.decode( new Uint8Array( this.dv.buffer, start, size ) );
 
 		} else {
 
-			var currentChar;
-			var len = 0;
+			// use 1:1 mapping of buffer to avoid redundant new array creation.
+			length = this._bytes.indexOf( 0, start ) - start;
 
-			while ( currentChar !== 0 ) {
+			result = this._textDecoder.decode( new Uint8Array( this.dv.buffer, start, length ) );
 
-				currentChar = this.getUint8();
-				if ( currentChar !== 0 ) a.push( currentChar );
-				len ++;
+			// account for null byte in length
+			length ++;
 
-			}
-
-			if ( ! isEven( len + 1 ) ) this.getUint8(); // if string with terminating nullbyte is uneven, extra nullbyte is added
+			// if string with terminating nullbyte is uneven, extra nullbyte is added, skip that too
+			length += length % 2;
 
 		}
 
-		return LoaderUtils.decodeText( new Uint8Array( a ) );
+		this.skip( length );
 
-	},
+		return result;
 
-	getStringArray: function ( size ) {
+	}
 
-		var a = this.getString( size );
+	getStringArray( size ) {
+
+		let a = this.getString( size );
 		a = a.split( '\0' );
 
 		return a.filter( Boolean ); // return array with any empty strings removed
 
 	}
 
-};
+}
+
 
 // ************** DEBUGGER  **************
 
-function Debugger( ) {
+class Debugger {
 
-	this.active = false;
-	this.depth = 0;
-	this.formList = [];
+	constructor() {
 
-}
+		this.active = false;
+		this.depth = 0;
+		this.formList = [];
+		this.offset = 0;
 
-Debugger.prototype = {
+		this.node = 0; // 0 = FORM, 1 = CHUNK, 2 = SUBNODE
+		this.nodeID = 'FORM';
 
-	constructor: Debugger,
+		this.dataOffset = 0;
+		this.length = 0;
+		this.skipped = false;
 
-	enable: function () {
+	}
+
+	enable() {
 
 		this.active = true;
 
-	},
+	}
 
-	log: function () {
+	log() {
 
 		if ( ! this.active ) return;
 
-		var nodeType;
+		let nodeType;
 
 		switch ( this.node ) {
 
@@ -1169,13 +1174,13 @@ Debugger.prototype = {
 
 		this.skipped = false;
 
-	},
+	}
 
-	closeForms: function () {
+	closeForms() {
 
 		if ( ! this.active ) return;
 
-		for ( var i = this.formList.length - 1; i >= 0; i -- ) {
+		for ( let i = this.formList.length - 1; i >= 0; i -- ) {
 
 			if ( this.offset >= this.formList[ i ] ) {
 
@@ -1189,21 +1194,15 @@ Debugger.prototype = {
 
 	}
 
-};
+}
 
 // ************** UTILITY FUNCTIONS **************
-
-function isEven( num ) {
-
-	return num % 2;
-
-}
 
 // calculate the length of the string in the buffer
 // this will be string.length + nullbyte + optional padbyte to make the length even
 function stringOffset( string ) {
 
-	return string.length + 1 + ( isEven( string.length + 1 ) ? 1 : 0 );
+	return string.length + 1 + ( ( string.length + 1 ) % 2 );
 
 }
 
@@ -1211,7 +1210,7 @@ function stringOffset( string ) {
 // printBuffer( this.reader.dv.buffer, this.reader.offset, length );
 function printBuffer( buffer, from, to ) {
 
-	console.log( LoaderUtils.decodeText( new Uint8Array( buffer, from, to ) ) );
+	console.log( new TextDecoder().decode( new Uint8Array( buffer, from, to ) ) );
 
 }
 

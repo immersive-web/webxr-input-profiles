@@ -1,27 +1,60 @@
-import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry.js';
+import { LineSegmentsGeometry } from './LineSegmentsGeometry.js';
 
-var LineGeometry = function () {
+/**
+ * A chain of vertices, forming a polyline.
+ *
+ * This is used in {@link Line2} to describe the shape.
+ *
+ * ```js
+ * const points = [
+ * 	new THREE.Vector3( - 10, 0, 0 ),
+ * 	new THREE.Vector3( 0, 5, 0 ),
+ * 	new THREE.Vector3( 10, 0, 0 ),
+ * ];
+ *
+ * const geometry = new LineGeometry();
+ * geometry.setFromPoints( points );
+ * ```
+ *
+ * @augments LineSegmentsGeometry
+ * @three_import import { LineLineGeometry2 } from 'three/addons/lines/LineGeometry.js';
+ */
+class LineGeometry extends LineSegmentsGeometry {
 
-	LineSegmentsGeometry.call( this );
+	/**
+	 * Constructs a new line geometry.
+	 */
+	constructor() {
 
-	this.type = 'LineGeometry';
+		super();
 
-};
+		/**
+		 * This flag can be used for type testing.
+		 *
+		 * @type {boolean}
+		 * @readonly
+		 * @default true
+		 */
+		this.isLineGeometry = true;
 
-LineGeometry.prototype = Object.assign( Object.create( LineSegmentsGeometry.prototype ), {
+		this.type = 'LineGeometry';
 
-	constructor: LineGeometry,
+	}
 
-	isLineGeometry: true,
-
-	setPositions: function ( array ) {
+	/**
+	 * Sets the given line positions for this geometry.
+	 *
+	 * @param {Float32Array|Array<number>} array - The position data to set.
+	 * @return {LineGeometry} A reference to this geometry.
+	 */
+	setPositions( array ) {
 
 		// converts [ x1, y1, z1,  x2, y2, z2, ... ] to pairs format
 
-		var length = array.length - 3;
-		var points = new Float32Array( 2 * length );
+		const length = array.length - 3;
+		const points = new Float32Array( 2 * length );
 
-		for ( var i = 0; i < length; i += 3 ) {
+		for ( let i = 0; i < length; i += 3 ) {
 
 			points[ 2 * i ] = array[ i ];
 			points[ 2 * i + 1 ] = array[ i + 1 ];
@@ -33,20 +66,26 @@ LineGeometry.prototype = Object.assign( Object.create( LineSegmentsGeometry.prot
 
 		}
 
-		LineSegmentsGeometry.prototype.setPositions.call( this, points );
+		super.setPositions( points );
 
 		return this;
 
-	},
+	}
 
-	setColors: function ( array ) {
+	/**
+	 * Sets the given line colors for this geometry.
+	 *
+	 * @param {Float32Array|Array<number>} array - The position data to set.
+	 * @return {LineGeometry} A reference to this geometry.
+	 */
+	setColors( array ) {
 
 		// converts [ r1, g1, b1,  r2, g2, b2, ... ] to pairs format
 
-		var length = array.length - 3;
-		var colors = new Float32Array( 2 * length );
+		const length = array.length - 3;
+		const colors = new Float32Array( 2 * length );
 
-		for ( var i = 0; i < length; i += 3 ) {
+		for ( let i = 0; i < length; i += 3 ) {
 
 			colors[ 2 * i ] = array[ i ];
 			colors[ 2 * i + 1 ] = array[ i + 1 ];
@@ -58,41 +97,61 @@ LineGeometry.prototype = Object.assign( Object.create( LineSegmentsGeometry.prot
 
 		}
 
-		LineSegmentsGeometry.prototype.setColors.call( this, colors );
-
-		return this;
-
-	},
-
-	fromLine: function ( line ) {
-
-		var geometry = line.geometry;
-
-		if ( geometry.isGeometry ) {
-
-			console.error( 'THREE.LineGeometry no longer supports Geometry. Use THREE.BufferGeometry instead.' );
-			return;
-
-		} else if ( geometry.isBufferGeometry ) {
-
-			this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
-
-		}
-
-		// set colors, maybe
-
-		return this;
-
-	},
-
-	copy: function ( /* source */ ) {
-
-		// todo
+		super.setColors( colors );
 
 		return this;
 
 	}
 
-} );
+	/**
+	 * Setups this line segments geometry from the given sequence of points.
+	 *
+	 * @param {Array<Vector3|Vector2>} points - An array of points in 2D or 3D space.
+	 * @return {LineGeometry} A reference to this geometry.
+	 */
+	setFromPoints( points ) {
+
+		// converts a vector3 or vector2 array to pairs format
+
+		const length = points.length - 1;
+		const positions = new Float32Array( 6 * length );
+
+		for ( let i = 0; i < length; i ++ ) {
+
+			positions[ 6 * i ] = points[ i ].x;
+			positions[ 6 * i + 1 ] = points[ i ].y;
+			positions[ 6 * i + 2 ] = points[ i ].z || 0;
+
+			positions[ 6 * i + 3 ] = points[ i + 1 ].x;
+			positions[ 6 * i + 4 ] = points[ i + 1 ].y;
+			positions[ 6 * i + 5 ] = points[ i + 1 ].z || 0;
+
+		}
+
+		super.setPositions( positions );
+
+		return this;
+
+	}
+
+	/**
+	 * Setups this line segments geometry from the given line.
+	 *
+	 * @param {Line} line - The line that should be used as a data source for this geometry.
+	 * @return {LineGeometry} A reference to this geometry.
+	 */
+	fromLine( line ) {
+
+		const geometry = line.geometry;
+
+		this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
+
+		// set colors, maybe
+
+		return this;
+
+	}
+
+}
 
 export { LineGeometry };

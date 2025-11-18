@@ -1,50 +1,107 @@
 import {
 	ShaderMaterial,
 	UniformsUtils
-} from '../../../build/three.module.js';
-import { Pass } from '../postprocessing/Pass.js';
+} from 'three';
+import { Pass, FullScreenQuad } from './Pass.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
-var TexturePass = function ( map, opacity ) {
+/**
+ * This pass can be used to render a texture over the entire screen.
+ *
+ * ```js
+ * const texture = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' );
+ * texture.colorSpace = THREE.SRGBColorSpace;
+ *
+ * const texturePass = new TexturePass( texture );
+ * composer.addPass( texturePass );
+ * ```
+ *
+ * @augments Pass
+ * @three_import import { TexturePass } from 'three/addons/postprocessing/TexturePass.js';
+ */
+class TexturePass extends Pass {
 
-	Pass.call( this );
+	/**
+	 * Constructs a new texture pass.
+	 *
+	 * @param {Texture} map - The texture to render.
+	 * @param {number} [opacity=1] - The opacity.
+	 */
+	constructor( map, opacity = 1 ) {
 
-	if ( CopyShader === undefined )
-		console.error( 'THREE.TexturePass relies on CopyShader' );
+		super();
 
-	var shader = CopyShader;
+		const shader = CopyShader;
 
-	this.map = map;
-	this.opacity = ( opacity !== undefined ) ? opacity : 1.0;
+		/**
+		 * The texture to render.
+		 *
+		 * @type {Texture}
+		 */
+		this.map = map;
 
-	this.uniforms = UniformsUtils.clone( shader.uniforms );
+		/**
+		 * The opacity.
+		 *
+		 * @type {number}
+		 * @default 1
+		 */
+		this.opacity = opacity;
 
-	this.material = new ShaderMaterial( {
+		/**
+		 * Overwritten to disable the swap.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.needsSwap = false;
 
-		uniforms: this.uniforms,
-		vertexShader: shader.vertexShader,
-		fragmentShader: shader.fragmentShader,
-		depthTest: false,
-		depthWrite: false
+		/**
+		 * The pass uniforms.
+		 *
+		 * @type {Object}
+		 */
+		this.uniforms = UniformsUtils.clone( shader.uniforms );
 
-	} );
+		/**
+		 * The pass material.
+		 *
+		 * @type {ShaderMaterial}
+		 */
+		this.material = new ShaderMaterial( {
 
-	this.needsSwap = false;
+			uniforms: this.uniforms,
+			vertexShader: shader.vertexShader,
+			fragmentShader: shader.fragmentShader,
+			depthTest: false,
+			depthWrite: false,
+			premultipliedAlpha: true
 
-	this.fsQuad = new Pass.FullScreenQuad( null );
+		} );
 
-};
+		// internals
 
-TexturePass.prototype = Object.assign( Object.create( Pass.prototype ), {
+		this._fsQuad = new FullScreenQuad( null );
 
-	constructor: TexturePass,
+	}
 
-	render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
+	/**
+	 * Performs the texture pass.
+	 *
+	 * @param {WebGLRenderer} renderer - The renderer.
+	 * @param {WebGLRenderTarget} writeBuffer - The write buffer. This buffer is intended as the rendering
+	 * destination for the pass.
+	 * @param {WebGLRenderTarget} readBuffer - The read buffer. The pass can access the result from the
+	 * previous pass from this buffer.
+	 * @param {number} deltaTime - The delta time in seconds.
+	 * @param {boolean} maskActive - Whether masking is active or not.
+	 */
+	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
-		var oldAutoClear = renderer.autoClear;
+		const oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		this.fsQuad.material = this.material;
+		this._fsQuad.material = this.material;
 
 		this.uniforms[ 'opacity' ].value = this.opacity;
 		this.uniforms[ 'tDiffuse' ].value = this.map;
@@ -52,12 +109,23 @@ TexturePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		renderer.setRenderTarget( this.renderToScreen ? null : readBuffer );
 		if ( this.clear ) renderer.clear();
-		this.fsQuad.render( renderer );
+		this._fsQuad.render( renderer );
 
 		renderer.autoClear = oldAutoClear;
 
 	}
 
-} );
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this
+	 * method whenever the pass is no longer used in your app.
+	 */
+	dispose() {
+
+		this.material.dispose();
+		this._fsQuad.dispose();
+
+	}
+
+}
 
 export { TexturePass };

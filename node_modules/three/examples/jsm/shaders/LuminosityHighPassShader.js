@@ -1,15 +1,21 @@
 import {
 	Color
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
- * Luminosity
- * http://en.wikipedia.org/wiki/Luminosity
+ * @module LuminosityHighPassShader
+ * @three_import import { LuminosityHighPassShader } from 'three/addons/shaders/LuminosityHighPassShader.js';
  */
 
-var LuminosityHighPassShader = {
+/**
+ * Luminosity high pass shader.
+ *
+ * @constant
+ * @type {ShaderMaterial~Shader}
+ */
+const LuminosityHighPassShader = {
 
-	shaderID: 'luminosityHighPass',
+	name: 'LuminosityHighPassShader',
 
 	uniforms: {
 
@@ -21,47 +27,41 @@ var LuminosityHighPassShader = {
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
 
-		'varying vec2 vUv;',
+		varying vec2 vUv;
 
-		'void main() {',
+		void main() {
 
-		'	vUv = uv;',
+			vUv = uv;
 
-		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		'}'
+		}`,
 
-	].join( '\n' ),
+	fragmentShader: /* glsl */`
 
-	fragmentShader: [
+		uniform sampler2D tDiffuse;
+		uniform vec3 defaultColor;
+		uniform float defaultOpacity;
+		uniform float luminosityThreshold;
+		uniform float smoothWidth;
 
-		'uniform sampler2D tDiffuse;',
-		'uniform vec3 defaultColor;',
-		'uniform float defaultOpacity;',
-		'uniform float luminosityThreshold;',
-		'uniform float smoothWidth;',
+		varying vec2 vUv;
 
-		'varying vec2 vUv;',
+		void main() {
 
-		'void main() {',
+			vec4 texel = texture2D( tDiffuse, vUv );
 
-		'	vec4 texel = texture2D( tDiffuse, vUv );',
+			float v = luminance( texel.xyz );
 
-		'	vec3 luma = vec3( 0.299, 0.587, 0.114 );',
+			vec4 outputColor = vec4( defaultColor.rgb, defaultOpacity );
 
-		'	float v = dot( texel.xyz, luma );',
+			float alpha = smoothstep( luminosityThreshold, luminosityThreshold + smoothWidth, v );
 
-		'	vec4 outputColor = vec4( defaultColor.rgb, defaultOpacity );',
+			gl_FragColor = mix( outputColor, texel, alpha );
 
-		'	float alpha = smoothstep( luminosityThreshold, luminosityThreshold + smoothWidth, v );',
-
-		'	gl_FragColor = mix( outputColor, texel, alpha );',
-
-		'}'
-
-	].join( '\n' )
+		}`
 
 };
 

@@ -13,11 +13,12 @@ export default [
     ],
     external: [
       './three/build/three.module.js',
-      './three/examples/jsm/loaders/RGBELoader.js',
+      './three/examples/jsm/loaders/HDRLoader.js',
       './three/examples/jsm/loaders/GLTFLoader.js',
       './three/examples/jsm/loaders/FBXLoader.js',
       './three/examples/jsm/controls/OrbitControls.js',
       './three/examples/jsm/webxr/VRButton.js',
+      './three/examples/jsm/webxr/XRButton.js',
       './ajv/ajv.min.js',
       './motion-controllers.js',
       '../motion-controllers.js',

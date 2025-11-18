@@ -1,40 +1,62 @@
 import {
 	BufferGeometry,
-	Euler,
 	FileLoader,
 	Float32BufferAttribute,
 	Group,
 	LineBasicMaterial,
 	LineSegments,
 	Loader
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
- * GCodeLoader is used to load gcode files usually used for 3D printing or CNC applications.
+ * A loader for the GCode format.
  *
- * Gcode files are composed by commands used by machines to create objects.
+ * GCode files are usually used for 3D printing or CNC applications.
  *
- * @class GCodeLoader
- * @param {Manager} manager Loading manager.
+ * ```js
+ * const loader = new GCodeLoader();
+ * const object = await loader.loadAsync( 'models/gcode/benchy.gcode' );
+ * scene.add( object );
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { GCodeLoader } from 'three/addons/loaders/GCodeLoader.js';
  */
+class GCodeLoader extends Loader {
 
-var GCodeLoader = function ( manager ) {
+	/**
+	 * Constructs a new GCode loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
+	constructor( manager ) {
 
-	Loader.call( this, manager );
+		super( manager );
 
-	this.splitLayer = false;
+		/**
+		 * Whether to split layers or not.
+		 *
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.splitLayer = false;
 
-};
+	}
 
-GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	/**
+	 * Starts loading from the given URL and passes the loaded GCode asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Group)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
+	load( url, onLoad, onProgress, onError ) {
 
-	constructor: GCodeLoader,
+		const scope = this;
 
-	load: function ( url, onLoad, onProgress, onError ) {
-
-		var scope = this;
-
-		var loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setWithCredentials( scope.withCredentials );
@@ -62,19 +84,25 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( data ) {
+	/**
+	 * Parses the given GCode data and returns a group with lines.
+	 *
+	 * @param {string} data - The raw Gcode data as a string.
+	 * @return {Group} The parsed GCode asset.
+	 */
+	parse( data ) {
 
-		var state = { x: 0, y: 0, z: 0, e: 0, f: 0, extruding: false, relative: false };
-		var layers = [];
+		let state = { x: 0, y: 0, z: 0, e: 0, f: 0, extruding: false, relative: false };
+		const layers = [];
 
-		var currentLayer = undefined;
+		let currentLayer = undefined;
 
-		var pathMaterial = new LineBasicMaterial( { color: 0xFF0000 } );
+		const pathMaterial = new LineBasicMaterial( { color: 0xFF0000 } );
 		pathMaterial.name = 'path';
 
-		var extrudingMaterial = new LineBasicMaterial( { color: 0x00FF00 } );
+		const extrudingMaterial = new LineBasicMaterial( { color: 0x00FF00 } );
 		extrudingMaterial.name = 'extruded';
 
 		function newLayer( line ) {
@@ -93,7 +121,7 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
-			if ( line.extruding ) {
+			if ( state.extruding ) {
 
 				currentLayer.vertex.push( p1.x, p1.y, p1.z );
 				currentLayer.vertex.push( p2.x, p2.y, p2.z );
@@ -119,21 +147,21 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		var lines = data.replace( /;.+/g, '' ).split( '\n' );
+		const lines = data.replace( /;.+/g, '' ).split( '\n' );
 
-		for ( var i = 0; i < lines.length; i ++ ) {
+		for ( let i = 0; i < lines.length; i ++ ) {
 
-			var tokens = lines[ i ].split( ' ' );
-			var cmd = tokens[ 0 ].toUpperCase();
+			const tokens = lines[ i ].split( ' ' );
+			const cmd = tokens[ 0 ].toUpperCase();
 
-			//Argumments
-			var args = {};
+			//Arguments
+			const args = {};
 			tokens.splice( 1 ).forEach( function ( token ) {
 
 				if ( token[ 0 ] !== undefined ) {
 
-					var key = token[ 0 ].toLowerCase();
-					var value = parseFloat( token.substring( 1 ) );
+					const key = token[ 0 ].toLowerCase();
+					const value = parseFloat( token.substring( 1 ) );
 					args[ key ] = value;
 
 				}
@@ -144,7 +172,7 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			//G0/G1 – Linear Movement
 			if ( cmd === 'G0' || cmd === 'G1' ) {
 
-				var line = {
+				const line = {
 					x: args.x !== undefined ? absolute( state.x, args.x ) : state.x,
 					y: args.y !== undefined ? absolute( state.y, args.y ) : state.y,
 					z: args.z !== undefined ? absolute( state.z, args.z ) : state.z,
@@ -155,7 +183,7 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				//Layer change detection is or made by watching Z, it's made by watching when we extrude at a new Z position
 				if ( delta( state.e, line.e ) > 0 ) {
 
-					line.extruding = delta( state.e, line.e ) > 0;
+					state.extruding = delta( state.e, line.e ) > 0;
 
 					if ( currentLayer == undefined || line.z != currentLayer.z ) {
 
@@ -186,12 +214,11 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			} else if ( cmd === 'G92' ) {
 
 				//G92: Set Position
-				var line = state;
+				const line = state;
 				line.x = args.x !== undefined ? args.x : line.x;
 				line.y = args.y !== undefined ? args.y : line.y;
 				line.z = args.z !== undefined ? args.z : line.z;
 				line.e = args.e !== undefined ? args.e : line.e;
-				state = line;
 
 			} else {
 
@@ -201,47 +228,47 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function addObject( vertex, extruding ) {
+		function addObject( vertex, extruding, i ) {
 
-			var geometry = new BufferGeometry();
+			const geometry = new BufferGeometry();
 			geometry.setAttribute( 'position', new Float32BufferAttribute( vertex, 3 ) );
-
-			var segments = new LineSegments( geometry, extruding ? extrudingMaterial : pathMaterial );
+			const segments = new LineSegments( geometry, extruding ? extrudingMaterial : pathMaterial );
 			segments.name = 'layer' + i;
 			object.add( segments );
 
 		}
 
-		var object = new Group();
+		const object = new Group();
 		object.name = 'gcode';
 
 		if ( this.splitLayer ) {
 
-			for ( var i = 0; i < layers.length; i ++ ) {
+			for ( let i = 0; i < layers.length; i ++ ) {
 
-				var layer = layers[ i ];
-				addObject( layer.vertex, true );
-				addObject( layer.pathVertex, false );
+				const layer = layers[ i ];
+				addObject( layer.vertex, true, i );
+				addObject( layer.pathVertex, false, i );
 
 			}
 
 		} else {
 
-			var vertex = [], pathVertex = [];
+			const vertex = [],
+				pathVertex = [];
 
-			for ( var i = 0; i < layers.length; i ++ ) {
+			for ( let i = 0; i < layers.length; i ++ ) {
 
-				var layer = layers[ i ];
-				var layerVertex = layer.vertex;
-				var layerPathVertex = layer.pathVertex;
+				const layer = layers[ i ];
+				const layerVertex = layer.vertex;
+				const layerPathVertex = layer.pathVertex;
 
-				for ( var j = 0; j < layerVertex.length; j ++ ) {
+				for ( let j = 0; j < layerVertex.length; j ++ ) {
 
 					vertex.push( layerVertex[ j ] );
 
 				}
 
-				for ( var j = 0; j < layerPathVertex.length; j ++ ) {
+				for ( let j = 0; j < layerPathVertex.length; j ++ ) {
 
 					pathVertex.push( layerPathVertex[ j ] );
 
@@ -249,17 +276,17 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
-			addObject( vertex, true );
-			addObject( pathVertex, false );
+			addObject( vertex, true, layers.length );
+			addObject( pathVertex, false, layers.length );
 
 		}
 
-		object.quaternion.setFromEuler( new Euler( - Math.PI / 2, 0, 0 ) );
+		object.rotation.set( - Math.PI / 2, 0, 0 );
 
 		return object;
 
 	}
 
-} );
+}
 
 export { GCodeLoader };

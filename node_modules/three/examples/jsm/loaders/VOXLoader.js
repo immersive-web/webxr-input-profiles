@@ -1,6 +1,7 @@
 import {
 	BufferGeometry,
-	DataTexture3D,
+	Color,
+	Data3DTexture,
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
@@ -8,11 +9,40 @@ import {
 	Mesh,
 	MeshStandardMaterial,
 	NearestFilter,
-	RedFormat
-} from '../../../build/three.module.js';
+	RedFormat,
+	SRGBColorSpace
+} from 'three';
 
+/**
+ * A loader for the VOX format.
+ *
+ * ```js
+ * const loader = new VOXLoader();
+ * const chunks = await loader.loadAsync( 'models/vox/monu10.vox' );
+ *
+ * for ( let i = 0; i < chunks.length; i ++ ) {
+ *
+ * 	const chunk = chunks[ i ];
+ * 	const mesh = new VOXMesh( chunk );
+ * 	mesh.scale.setScalar( 0.0015 );
+ * 	scene.add( mesh );
+ *
+ * }
+ * ```
+ * @augments Loader
+ * @three_import import { VOXLoader } from 'three/addons/loaders/VOXLoader.js';
+ */
 class VOXLoader extends Loader {
 
+	/**
+	 * Starts loading from the given URL and passes the loaded VOX asset
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {string} url - The path/URL of the file to be loaded. This can also be a data URI.
+	 * @param {function(Array<Object>)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 */
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -47,6 +77,12 @@ class VOXLoader extends Loader {
 
 	}
 
+	/**
+	 * Parses the given VOX data and returns the resulting chunks.
+	 *
+	 * @param {ArrayBuffer} buffer - The raw VOX data as an array buffer.
+	 * @return {Array<Object>} The parsed chunks.
+	 */
 	parse( buffer ) {
 
 		const data = new DataView( buffer );
@@ -54,9 +90,16 @@ class VOXLoader extends Loader {
 		const id = data.getUint32( 0, true );
 		const version = data.getUint32( 4, true );
 
-		if ( id !== 542658390 || version !== 150 ) {
+		if ( id !== 542658390 ) {
 
-			console.error( 'Not a valid VOX file' );
+			console.error( 'THREE.VOXLoader: Invalid VOX file.' );
+			return;
+
+		}
+
+		if ( version !== 150 ) {
+
+			console.error( 'THREE.VOXLoader: Invalid VOX file. Unsupported version:', version );
 			return;
 
 		}
@@ -107,12 +150,12 @@ class VOXLoader extends Loader {
 
 			for ( let j = 0; j < 4; j ++ ) {
 
-				id += String.fromCharCode( data.getUint8( i ++, true ) );
+				id += String.fromCharCode( data.getUint8( i ++ ) );
 
 			}
 
 			const chunkSize = data.getUint32( i, true ); i += 4;
-			data.getUint32( i, true ); i += 4; // childChunks
+			i += 4; // childChunks
 
 			if ( id === 'SIZE' ) {
 
@@ -164,8 +207,20 @@ class VOXLoader extends Loader {
 
 }
 
+/**
+ * A VOX mesh.
+ *
+ * Instances of this class are created from the loaded chunks of {@link VOXLoader}.
+ *
+ * @augments Mesh
+ */
 class VOXMesh extends Mesh {
 
+	/**
+	 * Constructs a new VOX mesh.
+	 *
+	 * @param {Object} chunk - A VOX chunk loaded via {@link VOXLoader}.
+	 */
 	constructor( chunk ) {
 
 		const data = chunk.data;
@@ -184,6 +239,8 @@ class VOXMesh extends Mesh {
 		const nz = [ 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0 ];
 		const pz = [ 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1 ];
 
+		const _color = new Color();
+
 		function add( tile, x, y, z, r, g, b ) {
 
 			x -= size.x / 2;
@@ -192,8 +249,10 @@ class VOXMesh extends Mesh {
 
 			for ( let i = 0; i < 18; i += 3 ) {
 
+				_color.setRGB( r, g, b, SRGBColorSpace );
+
 				vertices.push( tile[ i + 0 ] + x, tile[ i + 1 ] + y, tile[ i + 2 ] + z );
-				colors.push( r, g, b );
+				colors.push( _color.r, _color.g, _color.b );
 
 			}
 
@@ -266,8 +325,20 @@ class VOXMesh extends Mesh {
 
 }
 
-class VOXDataTexture3D extends DataTexture3D {
+/**
+ * A VOX 3D texture.
+ *
+ * Instances of this class are created from the loaded chunks of {@link VOXLoader}.
+ *
+ * @augments Data3DTexture
+ */
+class VOXData3DTexture extends Data3DTexture {
 
+	/**
+	 * Constructs a new VOX 3D texture.
+	 *
+	 * @param {Object} chunk - A VOX chunk loaded via {@link VOXLoader}.
+	 */
 	constructor( chunk ) {
 
 		const data = chunk.data;
@@ -296,9 +367,10 @@ class VOXDataTexture3D extends DataTexture3D {
 		this.minFilter = NearestFilter;
 		this.magFilter = LinearFilter;
 		this.unpackAlignment = 1;
+		this.needsUpdate = true;
 
 	}
 
 }
 
-export { VOXLoader, VOXMesh, VOXDataTexture3D };
+export { VOXLoader, VOXMesh, VOXData3DTexture };

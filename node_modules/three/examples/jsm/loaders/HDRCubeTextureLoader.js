@@ -4,64 +4,77 @@ import {
 	FileLoader,
 	FloatType,
 	HalfFloatType,
-	LinearEncoding,
 	LinearFilter,
-	Loader,
-	NearestFilter,
-	RGBAFormat,
-	RGBEEncoding,
-	RGBFormat,
-	UnsignedByteType
-} from '../../../build/three.module.js';
-import { RGBELoader } from '../loaders/RGBELoader.js';
+	LinearSRGBColorSpace,
+	Loader
+} from 'three';
+import { HDRLoader } from '../loaders/HDRLoader.js';
 
-var HDRCubeTextureLoader = function ( manager ) {
+/**
+ * A loader for loading HDR cube textures.
+ *
+ * ```js
+ * const loader = new HDRCubeTextureLoader();
+ * loader.setPath( 'textures/cube/pisaHDR/' );
+ * const cubeTexture = await loader.loadAsync( [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ] );
+ *
+ * scene.background = cubeTexture;
+ * scene.environment = cubeTexture;
+ * ```
+ *
+ * @augments Loader
+ * @three_import import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
+ */
+class HDRCubeTextureLoader extends Loader {
 
-	Loader.call( this, manager );
+	/**
+	 * Constructs a new HDR cube texture loader.
+	 *
+	 * @param {LoadingManager} [manager] - The loading manager.
+	 */
+	constructor( manager ) {
 
-	this.hdrLoader = new RGBELoader();
-	this.type = UnsignedByteType;
+		super( manager );
 
-};
+		/**
+		 * The internal HDR loader that loads the
+		 * individual textures for each cube face.
+		 *
+         * @type {HDRLoader}
+		 */
+		this.hdrLoader = new HDRLoader();
 
-HDRCubeTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+		/**
+		 * The texture type.
+		 *
+		 * @type {(HalfFloatType|FloatType)}
+		 * @default HalfFloatType
+		 */
+		this.type = HalfFloatType;
 
-	constructor: HDRCubeTextureLoader,
+	}
 
-	load: function ( urls, onLoad, onProgress, onError ) {
+	/**
+	 * Starts loading from the given URLs and passes the loaded HDR cube texture
+	 * to the `onLoad()` callback.
+	 *
+	 * @param {Array<string>} urls - The paths/URLs of the files to be loaded. This can also be a data URIs.
+	 * @param {function(CubeTexture)} onLoad - Executed when the loading process has been finished.
+	 * @param {onProgressCallback} onProgress - Executed while the loading is in progress.
+	 * @param {onErrorCallback} onError - Executed when errors occur.
+	 * @return {CubeTexture} The HDR cube texture.
+	 */
+	load( urls, onLoad, onProgress, onError ) {
 
-		if ( ! Array.isArray( urls ) ) {
-
-			console.warn( 'THREE.HDRCubeTextureLoader signature has changed. Use .setDataType() instead.' );
-
-			this.setDataType( urls );
-
-			urls = onLoad;
-			onLoad = onProgress;
-			onProgress = onError;
-			onError = arguments[ 4 ];
-
-		}
-
-		var texture = new CubeTexture();
+		const texture = new CubeTexture();
 
 		texture.type = this.type;
 
 		switch ( texture.type ) {
 
-			case UnsignedByteType:
-
-				texture.encoding = RGBEEncoding;
-				texture.format = RGBAFormat;
-				texture.minFilter = NearestFilter;
-				texture.magFilter = NearestFilter;
-				texture.generateMipmaps = false;
-				break;
-
 			case FloatType:
 
-				texture.encoding = LinearEncoding;
-				texture.format = RGBFormat;
+				texture.colorSpace = LinearSRGBColorSpace;
 				texture.minFilter = LinearFilter;
 				texture.magFilter = LinearFilter;
 				texture.generateMipmaps = false;
@@ -69,8 +82,7 @@ HDRCubeTextureLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 			case HalfFloatType:
 
-				texture.encoding = LinearEncoding;
-				texture.format = RGBFormat;
+				texture.colorSpace = LinearSRGBColorSpace;
 				texture.minFilter = LinearFilter;
 				texture.magFilter = LinearFilter;
 				texture.generateMipmaps = false;
@@ -78,9 +90,9 @@ HDRCubeTextureLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 		}
 
-		var scope = this;
+		const scope = this;
 
-		var loaded = 0;
+		let loaded = 0;
 
 		function loadHDRData( i, onLoad, onProgress, onError ) {
 
@@ -92,16 +104,16 @@ HDRCubeTextureLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 					loaded ++;
 
-					var texData = scope.hdrLoader.parse( buffer );
+					const texData = scope.hdrLoader.parse( buffer );
 
 					if ( ! texData ) return;
 
 					if ( texData.data !== undefined ) {
 
-						var dataTexture = new DataTexture( texData.data, texData.width, texData.height );
+						const dataTexture = new DataTexture( texData.data, texData.width, texData.height );
 
 						dataTexture.type = texture.type;
-						dataTexture.encoding = texture.encoding;
+						dataTexture.colorSpace = texture.colorSpace;
 						dataTexture.format = texture.format;
 						dataTexture.minFilter = texture.minFilter;
 						dataTexture.magFilter = texture.magFilter;
@@ -122,7 +134,7 @@ HDRCubeTextureLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 		}
 
-		for ( var i = 0; i < urls.length; i ++ ) {
+		for ( let i = 0; i < urls.length; i ++ ) {
 
 			loadHDRData( i, onLoad, onProgress, onError );
 
@@ -130,9 +142,15 @@ HDRCubeTextureLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 		return texture;
 
-	},
+	}
 
-	setDataType: function ( value ) {
+	/**
+	 * Sets the texture type.
+	 *
+     * @param {(HalfFloatType|FloatType)} value - The texture type to set.
+     * @return {HDRCubeTextureLoader} A reference to this loader.
+	 */
+	setDataType( value ) {
 
 		this.type = value;
 		this.hdrLoader.setDataType( value );
@@ -141,6 +159,6 @@ HDRCubeTextureLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 	}
 
-} );
+}
 
 export { HDRCubeTextureLoader };
