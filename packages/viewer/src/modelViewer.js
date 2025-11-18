@@ -2,7 +2,7 @@
 import * as THREE from './three/build/three.module.js';
 import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
 import { HDRLoader } from './three/examples/jsm/loaders/HDRLoader.js';
-//import { VRButton } from './three/examples/jsm/webxr/VRButton.js';
+// import { VRButton } from './three/examples/jsm/webxr/VRButton.js';
 import { XRButton } from './three/examples/jsm/webxr/XRButton.js';
 /* eslint-enable */
 
@@ -145,7 +145,7 @@ function initializeThree() {
   three.cameraControls.update();
 
   // Add XR
-  //canvasParentElement.appendChild(VRButton.createButton(three.renderer));
+  // canvasParentElement.appendChild(VRButton.createButton(three.renderer));
   canvasParentElement.appendChild(XRButton.createButton(three.renderer));
   three.renderer.xr.enabled = true;
   three.renderer.xr.addEventListener('sessionstart', () => {
@@ -195,7 +195,7 @@ async function onSelectionChange() {
 async function onBackgroundChange() {
   let hdrPath = backgroundSelector.backgroundPath;
 
-  if (hdrPath == '') {
+  if (hdrPath === '') {
     // AR Passthroug mode selected
     three.scene.background = null;
     hdrPath = backgroundSelector.defaultBackground;
@@ -206,11 +206,11 @@ async function onBackgroundChange() {
 
   await new Promise((resolve) => {
     const hdrLoader = new HDRLoader();
-    //hdrLoader.setDataType(THREE.UnsignedByteType);
+    // hdrLoader.setDataType(THREE.UnsignedByteType);
     hdrLoader.setPath('backgrounds/');
     hdrLoader.load(hdrPath, (texture) => {
       three.environmentMap = pmremGenerator.fromEquirectangular(texture).texture;
-      if (backgroundSelector.backgroundPath != '') {
+      if (backgroundSelector.backgroundPath !== '') {
         three.scene.background = three.environmentMap;
       }
 
