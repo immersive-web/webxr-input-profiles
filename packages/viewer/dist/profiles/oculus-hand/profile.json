@@ -1,0 +1,298 @@
+{
+  "profileId": "oculus-hand",
+  "fallbackProfileIds": [
+    "generic-hand",
+    "generic-hand-select"
+  ],
+  "layouts": {
+    "left": {
+      "selectComponentId": "xr-standard-trigger",
+      "components": {
+        "xr-standard-trigger": {
+          "type": "trigger",
+          "gamepadIndices": {
+            "button": 0
+          },
+          "rootNodeName": "xr_standard_trigger",
+          "visualResponses": {
+            "xr_standard_trigger_pressed": {
+              "componentProperty": "button",
+              "states": [
+                "default",
+                "touched",
+                "pressed"
+              ],
+              "valueNodeProperty": "transform",
+              "valueNodeName": "xr_standard_trigger_pressed_value",
+              "minNodeName": "xr_standard_trigger_pressed_min",
+              "maxNodeName": "xr_standard_trigger_pressed_max"
+            }
+          }
+        },
+        "menu": {
+          "type": "button",
+          "gamepadIndices": {
+            "button": 4
+          },
+          "rootNodeName": "menu",
+          "visualResponses": {
+            "menu_pressed": {
+              "componentProperty": "button",
+              "states": [
+                "default",
+                "touched",
+                "pressed"
+              ],
+              "valueNodeProperty": "transform",
+              "valueNodeName": "menu_pressed_value",
+              "minNodeName": "menu_pressed_min",
+              "maxNodeName": "menu_pressed_max"
+            }
+          }
+        },
+        "swipe-left": {
+          "type": "button",
+          "gamepadIndices": {
+            "button": 5
+          },
+          "rootNodeName": "swipe_left",
+          "visualResponses": {
+            "swipe_left_pressed": {
+              "componentProperty": "button",
+              "states": [
+                "default",
+                "touched",
+                "pressed"
+              ],
+              "valueNodeProperty": "transform",
+              "valueNodeName": "swipe_left_pressed_value",
+              "minNodeName": "swipe_left_pressed_min",
+              "maxNodeName": "swipe_left_pressed_max"
+            }
+          }
+        },
+        "swipe-right": {
+          "type": "button",
+          "gamepadIndices": {
+            "button": 6
+          },
+          "rootNodeName": "swipe_right",
+          "visualResponses": {
+            "swipe_right_pressed": {
+              "componentProperty": "button",
+              "states": [
+                "default",
+                "touched",
+                "pressed"
+              ],
+              "valueNodeProperty": "transform",
+              "valueNodeName": "swipe_right_pressed_value",
+              "minNodeName": "swipe_right_pressed_min",
+              "maxNodeName": "swipe_right_pressed_max"
+            }
+          }
+        },
+        "swipe-forward": {
+          "type": "button",
+          "gamepadIndices": {
+            "button": 7
+          },
+          "rootNodeName": "swipe_forward",
+          "visualResponses": {
+            "swipe_forward_pressed": {
+              "componentProperty": "button",
+              "states": [
+                "default",
+                "touched",
+                "pressed"
+              ],
+              "valueNodeProperty": "transform",
+              "valueNodeName": "swipe_forward_pressed_value",
+              "minNodeName": "swipe_forward_pressed_min",
+              "maxNodeName": "swipe_forward_pressed_max"
+            }
+          }
+        },
+        "swipe-backward": {
+          "type": "button",
+          "gamepadIndices": {
+            "button": 8
+          },
+          "rootNodeName": "swipe_backward",
+          "visualResponses": {
+            "swipe_backward_pressed": {
+              "componentProperty": "button",
+              "states": [
+                "default",
+                "touched",
+                "pressed"
+              ],
+              "valueNodeProperty": "transform",
+              "valueNodeName": "swipe_backward_pressed_value",
+              "minNodeName": "swipe_backward_pressed_min",
+              "maxNodeName": "swipe_backward_pressed_max"
+            }
+          }
+        },
+        "tap-thumb": {
+          "type": "button",
+          "gamepadIndices": {
+            "button": 9
+          },
+          "rootNodeName": "tap_thumb",
+          "visualResponses": {
+            "tap_thumb_pressed": {
+              "componentProperty": "button",
+              "states": [
+                "default",
+                "touched",
+                "pressed"
+              ],
+              "valueNodeProperty": "transform",
+              "valueNodeName": "tap_thumb_pressed_value",
+              "minNodeName": "tap_thumb_pressed_min",
+              "maxNodeName": "tap_thumb_pressed_max"
+            }
+          }
+        }
+      },
+      "gamepadMapping": "xr-standard",
+      "rootNodeName": "oculus-hand-left",
+      "assetPath": "left.glb"
+    },
+    "right": {
+      "selectComponentId": "xr-standard-trigger",
+      "components": {
+        "xr-standard-trigger": {
+          "type": "trigger",
+          "gamepadIndices": {
+            "button": 0
+          },
+          "rootNodeName": "xr_standard_trigger",
+          "visualResponses": {
+            "xr_standard_trigger_pressed": {
+              "componentProperty": "button",
+              "states": [
+                "default",
+                "touched",
+                "pressed"
+              ],
+              "valueNodeProperty": "transform",
+              "valueNodeName": "xr_standard_trigger_pressed_value",
+              "minNodeName": "xr_standard_trigger_pressed_min",
+              "maxNodeName": "xr_standard_trigger_pressed_max"
+            }
+          }
+        },
+        "swipe-left": {
+          "type": "button",
+          "gamepadIndices": {
+            "button": 5
+          },
+          "rootNodeName": "swipe_left",
+          "visualResponses": {
+            "swipe_left_pressed": {
+              "componentProperty": "button",
+              "states": [
+                "default",
+                "touched",
+                "pressed"
+              ],
+              "valueNodeProperty": "transform",
+              "valueNodeName": "swipe_left_pressed_value",
+              "minNodeName": "swipe_left_pressed_min",
+              "maxNodeName": "swipe_left_pressed_max"
+            }
+          }
+        },
+        "swipe-right": {
+          "type": "button",
+          "gamepadIndices": {
+            "button": 6
+          },
+          "rootNodeName": "swipe_right",
+          "visualResponses": {
+            "swipe_right_pressed": {
+              "componentProperty": "button",
+              "states": [
+                "default",
+                "touched",
+                "pressed"
+              ],
+              "valueNodeProperty": "transform",
+              "valueNodeName": "swipe_right_pressed_value",
+              "minNodeName": "swipe_right_pressed_min",
+              "maxNodeName": "swipe_right_pressed_max"
+            }
+          }
+        },
+        "swipe-forward": {
+          "type": "button",
+          "gamepadIndices": {
+            "button": 7
+          },
+          "rootNodeName": "swipe_forward",
+          "visualResponses": {
+            "swipe_forward_pressed": {
+              "componentProperty": "button",
+              "states": [
+                "default",
+                "touched",
+                "pressed"
+              ],
+              "valueNodeProperty": "transform",
+              "valueNodeName": "swipe_forward_pressed_value",
+              "minNodeName": "swipe_forward_pressed_min",
+              "maxNodeName": "swipe_forward_pressed_max"
+            }
+          }
+        },
+        "swipe-backward": {
+          "type": "button",
+          "gamepadIndices": {
+            "button": 8
+          },
+          "rootNodeName": "swipe_backward",
+          "visualResponses": {
+            "swipe_backward_pressed": {
+              "componentProperty": "button",
+              "states": [
+                "default",
+                "touched",
+                "pressed"
+              ],
+              "valueNodeProperty": "transform",
+              "valueNodeName": "swipe_backward_pressed_value",
+              "minNodeName": "swipe_backward_pressed_min",
+              "maxNodeName": "swipe_backward_pressed_max"
+            }
+          }
+        },
+        "tap-thumb": {
+          "type": "button",
+          "gamepadIndices": {
+            "button": 9
+          },
+          "rootNodeName": "tap_thumb",
+          "visualResponses": {
+            "tap_thumb_pressed": {
+              "componentProperty": "button",
+              "states": [
+                "default",
+                "touched",
+                "pressed"
+              ],
+              "valueNodeProperty": "transform",
+              "valueNodeName": "tap_thumb_pressed_value",
+              "minNodeName": "tap_thumb_pressed_min",
+              "maxNodeName": "tap_thumb_pressed_max"
+            }
+          }
+        }
+      },
+      "gamepadMapping": "xr-standard",
+      "rootNodeName": "oculus-hand-right",
+      "assetPath": "right.glb"
+    }
+  }
+}
