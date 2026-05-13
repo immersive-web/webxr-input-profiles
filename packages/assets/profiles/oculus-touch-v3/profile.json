@@ -1,4 +1,91 @@
 {
     "profileId" : "oculus-touch-v3",
-    "overrides" : {}
+    "overrides" : {
+        "left": {
+            "components": {
+                "xr-standard-trigger": {
+                    "labelTransform": {
+                        "position": [0.004087, -0.033372, -0.028371],
+                        "rotation": [0.959604, 0, 0.145148, -0.241025]
+                    }
+                },
+                "xr-standard-squeeze": {
+                    "labelTransform": {
+                        "position": [0.009225, -0.001613, 0.015745],
+                        "rotation": [0.070607, 0, -0.727198, 0.682787]
+                    }
+                },
+                "xr-standard-thumbstick": {
+                    "labelTransform": {
+                        "position": [-0.008047, 0.003851, -0.031632],
+                        "rotation": [-0.343296, 0, -0.066033, 0.936903]
+                    }
+                },
+                "x-button": {
+                    "labelTransform": {
+                        "position": [0.004244, 0.009816, -0.014778],
+                        "rotation": [-0.266106, 0, -0.047969, 0.96275]
+                    }
+                },
+                "y-button": {
+                    "labelTransform": {
+                        "position": [0.011783, 0.000321, -0.024473],
+                        "rotation": [-0.272368, 0, -0.036596, 0.961497]
+                    }
+                },
+                "thumbrest": {
+                    "labelTransform": {
+                        "position": [0.020514, 0.007132, -0.010843],
+                        "rotation": [-0.344887, 0, -0.066653, 0.936275]
+                    }
+                },
+                "menu": {
+                    "labelTransform": {
+                        "position": [-0.014135, 0.010122, -0.01345],
+                        "rotation": [-0.38329, 0, -0.07418, 0.920645]
+                    }
+                }
+            }
+        },
+        "right": {
+            "components": {
+                "xr-standard-trigger": {
+                    "labelTransform": {
+                        "position": [-0.00188, -0.029061, -0.038397],
+                        "rotation": [-0.688544, 0, -0.127641, 0.713873]
+                    }
+                },
+                "xr-standard-squeeze": {
+                    "labelTransform": {
+                        "position": [-0.009245, -0.002612, 0.014852],
+                        "rotation": [0.079687, 0, 0.725562, 0.683528]
+                    }
+                },
+                "xr-standard-thumbstick": {
+                    "labelTransform": {
+                        "position": [0.007726, 0.0038, -0.031594],
+                        "rotation": [-0.343281, 0, 0.064499, 0.937016]
+                    }
+                },
+                "a-button": {
+                    "labelTransform": {
+                        "position": [-0.004212, 0.009834, -0.014778],
+                        "rotation": [-0.266116, 0, 0.046273, 0.96283]
+                    }
+                },
+                "b-button": {
+                    "labelTransform": {
+                        "position": [-0.011781, 0.000356, -0.024477],
+                        "rotation": [-0.265801, 0, 0.034013, 0.963428]
+                    }
+                },
+                "thumbrest": {
+                    "labelTransform": {
+                        "position": [-0.022083, 0.00691, -0.010895],
+                        "rotation": [-0.344879, 0, 0.065146, 0.936384]
+                    }
+                }
+            }
+        }
+    }
 }
